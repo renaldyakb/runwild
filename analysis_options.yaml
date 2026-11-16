@@ -1,0 +1,21 @@
+include: package:flutter_lints/flutter.yaml
+analyzer:
+  exclude:
+    - .tooling/**
+    - lib/l10n/generated/**
+    - build/**
+    - android/**
+    - ios/**
+    - firebase/node_modules/**
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+linter:
+  rules:
+    avoid_print: true
+    prefer_single_quotes: true
+    unawaited_futures: true
+    always_declare_return_types: true
+    directives_ordering: true
+    use_super_parameters: true

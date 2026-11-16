@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validInitialProfile(data) {
+      let fields = ['displayName', 'email', 'level', 'goal', 'units',
+        'weeklyGoal', 'privacy', 'voice', 'autoPause', 'createdAt',
+        'updatedAt', 'schemaVersion'];
+      return data.keys().hasAll(fields) && data.keys().hasOnly(fields)
+        && data.displayName is string && data.displayName.size() >= 1
+        && data.displayName.size() <= 60 && data.displayName.matches('.*[^ ].*')
+        && data.email == request.auth.token.get('email', '')
+        && data.level in ['pemula', 'kembali', 'rutin']
+        && data.goal in ['sehat', 'lari_5k', 'lari_10k', 'turun_bb', 'lainnya']
+        && data.units == 'km'
+        && data.weeklyGoal.keys().hasOnly(['type', 'target'])
+        && data.weeklyGoal.type == 'sessions' && data.weeklyGoal.target is int
+        && data.weeklyGoal.target >= 1 && data.weeklyGoal.target <= 7
+        && data.privacy == { 'hideStartEnd': true, 'trimMeters': 200, 'defaultVisibility': 'private' }
+        && data.voice == { 'enabled': true, 'volume': 0.8, 'haptics': true, 'countdownCue': true, 'roundCue': true }
+        && data.autoPause == true
+        && data.createdAt == request.time && data.updatedAt == request.time
+        && data.schemaVersion == 1;
+    }
+
+    match /users/{uid} {
+      allow get: if isOwner(uid);
+      allow create: if isOwner(uid) && validInitialProfile(request.resource.data);
+      allow update, delete: if isOwner(uid);
+
+      match /activities/{activityId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+  }
+}
