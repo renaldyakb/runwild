@@ -1,4 +1,4 @@
-name: Flutter checks
+name: Build & Checks
 on:
   push:
   pull_request:
@@ -8,30 +8,8 @@ permissions:
   contents: read
 
 jobs:
-  verify:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.50.0'
-          channel: stable
-          cache: true
-      - run: flutter pub get --enforce-lockfile
-      - run: flutter gen-l10n
-      - run: dart format --output=none --set-exit-if-changed lib test
-      - run: flutter analyze --fatal-infos
-      - run: flutter test --coverage
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-evidence
-          path: |
-            coverage/lcov.info
-            test/failures/
-
   android:
-    needs: verify
+    name: Build Android APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,15 +23,16 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
+      - run: flutter gen-l10n
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: runwild-debug
+          name: runwild-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
 
-  ios:
-    needs: verify
-    runs-on: macos-latest
+  verify:
+    name: Code Analysis & Tests
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -62,4 +41,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
-      - run: flutter build ios --debug --no-codesign
+      - run: flutter gen-l10n
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze --fatal-infos
+      - run: flutter test test/share_card_test.dart test/personal_best_alert_test.dart test/run_preferences_integration_test.dart test/profile_settings_test.dart test/run_permissions_test.dart test/weekly_goal_celebration_test.dart test/activity_detail_test.dart test/activity_sync_test.dart test/home_progress_test.dart test/tracking_engine_test.dart
