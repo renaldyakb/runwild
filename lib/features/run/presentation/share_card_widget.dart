@@ -181,7 +181,7 @@ class ShareCardWidget extends StatelessWidget {
                         ),
                         if (personalBests.isNotEmpty) ...[
                           Text(
-                            s.shareRecord,
+                            'REKOR PRIBADI · ${personalBests.first.toUpperCase()}',
                             style: type(
                               story ? RwType.label : 10,
                               weight: FontWeight.w800,
