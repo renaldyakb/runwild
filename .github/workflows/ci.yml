@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   android:
@@ -29,6 +29,30 @@ jobs:
         with:
           name: runwild-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Extract App Version
+        id: app_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Publish to GitHub Releases
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.app_version.outputs.version }}
+          name: "RUNWILD ${{ steps.app_version.outputs.version }}"
+          body: |
+            ### RUNWILD — RUN. TRACK. IMPROVE. GO WILD. 🏃‍♂️⚡
+            
+            Versi rilis terbaru aplikasi RUNWILD dari branch `main`.
+            
+            #### 📦 Berkas Instalasi:
+            - **`app-release.apk`**: APK Release Android resmi (siap diunduh dan dipasang langsung di HP).
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   verify:
     name: Code Analysis & Tests
