@@ -1,5 +1,7 @@
 # Status RUNWILD
 
+- 18 Nov 2026: perbaikan CI setelah run 44325489061 gagal pada golden kartu bagikan. Lima baseline diselaraskan dengan UI terkini setelah inspeksi; catch yang mengabaikan golden dihapus. Verifikasi lokal sesuai workflow: 67 tes lulus, analyze fatal-infos bersih, format 118 file tanpa perubahan. Run baru tidak dimonitor sesuai permintaan pengguna.
+
 - 18 Nov 2026: patch versi/pembaruan dan UI sesi disiapkan sebagai 0.1.2+3 (belum dipublikasikan).
   - Versi tampilan, pembanding update, dan metadata sync membaca paket terpasang; pubspec sumber versi build/tag.
   - Catatan rilis dirender sebagai heading/bullet; CI memakai docs/releases/<versi>.md dan menunggu verify. Format di AGENTS.md bagian 9.

@@ -92,14 +92,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    try {
-      await expectLater(
-        find.byType(ShareCardScreen),
-        matchesGoldenFile('goldens/share_editor.png'),
-      );
-    } catch (_) {
-      tester.takeException();
-    }
+    await expectLater(
+      find.byType(ShareCardScreen),
+      matchesGoldenFile('goldens/share_editor.png'),
+    );
 
     // Verify format and theme chips
     expect(find.text('Story (9:16)'), findsOneWidget);
@@ -175,16 +171,12 @@ void main() {
         );
         expect(find.byIcon(Icons.shield_outlined), findsNothing);
         expect(tester.takeException(), isNull);
-        try {
-          await expectLater(
-            find.byType(ShareCardWidget),
-            matchesGoldenFile(
-              'goldens/share_${format.name}_${private ? "private" : "route"}.png',
-            ),
-          );
-        } catch (_) {
-          tester.takeException();
-        }
+        await expectLater(
+          find.byType(ShareCardWidget),
+          matchesGoldenFile(
+            'goldens/share_${format.name}_${private ? "private" : "route"}.png',
+          ),
+        );
       }
     }
   });
