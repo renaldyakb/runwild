@@ -87,6 +87,7 @@ jobs:
         with:
           tag_name: ${{ steps.app_version.outputs.version }}
           name: "RUNWILD ${{ steps.app_version.outputs.version }}"
+          make_latest: true
           body: |
             ### RUNWILD — RUN. TRACK. IMPROVE. GO WILD. 🏃‍♂️⚡
             

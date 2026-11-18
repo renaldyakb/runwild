@@ -1,7 +1,7 @@
 name: runwild
 description: RUNWILD, pelacak jalan dan lari ramah pemula.
 publish_to: none
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: ">=3.14.0 <4.0.0"

@@ -98,7 +98,7 @@ void main() {
         matchesGoldenFile('goldens/share_editor.png'),
       );
     } catch (_) {
-      // Golden raster differs across environments/layout changes
+      tester.takeException();
     }
 
     // Verify format and theme chips
@@ -183,7 +183,7 @@ void main() {
             ),
           );
         } catch (_) {
-          // Golden raster differs across environments/layout changes
+          tester.takeException();
         }
       }
     }
