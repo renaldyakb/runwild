@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/services/map_service.dart';
+import '../../../core/utils/duration_format.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_page.dart';
@@ -18,12 +19,7 @@ import '../../../domain/tracking/run_summary.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/activity_detail_notifier.dart';
 
-String _formatDuration(Duration duration) {
-  final seconds = duration.inSeconds;
-  final m = seconds ~/ 60;
-  final s = seconds % 60;
-  return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-}
+String _formatDuration(Duration duration) => formatClockDuration(duration);
 
 String _formatPace(double? secondsPerKm) {
   if (secondsPerKm == null || secondsPerKm <= 0 || secondsPerKm.isInfinite) {
@@ -377,9 +373,12 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
         ),
         const SizedBox(height: RwSpace.md),
 
-        // ── Interval Summary (Bila Ada) ─────────────────────────────
+        // ── Interval Summary (Aktual atau Rencana) ──────────────────
         if (detail.intervalSummary != null) ...[
           _IntervalSummaryCard(interval: detail.intervalSummary!),
+          const SizedBox(height: RwSpace.md),
+        ] else if (detail.intervalPlan != null) ...[
+          _IntervalPlanCard(plan: detail.intervalPlan!),
           const SizedBox(height: RwSpace.md),
         ],
 
@@ -668,7 +667,7 @@ class _IntervalSummaryCard extends StatelessWidget {
               ),
               const SizedBox(width: RwSpace.xs),
               Text(
-                s.intervalMode.toUpperCase(),
+                s.activityIntervalActualTitle.toUpperCase(),
                 style: const TextStyle(
                   fontFamily: RwType.family,
                   fontSize: 12,
@@ -683,21 +682,95 @@ class _IntervalSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _IntervalStat(label: 'PUTARAN', value: roundsText),
+                child: _IntervalStat(
+                  label: s.activityIntervalRoundsLabel,
+                  value: roundsText,
+                ),
               ),
               Expanded(
                 child: _IntervalStat(
-                  label: 'WAKTU LARI',
+                  label: s.activityIntervalRunLabel,
                   value: _formatDuration(interval.runTime),
                 ),
               ),
               Expanded(
                 child: _IntervalStat(
-                  label: 'WAKTU JALAN',
+                  label: s.activityIntervalWalkLabel,
                   value: _formatDuration(interval.walkTime),
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IntervalPlanCard extends StatelessWidget {
+  const _IntervalPlanCard({required this.plan});
+  final IntervalPlan plan;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final roundsText = plan.rounds?.toString() ?? s.intervalFree;
+    return RwCard(
+      padding: const EdgeInsets.all(RwSpace.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.timer_outlined,
+                size: 18,
+                color: RwColors.lime700,
+              ),
+              const SizedBox(width: RwSpace.xs),
+              Text(
+                s.activityIntervalPlanTitle.toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: RwType.family,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                  color: RwColors.ink950,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: RwSpace.sm),
+          Row(
+            children: [
+              Expanded(
+                child: _IntervalStat(
+                  label: s.activityIntervalPlanRunLabel,
+                  value: _formatDuration(plan.run),
+                ),
+              ),
+              Expanded(
+                child: _IntervalStat(
+                  label: s.activityIntervalPlanWalkLabel,
+                  value: _formatDuration(plan.walk),
+                ),
+              ),
+              Expanded(
+                child: _IntervalStat(
+                  label: s.activityIntervalPlanRoundsLabel,
+                  value: roundsText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: RwSpace.sm),
+          Text(
+            s.activityIntervalPlanNote,
+            style: const TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 12,
+              color: RwColors.mutedTextOnLight,
+            ),
           ),
         ],
       ),

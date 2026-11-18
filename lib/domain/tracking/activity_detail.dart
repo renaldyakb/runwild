@@ -117,30 +117,50 @@ List<KmSplit> calculateSplitsFromPoints(
   return splits;
 }
 
-/// Helper untuk mengurai konfigurasi interval menjadi ringkasan yang mudah ditampilkan.
-IntervalSummary? parseIntervalSummary(String? intervalJson, Duration elapsed) {
+/// Rencana interval yang tersimpan pada sesi (bukan hasil aktual).
+typedef IntervalPlan = ({
+  Duration run,
+  Duration walk,
+  int? rounds,
+  bool startWithWalk,
+});
+
+IntervalPlan? parseIntervalPlan(String? intervalJson) {
   if (intervalJson == null || intervalJson.isEmpty) return null;
   try {
     final config = decodeInterval(intervalJson);
-    final runSec = config.run.inSeconds;
-    final walkSec = config.walk.inSeconds;
-    final cycleSec = runSec + walkSec;
-
-    if (cycleSec <= 0) return null;
-
-    final completedRounds = elapsed.inSeconds ~/ cycleSec;
-    final totalRunSec = completedRounds * runSec;
-    final totalWalkSec = completedRounds * walkSec;
-
     return (
-      completedRounds: completedRounds,
-      totalRounds: config.rounds,
-      runTime: Duration(seconds: totalRunSec),
-      walkTime: Duration(seconds: totalWalkSec),
+      run: config.run,
+      walk: config.walk,
+      rounds: config.rounds,
+      startWithWalk: config.startWithWalk,
     );
   } catch (_) {
     return null;
   }
+}
+
+/// Ringkasan interval **aktual**; null bila sesi lama belum menyimpan detail
+/// aktual, sehingga tampilan memakai kartu rencana, bukan angka karangan.
+IntervalSummary? buildIntervalSummary({
+  required String? intervalJson,
+  required int? completedRounds,
+  required Duration? runTime,
+  required Duration? walkTime,
+}) {
+  final plan = parseIntervalPlan(intervalJson);
+  if (plan == null ||
+      completedRounds == null ||
+      runTime == null ||
+      walkTime == null) {
+    return null;
+  }
+  return (
+    completedRounds: completedRounds,
+    totalRounds: plan.rounds,
+    runTime: runTime,
+    walkTime: walkTime,
+  );
 }
 
 /// Domain model detail lengkap sebuah sesi aktivitas.
@@ -162,6 +182,7 @@ class ActivityDetail {
     this.intervalJson,
     this.activityId,
     this.intervalSummary,
+    this.intervalPlan,
   });
 
   final int id;
@@ -180,6 +201,7 @@ class ActivityDetail {
   final String? intervalJson;
   final String? activityId;
   final IntervalSummary? intervalSummary;
+  final IntervalPlan? intervalPlan;
 
   double? get averagePace => meters > 0 && moving > Duration.zero
       ? moving.inSeconds / (meters / 1000.0)

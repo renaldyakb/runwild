@@ -92,6 +92,7 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
           mode = ActivityMode.interval;
           try {
             final config = decodeInterval(session.intervalJson!);
+            final progress = await _journal.intervalProgress(owner, session.id);
             intervalMap = {
               'warmupSec': config.warmup.inSeconds,
               'runSec': config.run.inSeconds,
@@ -99,6 +100,11 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
               'rounds': config.rounds,
               'startWithWalk': config.startWithWalk,
               'cooldownSec': config.cooldown.inSeconds,
+              if (progress != null) ...{
+                'actualRounds': progress.rounds,
+                'actualRunSec': progress.run.inSeconds,
+                'actualWalkSec': progress.walk.inSeconds,
+              },
             };
           } catch (_) {}
         }
@@ -255,6 +261,9 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
 
         // Rekonstruksi interval jika ada
         String? intervalJson;
+        int? actualRounds;
+        int? actualRunSec;
+        int? actualWalkSec;
         final intervalMap = data['interval'];
         if (intervalMap is Map) {
           try {
@@ -275,6 +284,9 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
               ),
             );
             intervalJson = encodeInterval(config);
+            actualRounds = (intervalMap['actualRounds'] as num?)?.toInt();
+            actualRunSec = (intervalMap['actualRunSec'] as num?)?.toInt();
+            actualWalkSec = (intervalMap['actualWalkSec'] as num?)?.toInt();
           } catch (_) {}
         }
 
@@ -293,6 +305,13 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
           feeling: feeling,
           note: note,
           intervalJson: intervalJson,
+          intervalRounds: actualRounds,
+          intervalRun: actualRunSec == null
+              ? null
+              : Duration(seconds: actualRunSec),
+          intervalWalk: actualWalkSec == null
+              ? null
+              : Duration(seconds: actualWalkSec),
           routePoints: points,
         );
 

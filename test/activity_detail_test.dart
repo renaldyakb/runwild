@@ -138,7 +138,23 @@ void main() {
       expect(shortSplits.first.distanceMeters, 500.0);
     });
 
-    test('parseIntervalSummary parses interval JSON correctly', () {
+    test('parseIntervalPlan reads the plan without inventing progress', () {
+      final config = (
+        warmup: const Duration(minutes: 5),
+        run: const Duration(seconds: 120),
+        walk: const Duration(seconds: 60),
+        rounds: 10,
+        startWithWalk: false,
+        cooldown: const Duration(minutes: 3),
+      );
+      final plan = parseIntervalPlan(encodeInterval(config));
+      expect(plan, isNotNull);
+      expect(plan!.run, const Duration(seconds: 120));
+      expect(plan.walk, const Duration(seconds: 60));
+      expect(plan.rounds, 10);
+    });
+
+    test('buildIntervalSummary only uses stored actual progress', () {
       final config = (
         warmup: const Duration(minutes: 5),
         run: const Duration(seconds: 120),
@@ -148,12 +164,26 @@ void main() {
         cooldown: const Duration(minutes: 3),
       );
       final json = encodeInterval(config);
-      final summary = parseIntervalSummary(json, const Duration(seconds: 540));
+      expect(
+        buildIntervalSummary(
+          intervalJson: json,
+          completedRounds: null,
+          runTime: const Duration(minutes: 8),
+          walkTime: const Duration(minutes: 4),
+        ),
+        isNull,
+      );
+      final summary = buildIntervalSummary(
+        intervalJson: json,
+        completedRounds: 4,
+        runTime: const Duration(minutes: 8),
+        walkTime: const Duration(minutes: 4),
+      );
       expect(summary, isNotNull);
-      expect(summary!.completedRounds, 3);
+      expect(summary!.completedRounds, 4);
       expect(summary.totalRounds, 10);
-      expect(summary.runTime, const Duration(seconds: 360));
-      expect(summary.walkTime, const Duration(seconds: 180));
+      expect(summary.runTime, const Duration(minutes: 8));
+      expect(summary.walkTime, const Duration(minutes: 4));
     });
 
     test('ActivityDetail converts to RunSummary accurately', () {
@@ -279,6 +309,55 @@ void main() {
       expect(find.text('Aktivitas tidak ditemukan'), findsOneWidget);
     });
 
+    testWidgets(
+      'Legacy interval session shows the plan instead of invented progress',
+      (tester) async {
+        final db = RunJournal(NativeDatabase.memory());
+        addTearDown(db.close);
+        final when = DateTime(2026, 11, 16, 7, 0);
+        final id = await db.begin(
+          'runner',
+          when,
+          interval: defaultIntervalConfig,
+        );
+        await db.checkpoint(
+          'runner',
+          (
+            id: id,
+            startedAt: when,
+            meters: 1200.0,
+            moving: const Duration(minutes: 12),
+            elapsed: const Duration(minutes: 12),
+            points: 0,
+          ),
+          const [],
+          finish: true,
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              runJournalProvider.overrideWithValue(db),
+              mapServiceProvider.overrideWithValue(
+                OpenStreetMapService(tileProviderFactory: _Tiles.new),
+              ),
+              runOwnerProvider.overrideWithValue(() => 'runner'),
+              activitySyncRepositoryProvider.overrideWithValue(
+                _FakeSyncRepository(),
+              ),
+            ],
+            child: _testHost(ActivityDetailScreen(sessionId: id)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('RENCANA INTERVAL'), findsOneWidget);
+        expect(find.text('PUTARAN RENCANA'), findsOneWidget);
+        expect(find.text('WAKTU LARI'), findsNothing);
+        expect(find.textContaining('bukan hasil aktual'), findsOneWidget);
+      },
+    );
+
     testWidgets('Renders full activity detail, updates title and deletes', (
       tester,
     ) async {
@@ -312,10 +391,18 @@ void main() {
         accuracyMeters: 4.0,
         capturedAt: Duration(minutes: 10),
       );
-      await db.checkpoint('runner', cp, const [
-        (fix1, SampleResult.segmentStart),
-        (fix2, SampleResult.recorded),
-      ], finish: true);
+      await db.checkpoint(
+        'runner',
+        cp,
+        const [
+          (fix1, SampleResult.segmentStart),
+          (fix2, SampleResult.recorded),
+        ],
+        finish: true,
+        intervalRounds: 3,
+        intervalRun: Duration(minutes: 3),
+        intervalWalk: Duration(minutes: 6),
+      );
       await db.updateSummary(
         'runner',
         id,
@@ -344,6 +431,9 @@ void main() {
       expect(find.text('4,50'), findsOneWidget);
       expect(find.text('KILOMETER'), findsOneWidget);
       expect(find.text('PUTARAN'), findsOneWidget);
+      expect(find.text('3 / 8'), findsOneWidget);
+      expect(find.text('03:00'), findsOneWidget);
+      expect(find.text('06:00'), findsOneWidget);
       expect(find.text('Latihan rutin'), findsOneWidget);
       expect(find.text('Split per Kilometer'), findsOneWidget);
       expect(find.text('Bagikan Sesi'), findsWidgets);

@@ -232,6 +232,13 @@ Sesuai permintaan pengguna untuk memakai grafik dari komunitas yang tersedia di 
 1. Sesuai permintaan pengguna, font global aplikasi diganti dari `Archivo` ke `Google Sans Flex` dengan varian bobot lengkap (weight 100–900: Thin, ExtraLight, Light, Regular, Medium, SemiBold, Bold, ExtraBold, Black) yang dibundel di `assets/fonts/` agar rendering offline tetap stabil dan tajam.
 2. Tagline pada Hero Card di Home Dashboard diperbarui menjadi: "Run Free, Go Wild.".
 
+## ADR-028: Akurasi angka tampilan (PB, interval aktual, label pace/kalori)
+
+1. Perbandingan rekor memakai `millisecondsSinceEpoch` karena sesi disimpan sebagai `started_ms`; mikrodetik dibuang dan sebelumnya membuat badge Rekor Pribadi tidak pernah cocok.
+2. Drift naik ke v6 dengan tiga kolom nullable (`interval_rounds`, `interval_run_us`, `interval_walk_us`). Migrasi hanya `ALTER TABLE ... ADD COLUMN`, jadi data lama utuh. Rincian interval aktual ditulis saat checkpoint/finish dan ikut disinkronkan (`actualRounds`, `actualRunSec`, `actualWalkSec`). Sesi lama tanpa nilai itu menampilkan rencana interval dengan catatan jujur, bukan angka hasil `elapsed ÷ siklus`.
+3. Rekor pace diberi label "Pace Rata-rata Terbaik (≥1 km/≥5 km)" karena memang dihitung dari pace rata-rata sesi, bukan split tercepat. Perhitungan berbasis split ditunda sampai split disimpan untuk seluruh sesi.
+4. Estimasi kalori tetap memakai 65 kg: ringkasan/detail berlabel "perkiraan", Progress menambah catatan. Berat badan opsional menyusul.
+
 ## Ide nanti
 
 Tidak ada penambahan di luar roadmap PRD.
@@ -239,3 +246,5 @@ Tidak ada penambahan di luar roadmap PRD.
 - 2026-11-16: Sesuai permintaan pengguna, peta live memakai flutter_map 8.3.1 + latlong2 0.9.1 + url_launcher 6.3.2 melalui MapService, menggantikan rencana Google Maps untuk layar sesi. OSM Standard tanpa key; User-Agent RUNWILD, atribusi selalu terlihat, cache HTTP bawaan 128 MiB, tanpa bulk download. Tidak ada SLA tile publik; GPS tetap merekam jika tile gagal. Sumber: https://operations.osmfoundation.org/policies/tiles/ dan https://pub.dev/packages/flutter_map .
 
 - 18 Nov 2026: package_info_plus 10.2.2 dipin untuk membaca versi/build APK terpasang; pubspec menjadi sumber versi rilis. Patch perbaikan disiapkan sebagai 0.1.2+3 agar terdeteksi oleh pengguna 0.1.1.
+
+- 18 Nov 2026: audit sisa `catch (_)` di layanan notifikasi, audio, sync, dan share card agar setiap kegagalan tercatat (tanpa koordinat); belum dikerjakan karena butuh verifikasi perangkat.

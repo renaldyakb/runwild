@@ -27,6 +27,9 @@ typedef RunCheckpoint = ({
   int points,
 });
 
+/// Rincian interval yang benar-benar terjadi, disimpan saat sesi berjalan.
+typedef StoredIntervalProgress = ({int rounds, Duration run, Duration walk});
+
 typedef FinishedSessionRecord = ({
   int id,
   String owner,
@@ -76,7 +79,7 @@ class RunJournal extends GeneratedDatabase {
   RunJournal(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => const [];
@@ -96,6 +99,9 @@ class RunJournal extends GeneratedDatabase {
           finished INTEGER NOT NULL DEFAULT 0,
           interval_json TEXT,
           interval_us INTEGER NOT NULL DEFAULT 0,
+          interval_rounds INTEGER,
+          interval_run_us INTEGER,
+          interval_walk_us INTEGER,
           feeling TEXT,
           note TEXT,
           synced INTEGER NOT NULL DEFAULT 0,
@@ -158,6 +164,21 @@ class RunJournal extends GeneratedDatabase {
       }
       if (!columns.contains('title')) {
         await customStatement('ALTER TABLE run_sessions ADD COLUMN title TEXT');
+      }
+      if (!columns.contains('interval_rounds')) {
+        await customStatement(
+          'ALTER TABLE run_sessions ADD COLUMN interval_rounds INTEGER',
+        );
+      }
+      if (!columns.contains('interval_run_us')) {
+        await customStatement(
+          'ALTER TABLE run_sessions ADD COLUMN interval_run_us INTEGER',
+        );
+      }
+      if (!columns.contains('interval_walk_us')) {
+        await customStatement(
+          'ALTER TABLE run_sessions ADD COLUMN interval_walk_us INTEGER',
+        );
       }
     },
     beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
@@ -262,6 +283,27 @@ class RunJournal extends GeneratedDatabase {
     return (config: config, elapsed: elapsed);
   }
 
+  /// Rincian interval aktual milik sesi ini, atau null bila belum pernah
+  /// dicatat (sesi lama) sehingga tampilan tidak boleh mengarang angka.
+  Future<StoredIntervalProgress?> intervalProgress(String owner, int id) async {
+    final rows = await customSelect(
+      'SELECT interval_rounds, interval_run_us, interval_walk_us '
+      'FROM run_sessions WHERE owner = ? AND id = ?',
+      variables: [Variable(owner), Variable(id)],
+    ).get();
+    if (rows.isEmpty) return null;
+    final row = rows.first;
+    final rounds = row.readNullable<int>('interval_rounds');
+    final run = row.readNullable<int>('interval_run_us');
+    final walk = row.readNullable<int>('interval_walk_us');
+    if (rounds == null || run == null || walk == null) return null;
+    return (
+      rounds: rounds,
+      run: Duration(microseconds: run),
+      walk: Duration(microseconds: walk),
+    );
+  }
+
   Future<RunCheckpoint?> pending(String owner) async {
     final row = await customSelect(
       'SELECT * FROM run_sessions WHERE owner = ? AND finished = 0',
@@ -286,10 +328,16 @@ class RunJournal extends GeneratedDatabase {
     List<(GpsSample, SampleResult)> samples, {
     bool finish = false,
     Duration? intervalElapsed,
+    int? intervalRounds,
+    Duration? intervalRun,
+    Duration? intervalWalk,
   }) => transaction(() async {
     final updated = await customUpdate(
       '''UPDATE run_sessions SET meters = ?, moving_us = ?, elapsed_us = ?,
-         points = ?, finished = ?, interval_us = COALESCE(?, interval_us)
+         points = ?, finished = ?, interval_us = COALESCE(?, interval_us),
+         interval_rounds = COALESCE(?, interval_rounds),
+         interval_run_us = COALESCE(?, interval_run_us),
+         interval_walk_us = COALESCE(?, interval_walk_us)
          WHERE id = ? AND owner = ? AND finished = 0''',
       variables: [
         Variable(state.meters),
@@ -298,6 +346,9 @@ class RunJournal extends GeneratedDatabase {
         Variable(state.points),
         Variable(finish ? 1 : 0),
         Variable<int>(intervalElapsed?.inMicroseconds),
+        Variable<int>(intervalRounds),
+        Variable<int>(intervalRun?.inMicroseconds),
+        Variable<int>(intervalWalk?.inMicroseconds),
         Variable(state.id),
         Variable(owner),
       ],
@@ -541,6 +592,9 @@ class RunJournal extends GeneratedDatabase {
     String? feeling,
     String? note,
     String? intervalJson,
+    int? intervalRounds,
+    Duration? intervalRun,
+    Duration? intervalWalk,
     List<({double latitude, double longitude})> routePoints = const [],
   }) => transaction(() async {
     final existing = await customSelect(
@@ -567,8 +621,9 @@ class RunJournal extends GeneratedDatabase {
     final id = await customInsert(
       '''INSERT INTO run_sessions(
            owner, started_ms, meters, moving_us, elapsed_us, points,
-           finished, interval_json, interval_us, feeling, note, synced, activity_id, title
-         ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, 0, ?, ?, 1, ?, ?)''',
+           finished, interval_json, interval_us, feeling, note, synced, activity_id, title,
+           interval_rounds, interval_run_us, interval_walk_us
+         ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, 0, ?, ?, 1, ?, ?, ?, ?, ?)''',
       variables: [
         Variable(owner),
         Variable(startedAt.millisecondsSinceEpoch),
@@ -581,6 +636,9 @@ class RunJournal extends GeneratedDatabase {
         Variable<String>(note),
         Variable(activityId),
         Variable<String>(title),
+        Variable<int>(intervalRounds),
+        Variable<int>(intervalRun?.inMicroseconds),
+        Variable<int>(intervalWalk?.inMicroseconds),
       ],
     );
 

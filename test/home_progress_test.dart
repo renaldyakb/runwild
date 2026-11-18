@@ -7,7 +7,11 @@ import 'package:runwild/design/theme/rw_theme.dart';
 import 'package:runwild/domain/interval/interval_config.dart';
 import 'package:runwild/domain/stats/stats_engine.dart';
 import 'package:runwild/features/activities/presentation/progress_screen.dart';
+import 'package:runwild/features/foundation/application/home_stats_provider.dart';
 import 'package:runwild/features/foundation/presentation/home_dashboard.dart';
+import 'package:runwild/features/profile/application/initial_profile.dart';
+import 'package:runwild/features/profile/application/profile_service.dart';
+import 'package:runwild/features/profile/domain/user_profile.dart';
 import 'package:runwild/features/run/application/run_journal.dart';
 import 'package:runwild/l10n/generated/app_localizations.dart';
 
@@ -267,8 +271,60 @@ void main() {
       expect(find.text('REKOR PRIBADI (PERSONAL BEST)'), findsOneWidget);
       expect(find.text('Jarak Terjauh'), findsOneWidget);
       expect(find.text('Durasi Terlama'), findsOneWidget);
-      expect(find.text('Pace 1 KM Terbaik'), findsOneWidget);
-      expect(find.text('Pace 5 KM Terbaik'), findsOneWidget);
+      expect(find.text('Pace Rata-rata Terbaik (≥1 km)'), findsOneWidget);
+      expect(find.text('Pace Rata-rata Terbaik (≥5 km)'), findsOneWidget);
     });
+
+    test(
+      'weekSummaryProvider falls back to default target when profile fails',
+      () async {
+        final logs = <String>[];
+        final originalDebugPrint = debugPrint;
+        debugPrint = (String? message, {int? wrapWidth}) {
+          if (message != null) logs.add(message);
+        };
+        addTearDown(() => debugPrint = originalDebugPrint);
+
+        final container = ProviderContainer(
+          overrides: [
+            runJournalProvider.overrideWithValue(journal),
+            runOwnerProvider.overrideWithValue(() => 'tester-1'),
+            profileRepositoryProvider.overrideWithValue(
+              _OfflineProfileRepository(),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+        final subscription = container.listen(
+          weekSummaryProvider,
+          (previous, next) {},
+        );
+        addTearDown(subscription.close);
+
+        final summary = await container.read(weekSummaryProvider.future);
+
+        expect(summary.targetSessions, ProfileLimits.initialSessions);
+        expect(summary.sessionCount, 0);
+        expect(
+          logs.where(
+            (line) => line.contains('Weekly goal profile unavailable'),
+          ),
+          isNotEmpty,
+        );
+      },
+    );
   });
+}
+
+class _OfflineProfileRepository implements ProfileRepository {
+  @override
+  Future<UserProfile?> fetchProfile(String uid) async {
+    throw StateError('profil tidak tersedia offline');
+  }
+
+  @override
+  Future<void> updateProfile(String uid, UserProfile profile) async {}
+
+  @override
+  Future<void> deleteAccount(String uid) async {}
 }

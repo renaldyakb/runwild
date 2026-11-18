@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../run/application/run_journal.dart';
@@ -55,7 +56,10 @@ class FirestoreProfileRepository implements ProfileRepository {
       final prof = UserProfile.fromFirestore(doc.data()!);
       _cachedProfile = prof;
       return prof;
-    } catch (_) {
+    } catch (error) {
+      // Offline atau rules menolak: cache tetap dipakai, tetapi kegagalannya
+      // harus terlihat di log (jenis error saja, tanpa data pribadi).
+      debugPrint('Profile fetch failed, using cache: ${error.runtimeType}');
       return _cachedProfile;
     }
   }

@@ -1,5 +1,33 @@
 # Status RUNWILD
 
+- 18 Nov 2026: rilis 0.1.3+4 disiapkan dan dipush ke `main`.
+  - `pubspec.yaml` 0.1.3+4; catatan rilis `docs/releases/0.1.3.md` (Diperbaiki/Diperbarui, 6 bullet, bahasa pengguna).
+  - Isi: badge rekor pribadi, data interval aktual (Drift v6 + sinkron cloud), label pace rata-rata, catatan kalori, format durasi lebih dari satu jam.
+  - Verifikasi sebelum push: 74 tes daftar CI + tes baru lulus, `flutter analyze --fatal-infos` bersih, format 0 perubahan.
+  - Menunggu: workflow GitHub Actions membangun APK dan membuat tag v0.1.3; belum ada uji perangkat fisik untuk perubahan ini.
+
+- 18 Nov 2026: perbaikan akurasi data tampilan (PB, interval aktual, label pace/kalori, format durasi).
+  - Rekor pribadi: perbandingan waktu memakai milidetik (`millisecondsSinceEpoch`), sehingga badge "Rekor Pribadi" muncul untuk sesi normal.
+  - Interval: Drift v6 menambah `interval_rounds`, `interval_run_us`, `interval_walk_us` (nullable, hanya `ADD COLUMN`). Nilai aktual ditulis saat checkpoint/finish, disinkronkan sebagai `actualRounds/actualRunSec/actualWalkSec`, dan dipulihkan saat tarik cloud. Sesi lama tanpa angka aktual menampilkan kartu "Rencana Interval" + catatan; tidak ada putaran/waktu karangan.
+  - Label: rekor pace kini "Pace Rata-rata Terbaik (≥1 km/≥5 km)"; Progress menambah catatan "Kalori adalah perkiraan..."; label interval detail lewat ARB.
+  - Durasi ≥1 jam tampil `1:30:00` di HUD, daftar, detail, ringkasan, dan kartu bagikan (`core/utils/duration_format.dart`).
+  - Bukti: `flutter analyze --fatal-infos` bersih, format 0 perubahan, 74 tes daftar CI lulus, `activity_detail_test` 9/9 (termasuk sesi lama → kartu rencana), `duration_format_test` 3/3.
+  - Belum: golden `run_live.png` usang (gagal juga pada HEAD, bukan regresi), `app_test`/`auth_screen_test`/`profile_setup_test` masih memakai teks lama, 20 `catch (_)` lain belum diaudit.
+
+- 18 Nov 2026: audit akurasi data yang tampil (temuan; perbaikannya ada di entri di atas).
+  - Rekor pribadi praktis tidak terdeteksi pada sesi normal: `summary.startedAt` membawa mikrodetik, SQLite menyimpan milidetik, sehingga `isAtSameMomentAs` gagal. Bukti uji: `...980119` vs `...980000`, `detectPersonalBestsForSession` mengembalikan `[]`. Badge "Rekor Pribadi" hanya bisa muncul pada sesi hasil pemulihan atau bila µs kebetulan 0.
+  - Detail riwayat interval menampilkan putaran/waktu yang tidak terjadi: `parseIntervalSummary` membagi `elapsed` dengan siklus lari+jalan tanpa memperhitungkan warmup, cooldown, dan jeda. Bukti uji: 5 menit warmup saja menghasilkan "1 putaran, lari 1 menit, jalan 2 menit".
+  - "Pace 1 KM/5 KM Terbaik" adalah pace rata-rata sesi (bukan split tercepat), dan Progress menulis "TOTAL KALORI" tanpa label perkiraan (rumus tetap 65 kg; sesi jalan dihitung seperti lari).
+  - Minor: durasi >1 jam tampil "90:00" di daftar/detail, grafik bulanan M4 mencakup 10 hari, dan label interval di detail belum lewat ARB.
+  - Uji pembuktian memakai berkas sementara yang sudah dihapus; tidak ada perubahan perilaku.
+
+- 18 Nov 2026: audit gap pasca-Fase 4, tanpa fitur baru.
+  - `weekSummaryProvider` dan `FirestoreProfileRepository` tidak lagi menelan error diam-diam; jenis error dicatat via `debugPrint` (tanpa data pribadi) dan target mingguan tetap memakai nilai bawaan saat profil gagal dibaca.
+  - `docs/SCREENS.md` disegarkan sesuai rute nyata di `lib/app/router.dart` (S-01–S-92); klaim "shell Fase 0" dan "Fase 4 belum dimulai" dihapus.
+  - Bukti: 68 tes daftar CI lulus (termasuk tes fallback baru), `flutter analyze --fatal-infos` bersih, `dart format` tanpa perubahan.
+  - Belum: 20 `catch (_)` lain (notifikasi, audio, sync, share) belum diaudit; tercatat di DECISIONS "Ide Nanti".
+  - Temuan baru (belum diperbaiki): `test/app_test.dart` masih menguji shell Fase 0 ("Kejar jarakmu.", Profil "belum tersedia", tombol katalog di Profil, tema gelap) sehingga 13 tesnya gagal di lokal; file ini tidak ada dalam daftar tes CI. Perlu sesi terpisah untuk memperbarui atau menghapusnya.
+
 - 18 Nov 2026: perbaikan CI setelah run 44325489061 gagal pada golden kartu bagikan. Lima baseline diselaraskan dengan UI terkini setelah inspeksi; catch yang mengabaikan golden dihapus. Verifikasi lokal sesuai workflow: 67 tes lulus, analyze fatal-infos bersih, format 118 file tanpa perubahan. Run baru tidak dimonitor sesuai permintaan pengguna.
 
 - 18 Nov 2026: patch versi/pembaruan dan UI sesi disiapkan sebagai 0.1.2+3 (belum dipublikasikan).
@@ -9,11 +37,11 @@
   - Bukti: 35 tes terarah lulus, analisis bersih setelah perbaikan lint, YAML valid; golden Home/update/drawer diperiksa.
   - Belum diuji: GitHub Actions, build/install APK release 0.1.2 dan unduhan pembaruan di HP.
 
-- 18 Nov 2026 � Pembaruan visual detail aktivitas & kartu bagikan selesai di kode.
+- 18 Nov 2026 � Pembaruan visual detail aktivitas & kartu bagikan selesai di kode.
   - Detail: peta OSM membingkai seluruh koordinat tersimpan di atas jejak rute; segmen GPS tetap terpisah, tanpa status GPS live pada riwayat.
   - Bagikan: pratinjau di atas, kontrol format/warna/foto, aksi tetap di bawah; ekspor tipografi minimal dengan tiga warna dan dua rasio.
   - Privat: tanpa ikon perisai maupun path GPS; foto tetap terlihat dan dijelaskan pada kontrol privasi. Rute kosong tidak diganti data rekaan.
-  - PNG: lebar 1080 px; tes ekspor persegi membuktikan 1080 � 1080. Foto, rekor pribadi, dan pilihan format tetap tersedia.
+  - PNG: lebar 1080 px; tes ekspor persegi membuktikan 1080 � 1080. Foto, rekor pribadi, dan pilihan format tetap tersedia.
   - Bukti: 12 tes share_card/activity_detail/activity_map lulus; analisis 6 file bersih; 5 golden diperiksa secara visual (editor serta Story/persegi privat/rute).
   - Uji HP tersisa: tile internet/cache, foto kamera/galeri dan sheet berbagi Android; lihat tambahan docs/TESTING.md.
 

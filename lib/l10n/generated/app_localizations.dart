@@ -1948,6 +1948,60 @@ abstract class AppLocalizations {
   /// **'Split per Kilometer'**
   String get activitySplitsTitle;
 
+  /// No description provided for @activityIntervalActualTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Statistik Interval'**
+  String get activityIntervalActualTitle;
+
+  /// No description provided for @activityIntervalRoundsLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'PUTARAN'**
+  String get activityIntervalRoundsLabel;
+
+  /// No description provided for @activityIntervalRunLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'WAKTU LARI'**
+  String get activityIntervalRunLabel;
+
+  /// No description provided for @activityIntervalWalkLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'WAKTU JALAN'**
+  String get activityIntervalWalkLabel;
+
+  /// No description provided for @activityIntervalPlanTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Rencana Interval'**
+  String get activityIntervalPlanTitle;
+
+  /// No description provided for @activityIntervalPlanRunLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'LARI / PUTARAN'**
+  String get activityIntervalPlanRunLabel;
+
+  /// No description provided for @activityIntervalPlanWalkLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'JALAN / PUTARAN'**
+  String get activityIntervalPlanWalkLabel;
+
+  /// No description provided for @activityIntervalPlanRoundsLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'PUTARAN RENCANA'**
+  String get activityIntervalPlanRoundsLabel;
+
+  /// No description provided for @activityIntervalPlanNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi ini tersimpan sebelum rincian aktual dicatat. Angka di atas adalah rencana interval, bukan hasil aktual.'**
+  String get activityIntervalPlanNote;
+
   /// No description provided for @activityRouteTitle.
   ///
   /// In id, this message translates to:
@@ -2086,6 +2140,12 @@ abstract class AppLocalizations {
   /// **'TOTAL KALORI'**
   String get progressTotalCalories;
 
+  /// No description provided for @progressCaloriesNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalori adalah perkiraan, bukan hasil pengukuran medis.'**
+  String get progressCaloriesNote;
+
   /// No description provided for @progressAvgPace.
   ///
   /// In id, this message translates to:
@@ -2113,13 +2173,13 @@ abstract class AppLocalizations {
   /// No description provided for @progressRecordBest1k.
   ///
   /// In id, this message translates to:
-  /// **'Pace 1 KM Terbaik'**
+  /// **'Pace Rata-rata Terbaik (≥1 km)'**
   String get progressRecordBest1k;
 
   /// No description provided for @progressRecordBest5k.
   ///
   /// In id, this message translates to:
-  /// **'Pace 5 KM Terbaik'**
+  /// **'Pace Rata-rata Terbaik (≥5 km)'**
   String get progressRecordBest5k;
 
   /// No description provided for @progressNoRecords.

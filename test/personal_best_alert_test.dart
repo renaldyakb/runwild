@@ -56,10 +56,35 @@ void main() {
 
         expect(pbs, contains('Jarak Terjauh'));
         expect(pbs, contains('Durasi Terlama'));
-        expect(pbs, isNot(contains('Pace 1K Terbaik')));
-        expect(pbs, isNot(contains('Pace 5K Terbaik')));
+        expect(pbs, isNot(contains('Pace 1K Rata-rata')));
+        expect(pbs, isNot(contains('Pace 5K Rata-rata')));
       },
     );
+
+    test('detects a record when the session time carries microseconds', () {
+      final precise = DateTime(2026, 11, 18, 7, 0, 0, 123, 456);
+      final stored = DateTime.fromMillisecondsSinceEpoch(
+        precise.millisecondsSinceEpoch,
+      );
+      final records = (
+        longestDistance: (
+          title: 'Jarak Terjauh',
+          value: '5.20',
+          unit: 'km',
+          achievedAt: stored,
+        ),
+        longestDuration: null,
+        bestPace1k: null,
+        bestPace5k: null,
+      );
+
+      final pbs = StatsEngine.detectPersonalBestsForSession(
+        startedAt: precise,
+        records: records,
+      );
+
+      expect(pbs, contains('Jarak Terjauh'));
+    });
 
     testWidgets(
       'RunSummaryScreen renders PB alert banner when session holds record',

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/stats/stats_engine.dart';
@@ -41,7 +42,10 @@ final weekSummaryProvider = FutureProvider.autoDispose<WeekSummary>((
   UserProfile? profile;
   try {
     profile = await ref.watch(userProfileProvider.future);
-  } catch (_) {
+  } catch (error) {
+    // Profil gagal dibaca bukan alasan untuk diam: catat jenis error (tanpa
+    // data pribadi), lalu pakai target bawaan agar Home tetap tampil jujur.
+    debugPrint('Weekly goal profile unavailable: ${error.runtimeType}');
     profile = null;
   }
   final targetSessions =

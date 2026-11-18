@@ -348,6 +348,9 @@ class RunGpsProbe extends Notifier<GpsProbeSnapshot> {
           .toList(),
       finish: finish,
       intervalElapsed: _interval?.snapshot.elapsed,
+      intervalRounds: _interval?.snapshot.completedRounds,
+      intervalRun: _interval?.snapshot.runTime,
+      intervalWalk: _interval?.snapshot.walkTime,
     );
     _writing = operation;
     try {

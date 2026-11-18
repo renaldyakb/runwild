@@ -37,10 +37,17 @@ final activityDetailProvider = FutureProvider.autoDispose
         totalMoving: record.moving,
       );
 
-      final intervalSummary = parseIntervalSummary(
-        record.intervalJson,
-        record.elapsed,
+      final intervalProgress = await journal.intervalProgress(owner, sessionId);
+      final intervalSummary = buildIntervalSummary(
+        intervalJson: record.intervalJson,
+        completedRounds: intervalProgress?.rounds,
+        runTime: intervalProgress?.run,
+        walkTime: intervalProgress?.walk,
       );
+      // Sesi lama tanpa angka aktual hanya boleh menampilkan rencananya.
+      final intervalPlan = intervalSummary == null
+          ? parseIntervalPlan(record.intervalJson)
+          : null;
 
       return ActivityDetail(
         id: record.id,
@@ -59,6 +66,7 @@ final activityDetailProvider = FutureProvider.autoDispose
         intervalJson: record.intervalJson,
         activityId: record.activityId,
         intervalSummary: intervalSummary,
+        intervalPlan: intervalPlan,
       );
     });
 

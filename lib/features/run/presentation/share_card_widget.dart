@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/utils/duration_format.dart';
 import '../../../design/components/rw_route_view.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/tracking/run_summary.dart';
@@ -15,12 +16,7 @@ enum ShareCardFormat {
   square, // 1:1
 }
 
-String _formatDuration(Duration duration) {
-  final seconds = duration.inSeconds;
-  final m = seconds ~/ 60;
-  final s = seconds % 60;
-  return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-}
+String _formatDuration(Duration duration) => formatClockDuration(duration);
 
 String _formatPace(double? secondsPerKm) {
   if (secondsPerKm == null || secondsPerKm <= 0 || secondsPerKm.isInfinite) {

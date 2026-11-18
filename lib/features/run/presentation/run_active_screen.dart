@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../core/constants/map_limits.dart';
 import '../../../core/services/map_service.dart';
 import '../../../core/services/run_wakelock.dart';
+import '../../../core/utils/duration_format.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_chip.dart';
@@ -176,8 +177,7 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
     if (_locked) setState(() => _locked = false);
   }
 
-  String _time(int seconds) =>
-      '${(seconds ~/ Duration.secondsPerMinute).toString().padLeft(2, '0')}:${(seconds % Duration.secondsPerMinute).toString().padLeft(2, '0')}';
+  String _time(int seconds) => formatClockDuration(Duration(seconds: seconds));
 
   @override
   Widget build(BuildContext context) {

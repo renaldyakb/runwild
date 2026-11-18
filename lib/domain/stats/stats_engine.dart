@@ -393,7 +393,7 @@ abstract final class StatsEngine {
       final m = minPace1k.round() ~/ 60;
       final s = minPace1k.round() % 60;
       best1kRecord = (
-        title: 'Pace 1 KM Terbaik',
+        title: 'Pace Rata-rata Terbaik (≥1 km)',
         value: '$m\'${s.toString().padLeft(2, '0')}"',
         unit: '/km',
         achievedAt: best1k.startedAt,
@@ -405,7 +405,7 @@ abstract final class StatsEngine {
       final m = minPace5k.round() ~/ 60;
       final s = minPace5k.round() % 60;
       best5kRecord = (
-        title: 'Pace 5 KM Terbaik',
+        title: 'Pace Rata-rata Terbaik (≥5 km)',
         value: '$m\'${s.toString().padLeft(2, '0')}"',
         unit: '/km',
         achievedAt: best5k.startedAt,
@@ -420,6 +420,11 @@ abstract final class StatsEngine {
     );
   }
 
+  /// Membandingkan momen memakai resolusi penyimpanan (milidetik), karena
+  /// SQLite menyimpan `started_ms` dan membuang mikrodetik dari `DateTime`.
+  static bool _sameInstant(DateTime a, DateTime b) =>
+      a.millisecondsSinceEpoch == b.millisecondsSinceEpoch;
+
   /// Memeriksa apakah sesi dengan [startedAt] memecahkan atau memegang
   /// salah satu rekor pribadi (Personal Best).
   static List<String> detectPersonalBestsForSession({
@@ -428,20 +433,20 @@ abstract final class StatsEngine {
   }) {
     final pbs = <String>[];
     if (records.longestDistance != null &&
-        records.longestDistance!.achievedAt.isAtSameMomentAs(startedAt)) {
+        _sameInstant(records.longestDistance!.achievedAt, startedAt)) {
       pbs.add('Jarak Terjauh');
     }
     if (records.longestDuration != null &&
-        records.longestDuration!.achievedAt.isAtSameMomentAs(startedAt)) {
+        _sameInstant(records.longestDuration!.achievedAt, startedAt)) {
       pbs.add('Durasi Terlama');
     }
     if (records.bestPace1k != null &&
-        records.bestPace1k!.achievedAt.isAtSameMomentAs(startedAt)) {
-      pbs.add('Pace 1K Terbaik');
+        _sameInstant(records.bestPace1k!.achievedAt, startedAt)) {
+      pbs.add('Pace 1K Rata-rata');
     }
     if (records.bestPace5k != null &&
-        records.bestPace5k!.achievedAt.isAtSameMomentAs(startedAt)) {
-      pbs.add('Pace 5K Terbaik');
+        _sameInstant(records.bestPace5k!.achievedAt, startedAt)) {
+      pbs.add('Pace 5K Rata-rata');
     }
     return pbs;
   }

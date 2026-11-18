@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/utils/duration_format.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_chip.dart';
@@ -208,8 +209,7 @@ class _ActivityCard extends StatelessWidget {
   const _ActivityCard({required this.item});
   final HistoryItem item;
 
-  String _time(int seconds) =>
-      '${seconds ~/ Duration.secondsPerMinute}:${(seconds % Duration.secondsPerMinute).toString().padLeft(2, '0')}';
+  String _time(int seconds) => formatClockDuration(Duration(seconds: seconds));
 
   @override
   Widget build(BuildContext context) {

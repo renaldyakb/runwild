@@ -156,6 +156,15 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: RwSpace.xs),
+                      Text(
+                        s.progressCaloriesNote,
+                        style: const TextStyle(
+                          fontFamily: RwType.family,
+                          fontSize: 11,
+                          color: RwColors.mutedTextOnLight,
+                        ),
+                      ),
                       const SizedBox(height: RwSpace.lg),
 
                       // fl_chart Community Bar Chart
@@ -354,7 +363,7 @@ class _RecordCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: RwColors.mutedTextOnLight,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

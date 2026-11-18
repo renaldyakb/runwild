@@ -1028,6 +1028,34 @@ class AppLocalizationsId extends AppLocalizations {
   String get activitySplitsTitle => 'Split per Kilometer';
 
   @override
+  String get activityIntervalActualTitle => 'Statistik Interval';
+
+  @override
+  String get activityIntervalRoundsLabel => 'PUTARAN';
+
+  @override
+  String get activityIntervalRunLabel => 'WAKTU LARI';
+
+  @override
+  String get activityIntervalWalkLabel => 'WAKTU JALAN';
+
+  @override
+  String get activityIntervalPlanTitle => 'Rencana Interval';
+
+  @override
+  String get activityIntervalPlanRunLabel => 'LARI / PUTARAN';
+
+  @override
+  String get activityIntervalPlanWalkLabel => 'JALAN / PUTARAN';
+
+  @override
+  String get activityIntervalPlanRoundsLabel => 'PUTARAN RENCANA';
+
+  @override
+  String get activityIntervalPlanNote =>
+      'Sesi ini tersimpan sebelum rincian aktual dicatat. Angka di atas adalah rencana interval, bukan hasil aktual.';
+
+  @override
   String get activityRouteTitle => 'Peta Rute Sesi';
 
   @override
@@ -1104,6 +1132,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get progressTotalCalories => 'TOTAL KALORI';
 
   @override
+  String get progressCaloriesNote =>
+      'Kalori adalah perkiraan, bukan hasil pengukuran medis.';
+
+  @override
   String get progressAvgPace => 'PACE RATA-RATA';
 
   @override
@@ -1116,10 +1148,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get progressRecordLongestDur => 'Durasi Terlama';
 
   @override
-  String get progressRecordBest1k => 'Pace 1 KM Terbaik';
+  String get progressRecordBest1k => 'Pace Rata-rata Terbaik (≥1 km)';
 
   @override
-  String get progressRecordBest5k => 'Pace 5 KM Terbaik';
+  String get progressRecordBest5k => 'Pace Rata-rata Terbaik (≥5 km)';
 
   @override
   String get progressNoRecords =>
