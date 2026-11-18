@@ -34,11 +34,16 @@ jobs:
           FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
           GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
         run: |
+          if [ -f config/google-services.json ]; then
+            cp config/google-services.json android/app/google-services.json
+          fi
           mkdir -p config
           DART_DEFINES=""
           if [ -n "$FIREBASE_CONFIG_JSON" ]; then
             echo "$FIREBASE_CONFIG_JSON" > config/prod.android.json
             DART_DEFINES="--dart-define-from-file=config/prod.android.json"
+          elif [ -f config/dev.android.json ]; then
+            DART_DEFINES="--dart-define-from-file=config/dev.android.json"
           else
             if [ -n "$FIREBASE_API_KEY" ]; then
               DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_API_KEY=$FIREBASE_API_KEY"

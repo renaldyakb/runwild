@@ -27,6 +27,15 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        getByName("debug") {
+            val keystoreFile = file("debug.keystore")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+            }
+        }
+    }
+
     buildTypes {
         release {
             // Signing dengan debug key agar APK release bisa langsung di-install pada perangkat pengujian/distribusi
