@@ -11,8 +11,12 @@
   "introProgress": "Langkah {current} dari {total}",
   "@introProgress": {
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "introNext": "Lanjut",
@@ -154,15 +158,63 @@
   "intervalAudioError": "Suara belum bisa diputar. Ikuti fase di layar; matikan lalu aktifkan panduan untuk mencoba lagi pada fase berikutnya.",
   "intervalInvalid": "Lengkapi durasi dan putaran sesuai batas.",
   "intervalRange": "Masukkan bilangan bulat {min}–{max}.",
-  "@intervalRange": {"placeholders": {"min": {"type": "int"}, "max": {"type": "int"}}},
+  "@intervalRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "intervalRound": "Putaran {current}/{total}",
-  "@intervalRound": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
+  "@intervalRound": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "intervalRoundFree": "Putaran {current}",
-  "@intervalRoundFree": {"placeholders": {"current": {"type": "int"}}},
+  "@intervalRoundFree": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      }
+    }
+  },
   "intervalSummary": "Total {minutes} menit {seconds} detik · {rounds}× lari {run} detik (termasuk pemanasan dan pendinginan)",
-  "@intervalSummary": {"placeholders": {"minutes": {"type": "int"}, "seconds": {"type": "int"}, "rounds": {"type": "int"}, "run": {"type": "int"}}},
+  "@intervalSummary": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      },
+      "rounds": {
+        "type": "int"
+      },
+      "run": {
+        "type": "int"
+      }
+    }
+  },
   "intervalSummaryFree": "Bebas · lari {run} detik / jalan {walk} detik per putaran (tanpa batas)",
-  "@intervalSummaryFree": {"placeholders": {"run": {"type": "int"}, "walk": {"type": "int"}}},
+  "@intervalSummaryFree": {
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "walk": {
+        "type": "int"
+      }
+    }
+  },
   "intervalFreeRounds": "Bebas",
   "intervalLimitedRounds": "Terbatas",
   "runActiveTitle": "Sesi lari",
@@ -176,10 +228,22 @@
   "runRecoveredSplitsHint": "Split sebelum pemulihan dapat berupa estimasi dari total sesi tersimpan.",
   "runSplitsEmpty": "Split muncul setelah ada jarak yang tercatat.",
   "runSplitMeters": "{meters} m",
-  "@runSplitMeters": {"placeholders": {"meters": {"type": "int"}}},
+  "@runSplitMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
   "mapWaiting": "Menunggu posisi GPS yang cukup akurat. Pastikan lokasi presisi aktif dan coba di ruang terbuka.",
   "mapAccuracy": "Akurasi GPS ±{meters} m",
-  "@mapAccuracy": {"placeholders": {"meters": {"type": "int"}}},
+  "@mapAccuracy": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
   "mapStale": "Posisi terakhir belum diperbarui. Marker bukan jaminan posisi saat ini.",
   "mapCurrent": "Posisi GPS saat ini",
   "mapFollowing": "Mengikuti posisi",
@@ -194,7 +258,13 @@
   "runMovingTime": "Durasi bergerak",
   "runAveragePace": "Pace rata-rata",
   "runPaceUnit": "{pace} /km",
-  "@runPaceUnit": {"placeholders": {"pace": {"type": "String"}}},
+  "@runPaceUnit": {
+    "placeholders": {
+      "pace": {
+        "type": "String"
+      }
+    }
+  },
   "runPaused": "Sesi dijeda",
   "runAutoPaused": "Dijeda otomatis",
   "runPause": "Jeda",
@@ -209,19 +279,58 @@
   "summaryFeelingHard": "Berat",
   "summarySplits": "Split per Kilometer",
   "summarySplitKm": "Km {km}",
-  "@summarySplitKm": {"placeholders": {"km": {"type": "int"}}},
+  "@summarySplitKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "summaryIntervalStats": "Statistik Interval",
   "summaryIntervalRounds": "{completed} putaran",
-  "@summaryIntervalRounds": {"placeholders": {"completed": {"type": "int"}}},
+  "@summaryIntervalRounds": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      }
+    }
+  },
   "summaryIntervalRoundsTotal": "{completed} dari {total} putaran",
-  "@summaryIntervalRoundsTotal": {"placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}},
+  "@summaryIntervalRoundsTotal": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "summaryIntervalRunTime": "Lari: {time}",
-  "@summaryIntervalRunTime": {"placeholders": {"time": {"type": "String"}}},
+  "@summaryIntervalRunTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "summaryIntervalWalkTime": "Jalan: {time}",
-  "@summaryIntervalWalkTime": {"placeholders": {"time": {"type": "String"}}},
+  "@summaryIntervalWalkTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "summaryCalories": "Kalori (perkiraan)",
   "summaryCaloriesUnit": "{cal} kkal",
-  "@summaryCaloriesUnit": {"placeholders": {"cal": {"type": "int"}}},
+  "@summaryCaloriesUnit": {
+    "placeholders": {
+      "cal": {
+        "type": "int"
+      }
+    }
+  },
   "summarySave": "Simpan Sesi",
   "summaryDiscard": "Buang Sesi",
   "summaryDiscardPrompt": "Buang sesi lari ini? Sesi yang dibuang tidak dapat dipulihkan.",
@@ -232,7 +341,16 @@
   "runRecoveryTitle": "Sesi belum selesai",
   "runRecoveryChecking": "Memeriksa sesi tersimpan…",
   "runRecoverySummary": "Mulai pukul {time} · {meters} m",
-  "@runRecoverySummary": {"placeholders": {"time": {"type": "String"}, "meters": {"type": "int"}}},
+  "@runRecoverySummary": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
   "runRecoveryResume": "Lanjutkan sesi",
   "runRecoverySave": "Simpan dan akhiri",
   "runRecoveryDiscard": "Buang sesi",
@@ -254,8 +372,12 @@
   "runGpsMetrics": "{points} titik GPS · {meters} m",
   "@runGpsMetrics": {
     "placeholders": {
-      "points": { "type": "int" },
-      "meters": { "type": "int" }
+      "points": {
+        "type": "int"
+      },
+      "meters": {
+        "type": "int"
+      }
     }
   },
   "runStart": "Mulai Lari",
@@ -292,7 +414,6 @@
   "loadingLabel": "Contoh tombol saat memproses",
   "choices": "Pilihan",
   "freeMode": "Bebas",
-  "intervalMode": "Interval",
   "metrics": "Angka dan satuan",
   "metricNote": "Contoh tampilan tanpa data aktivitas. Angka akan muncul dari sesi yang direkam.",
   "distance": "Jarak",
@@ -344,15 +465,23 @@
   "homeWeeklyGoalProgress": "{completed} dari {target} sesi ({percent}%)",
   "@homeWeeklyGoalProgress": {
     "placeholders": {
-      "completed": {"type": "int"},
-      "target": {"type": "int"},
-      "percent": {"type": "int"}
+      "completed": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
     }
   },
   "homeStreak": "Streak {weeks} minggu berturut-turut",
   "@homeStreak": {
     "placeholders": {
-      "weeks": {"type": "int"}
+      "weeks": {
+        "type": "int"
+      }
     }
   },
   "homeRecommendationTitle": "Rekomendasi Hari Ini",
@@ -412,5 +541,33 @@
   "profileDeleteAccountButton": "HAPUS AKUN SAYA",
   "profileDeleteAccountSuccess": "Akun dan semua data berhasil dihapus permanen",
   "profileDeleteAccountRecentLogin": "Demi keamanan, silakan keluar lalu masuk kembali sebelum menghapus akun.",
-  "profileDeleteAccountError": "Gagal menghapus akun. Coba beberapa saat lagi."
+  "profileDeleteAccountError": "Gagal menghapus akun. Coba beberapa saat lagi.",
+  "shareTitle": "Kartu bagikan",
+  "sharePreview": "Pratinjau",
+  "shareFormat": "Format",
+  "shareTheme": "Warna",
+  "shareStory": "Story (9:16)",
+  "shareSquare": "Persegi (1:1)",
+  "shareLime": "Lime",
+  "sharePaper": "Kertas",
+  "shareCharcoal": "Arang",
+  "sharePhoto": "Foto latar",
+  "shareCamera": "Kamera",
+  "shareGallery": "Galeri",
+  "shareRemovePhoto": "Hapus foto",
+  "sharePrivate": "Sembunyikan rute",
+  "sharePrivateHint": "Gambar hanya memuat statistik. Foto pilihanmu tetap terlihat.",
+  "shareAction": "Bagikan gambar",
+  "shareClose": "Tutup",
+  "shareRouteHidden": "Rute disembunyikan",
+  "shareNoRoute": "Rute tidak direkam",
+  "shareRun": "SESI LARI",
+  "shareDistanceUnit": "km",
+  "shareDuration": "Durasi",
+  "sharePace": "Pace /km",
+  "shareRecord": "Rekor pribadi",
+  "shareTagline": "Run free.\nGo wild.",
+  "shareImageError": "Tidak dapat memuat gambar. Coba lagi.",
+  "shareError": "Belum bisa membagikan kartu. Coba lagi.",
+  "shareRouteError": "Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi."
 }

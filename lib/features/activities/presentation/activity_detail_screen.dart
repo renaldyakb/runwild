@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/services/map_service.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_page.dart';
@@ -12,6 +13,7 @@ import '../../../design/components/rw_route_view.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/tracking/activity_detail.dart';
 import '../../../domain/tracking/activity_history.dart';
+import '../../../domain/tracking/live_route.dart';
 import '../../../domain/tracking/run_summary.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/activity_detail_notifier.dart';
@@ -149,6 +151,11 @@ class _DetailContent extends ConsumerWidget {
       for (final p in detail.points)
         (latitude: p.latitude, longitude: p.longitude),
     ];
+    final segments = <List<RoutePoint>>[];
+    for (final point in detail.points) {
+      if (segments.isEmpty || point.segmentStart) segments.add([]);
+      segments.last.add((latitude: point.latitude, longitude: point.longitude));
+    }
     final segmentStarts = {
       for (var i = 0; i < detail.points.length; i++)
         if (detail.points[i].segmentStart) i,
@@ -199,6 +206,14 @@ class _DetailContent extends ConsumerWidget {
 
         // ── Route Map Preview ───────────────────────────────────────
         if (routePoints.length >= 2) ...[
+          ref
+              .watch(mapServiceProvider)
+              .buildLiveMap(
+                route: (segments: segments, position: null, age: null),
+                locked: false,
+                historical: true,
+              ),
+          const SizedBox(height: RwSpace.md),
           Container(
             height: RwSize.liveMapHeight,
             decoration: BoxDecoration(

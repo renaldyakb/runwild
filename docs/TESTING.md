@@ -142,3 +142,12 @@ di HP. Tombol Mulai berlari harus membuka izin lalu countdown/pemulihan.
 Periksa tema terang/gelap, font sistem besar, scroll sampai kartu mingguan,
 dan pastikan navigasi tidak menutupi konten. Peta dan statistik belum tersedia;
 beranda tidak boleh mengklaim GPS terkunci atau menampilkan jarak rekaan.
+
+
+## Pembaruan detail & bagikan · 18 November 2026
+- Buka aktivitas dengan GPS: peta di atas jejak rute, seluruh rute masuk bingkai; geser/zoom peta, atribusi OSM tetap terbaca. Aktivitas tanpa GPS menampilkan pesan jujur.
+- Buka saat offline: jejak rute tetap terlihat; tile yang belum tersimpan boleh tidak tersedia dan harus memberi pesan kegagalan peta.
+- Buka kartu bagikan: pratinjau tampil dahulu, pilih Story/persegi dan Lime/Kertas/Arang; tombol bagikan tetap di bawah.
+- Aktifkan sembunyikan rute: path GPS hilang dari pratinjau dan PNG, tidak ada perisai. Foto pilihan tetap terlihat sesuai keterangan privasi.
+- Pilih foto galeri/kamera, hapus foto, lalu bagikan melalui sheet Android. Pastikan hasil sesuai pratinjau dan teks terbaca.
+- Cek PNG di galeri/penerima: persegi 1080 × 1080, Story 1080 × 1920. Uji teks sistem 200% dan layar HP kecil; laporkan potongan teks/overflow.

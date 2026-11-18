@@ -1233,4 +1233,90 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get profileDeleteAccountError =>
       'Gagal menghapus akun. Coba beberapa saat lagi.';
+
+  @override
+  String get shareTitle => 'Kartu bagikan';
+
+  @override
+  String get sharePreview => 'Pratinjau';
+
+  @override
+  String get shareFormat => 'Format';
+
+  @override
+  String get shareTheme => 'Warna';
+
+  @override
+  String get shareStory => 'Story (9:16)';
+
+  @override
+  String get shareSquare => 'Persegi (1:1)';
+
+  @override
+  String get shareLime => 'Lime';
+
+  @override
+  String get sharePaper => 'Kertas';
+
+  @override
+  String get shareCharcoal => 'Arang';
+
+  @override
+  String get sharePhoto => 'Foto latar';
+
+  @override
+  String get shareCamera => 'Kamera';
+
+  @override
+  String get shareGallery => 'Galeri';
+
+  @override
+  String get shareRemovePhoto => 'Hapus foto';
+
+  @override
+  String get sharePrivate => 'Sembunyikan rute';
+
+  @override
+  String get sharePrivateHint =>
+      'Gambar hanya memuat statistik. Foto pilihanmu tetap terlihat.';
+
+  @override
+  String get shareAction => 'Bagikan gambar';
+
+  @override
+  String get shareClose => 'Tutup';
+
+  @override
+  String get shareRouteHidden => 'Rute disembunyikan';
+
+  @override
+  String get shareNoRoute => 'Rute tidak direkam';
+
+  @override
+  String get shareRun => 'SESI LARI';
+
+  @override
+  String get shareDistanceUnit => 'km';
+
+  @override
+  String get shareDuration => 'Durasi';
+
+  @override
+  String get sharePace => 'Pace /km';
+
+  @override
+  String get shareRecord => 'Rekor pribadi';
+
+  @override
+  String get shareTagline => 'Run free.\nGo wild.';
+
+  @override
+  String get shareImageError => 'Tidak dapat memuat gambar. Coba lagi.';
+
+  @override
+  String get shareError => 'Belum bisa membagikan kartu. Coba lagi.';
+
+  @override
+  String get shareRouteError =>
+      'Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.';
 }

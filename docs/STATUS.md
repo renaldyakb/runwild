@@ -1,5 +1,13 @@
 # Status RUNWILD
 
+- 18 Nov 2026 · Pembaruan visual detail aktivitas & kartu bagikan selesai di kode.
+  - Detail: peta OSM membingkai seluruh koordinat tersimpan di atas jejak rute; segmen GPS tetap terpisah, tanpa status GPS live pada riwayat.
+  - Bagikan: pratinjau di atas, kontrol format/warna/foto, aksi tetap di bawah; ekspor tipografi minimal dengan tiga warna dan dua rasio.
+  - Privat: tanpa ikon perisai maupun path GPS; foto tetap terlihat dan dijelaskan pada kontrol privasi. Rute kosong tidak diganti data rekaan.
+  - PNG: lebar 1080 px; tes ekspor persegi membuktikan 1080 × 1080. Foto, rekor pribadi, dan pilihan format tetap tersedia.
+  - Bukti: 12 tes share_card/activity_detail/activity_map lulus; analisis 6 file bersih; 5 golden diperiksa secara visual (editor serta Story/persegi privat/rute).
+  - Uji HP tersisa: tile internet/cache, foto kamera/galeri dan sheet berbagi Android; lihat tambahan docs/TESTING.md.
+
 - Fase 4 selesai 100% (T4.1â€“T4.7):
   1. T4.6 (Profil & Pengaturan): Model `UserProfile`, layar pengaturan atletis V3 di tab profil (ubah nama, level, target lari, target sesi mingguan, satuan km, auto-pause, panduan suara, getaran haptik, countdown cue, round cue, privasi sembunyikan titik 200m).
   2. T4.7 (Hapus Akun): Dialog konfirmasi ganda (peringatan keras + input verifikasi teks 'HAPUS'), penghapusan tuntas subkoleksi activities dan dokumen user Firestore, pembersihan total data lokal via `RunJournal.purgeUserData`, dan penghapusan akun Firebase Auth.

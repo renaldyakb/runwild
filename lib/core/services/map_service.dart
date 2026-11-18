@@ -11,7 +11,11 @@ import '../../l10n/generated/app_localizations.dart';
 import '../constants/map_limits.dart';
 
 abstract interface class MapService {
-  Widget buildLiveMap({required LiveRouteSnapshot route, required bool locked});
+  Widget buildLiveMap({
+    required LiveRouteSnapshot route,
+    required bool locked,
+    bool historical = false,
+  });
 }
 
 final mapServiceProvider = Provider<MapService>(
@@ -26,9 +30,11 @@ class OpenStreetMapService implements MapService {
   Widget buildLiveMap({
     required LiveRouteSnapshot route,
     required bool locked,
+    bool historical = false,
   }) => _LiveMap(
     route: route,
     locked: locked,
+    historical: historical,
     tileProviderFactory: tileProviderFactory,
   );
 }
@@ -37,10 +43,12 @@ class _LiveMap extends StatefulWidget {
   const _LiveMap({
     required this.route,
     required this.locked,
+    this.historical = false,
     this.tileProviderFactory,
   });
   final LiveRouteSnapshot route;
   final bool locked;
+  final bool historical;
   final TileProvider Function()? tileProviderFactory;
   @override
   State<_LiveMap> createState() => _LiveMapState();
@@ -179,56 +187,58 @@ class _LiveMapState extends State<_LiveMap> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // GPS Accuracy and Stale Status Strip
-        Container(
-          margin: const EdgeInsets.only(bottom: RwSpace.xs),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: stale ? const Color(0xFFFEF3C7) : Colors.white,
-            borderRadius: BorderRadius.circular(RwRadius.sm),
-            border: Border.all(
-              color: stale ? const Color(0xFFFDE68A) : const Color(0xFFE2E6DC),
+        if (!widget.historical)
+          Container(
+            margin: const EdgeInsets.only(bottom: RwSpace.xs),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: stale ? const Color(0xFFFEF3C7) : Colors.white,
+              borderRadius: BorderRadius.circular(RwRadius.sm),
+              border: Border.all(
+                color: stale
+                    ? const Color(0xFFFDE68A)
+                    : const Color(0xFFE2E6DC),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  stale ? Icons.gps_not_fixed_rounded : Icons.gps_fixed_rounded,
+                  size: 14,
+                  color: stale ? const Color(0xFFD97706) : RwColors.lime700,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (position == null || stale)
+                        Text(
+                          s.mapStale,
+                          style: const TextStyle(
+                            fontFamily: RwType.family,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFB45309),
+                          ),
+                        ),
+                      if (widget.route.position case final fix?)
+                        Text(
+                          s.mapAccuracy(fix.accuracyMeters.ceil()),
+                          style: const TextStyle(
+                            fontFamily: RwType.family,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: RwColors.ink950,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              Icon(
-                stale ? Icons.gps_not_fixed_rounded : Icons.gps_fixed_rounded,
-                size: 14,
-                color: stale ? const Color(0xFFD97706) : RwColors.lime700,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (position == null || stale)
-                      Text(
-                        s.mapStale,
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFB45309),
-                        ),
-                      ),
-                    if (widget.route.position case final fix?)
-                      Text(
-                        s.mapAccuracy(fix.accuracyMeters.ceil()),
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: RwColors.ink950,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(height: RwSpace.xs),
 
         // Live Map View Frame
@@ -247,6 +257,17 @@ class _LiveMapState extends State<_LiveMap> {
                   options: MapOptions(
                     initialCenter: center,
                     initialZoom: MapLimits.initialZoom,
+                    initialCameraFit: widget.historical
+                        ? CameraFit.coordinates(
+                            coordinates: [
+                              for (final segment in segments)
+                                for (final point in segment)
+                                  LatLng(point.latitude, point.longitude),
+                            ],
+                            padding: const EdgeInsets.all(RwSpace.xxl),
+                            maxZoom: MapLimits.initialZoom,
+                          )
+                        : null,
                     minZoom: MapLimits.minZoom,
                     maxZoom: MapLimits.maxZoom,
                     backgroundColor: RwColors.paper200,
@@ -342,12 +363,12 @@ class _LiveMapState extends State<_LiveMap> {
                   ],
                 ),
 
-                // OpenStreetMap Credit Badge at Bottom-Left with 25% opacity
+                // Attribution remains visible over map tiles.
                 Positioned(
                   left: 8,
                   bottom: 8,
                   child: Opacity(
-                    opacity: 0.25,
+                    opacity: 1,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
@@ -386,7 +407,7 @@ class _LiveMapState extends State<_LiveMap> {
                               s.mapAttribution,
                               style: const TextStyle(
                                 fontFamily: RwType.family,
-                                fontSize: 9,
+                                fontSize: RwType.label,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                                 letterSpacing: 0,
@@ -405,19 +426,20 @@ class _LiveMapState extends State<_LiveMap> {
         const SizedBox(height: RwSpace.sm),
 
         // Recenter & Follow Button
-        RwButton.secondary(
-          label: _follow ? s.mapFollowing : s.mapRecenter,
-          icon: Icons.my_location,
-          fullWidth: true,
-          onPressed: widget.locked || position == null
-              ? null
-              : () {
-                  setState(() => _follow = true);
-                  if (_ready) {
-                    _controller.move(position, _controller.camera.zoom);
-                  }
-                },
-        ),
+        if (!widget.historical)
+          RwButton.secondary(
+            label: _follow ? s.mapFollowing : s.mapRecenter,
+            icon: Icons.my_location,
+            fullWidth: true,
+            onPressed: widget.locked || position == null
+                ? null
+                : () {
+                    setState(() => _follow = true);
+                    if (_ready) {
+                      _controller.move(position, _controller.camera.zoom);
+                    }
+                  },
+          ),
       ],
     );
   }

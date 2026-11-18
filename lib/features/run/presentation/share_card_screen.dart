@@ -14,6 +14,7 @@ import '../../../design/components/rw_route_view.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/stats/stats_engine.dart';
 import '../../../domain/tracking/run_summary.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../foundation/application/home_stats_provider.dart';
 import '../../profile/application/profile_service.dart';
 import '../application/run_journal.dart';
@@ -35,6 +36,7 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
   var _initializedPrivacy = false;
   var _sharing = false;
   Uint8List? _customImage;
+  Set<int> _segmentStarts = const {};
   List<LatLngPoint> _routePoints = const [];
 
   @override
@@ -50,13 +52,25 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
         final pts = await ref.read(runJournalProvider).sessionPoints(sessionId);
         if (mounted && pts.isNotEmpty) {
           setState(() {
+            _segmentStarts = {
+              for (var i = 0; i < pts.length; i++)
+                if (pts[i].segmentStart) i,
+            };
             _routePoints = [
               for (final p in pts)
                 (latitude: p.latitude, longitude: p.longitude),
             ];
           });
         }
-      } catch (_) {}
+      } catch (error) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context).shareRouteError),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -71,12 +85,12 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
       );
       if (picked != null) {
         final bytes = await picked.readAsBytes();
-        setState(() => _customImage = bytes);
+        if (mounted) setState(() => _customImage = bytes);
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tidak dapat memuat gambar.')),
+          SnackBar(content: Text(AppLocalizations.of(context).shareImageError)),
         );
       }
     }
@@ -90,23 +104,25 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
           _boundaryKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
       if (boundary == null) return;
-      final image = await boundary.toImage(pixelRatio: 3.0);
+      final image = await boundary.toImage(
+        pixelRatio: RwSize.shareExportWidth / boundary.size.width,
+      );
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
       if (byteData == null) return;
       final pngBytes = byteData.buffer.asUint8List();
 
       final service = ref.read(shareCardServiceProvider);
-      await service.shareImage(
+      final shared = await service.shareImage(
         pngBytes,
         title: 'Sesi Lari RUNWILD',
         text: 'Lari bersama RUNWILD · RUN FREE, GO WILD.',
       );
+      if (!shared) throw StateError('Image share failed');
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Belum bisa membagikan kartu. Coba lagi.'),
-          ),
+          SnackBar(content: Text(AppLocalizations.of(context).shareError)),
         );
       }
     } finally {
@@ -124,302 +140,47 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
       }
     }
 
-    final isStory = _format == ShareCardFormat.story;
-
+    final s = AppLocalizations.of(context);
+    final records = ref.watch(personalRecordsProvider).value;
+    final pbs = records == null
+        ? const <String>[]
+        : StatsEngine.detectPersonalBestsForSession(
+            startedAt: widget.summary.startedAt,
+            records: records,
+          );
     return Scaffold(
       backgroundColor: RwColors.paper50,
-      appBar: AppBar(
-        title: const Text(
-          'Kartu Bagikan',
-          style: TextStyle(
-            fontFamily: RwType.family,
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-            letterSpacing: -0.3,
+      appBar: AppBar(title: Text(s.shareTitle)),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(RwSpace.md),
+          child: RwButton.primary(
+            label: s.shareAction,
+            icon: Icons.ios_share,
+            loading: _sharing,
+            onPressed: _share,
           ),
         ),
       ),
       body: SafeArea(
         child: RwPage(
-          physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            // ── Section 1: Format & Rasio ─────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(RwSpace.sm + 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(RwRadius.md),
-                border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'FORMAT RASIO',
-                    style: TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.4,
-                      color: RwColors.mutedTextOnLight,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  RwSegmentedControl<ShareCardFormat>(
-                    items: const [
-                      RwSegmentItem(
-                        value: ShareCardFormat.story,
-                        label: 'Story (9:16)',
-                        icon: Icons.stay_current_portrait_rounded,
-                      ),
-                      RwSegmentItem(
-                        value: ShareCardFormat.square,
-                        label: 'Persegi (1:1)',
-                        icon: Icons.crop_square_rounded,
-                      ),
-                    ],
-                    selectedValue: _format,
-                    onChanged: (fmt) => setState(() => _format = fmt),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: RwSpace.sm),
-
-            // ── Section 2: Tema Visual ────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(RwSpace.sm + 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(RwRadius.md),
-                border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'TEMA VISUAL',
-                    style: TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.4,
-                      color: RwColors.mutedTextOnLight,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  RwSegmentedControl<ShareCardTheme>(
-                    items: const [
-                      RwSegmentItem(
-                        value: ShareCardTheme.primeLime,
-                        label: '⚡ Prime Lime',
-                      ),
-                      RwSegmentItem(
-                        value: ShareCardTheme.cleanPaper,
-                        label: '📄 Kertas Bersih',
-                      ),
-                      RwSegmentItem(
-                        value: ShareCardTheme.boldCharcoal,
-                        label: '⬛ Bold Charcoal',
-                      ),
-                    ],
-                    selectedValue: _theme,
-                    onChanged: (thm) => setState(() => _theme = thm),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: RwSpace.sm),
-
-            // ── Section 3: Foto Latar Medsos ──────────────────────────
-            Container(
-              padding: const EdgeInsets.all(RwSpace.sm + 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(RwRadius.md),
-                border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.photo_camera_rounded,
-                        size: 18,
-                        color: RwColors.ink950,
-                      ),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Foto Latar Medsos',
-                          style: TextStyle(
-                            fontFamily: RwType.family,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                      if (_customImage != null)
-                        TextButton.icon(
-                          onPressed: () => setState(() => _customImage = null),
-                          icon: const Icon(Icons.close_rounded, size: 15),
-                          label: const Text(
-                            'Hapus Foto',
-                            style: TextStyle(
-                              fontFamily: RwType.family,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: RwColors.danger500,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: const Icon(Icons.camera_alt_outlined, size: 17),
-                          label: const Text(
-                            'Kamera',
-                            style: TextStyle(
-                              fontFamily: RwType.family,
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: RwColors.ink950,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: Color(0xFFE2E6DC)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                RwRadius.pill,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: const Icon(
-                            Icons.photo_library_outlined,
-                            size: 17,
-                          ),
-                          label: const Text(
-                            'Galeri',
-                            style: TextStyle(
-                              fontFamily: RwType.family,
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: RwColors.ink950,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: Color(0xFFE2E6DC)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                RwRadius.pill,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: RwSpace.sm),
-
-            // ── Section 4: Privasi Rute ───────────────────────────────
-            Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(RwRadius.md),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: RwSpace.sm + 2,
-                  vertical: RwSpace.xs,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(RwRadius.md),
-                  border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-                ),
-                child: SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  secondary: const Icon(
-                    Icons.shield_outlined,
-                    size: 20,
-                    color: RwColors.ink950,
-                  ),
-                  title: const Text(
-                    'Sembunyikan privasi rute',
-                    style: TextStyle(
-                      fontFamily: RwType.family,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  ),
-                  subtitle: const Text(
-                    'Sembunyikan alur GPS demi keamanan tempat tinggal Anda',
-                    style: TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 11,
-                      color: RwColors.mutedTextOnLight,
-                    ),
-                  ),
-                  value: _hideRoute,
-                  onChanged: (val) => setState(() => _hideRoute = val),
-                ),
-              ),
-            ),
-            const SizedBox(height: RwSpace.md),
-
-            // ── Section 5: Live Interactive Card Preview ──────────────
             Center(
-              child: Container(
-                constraints: BoxConstraints(maxWidth: isStory ? 260 : 280),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(RwRadius.lg + 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
-                      spreadRadius: -2,
-                    ),
-                  ],
-                ),
+              child: SizedBox(
+                width: _format == ShareCardFormat.story
+                    ? RwSize.sharePreviewWidth
+                    : RwSize.shareCanvas,
                 child: RepaintBoundary(
                   key: _boundaryKey,
-                  child: Builder(
-                    builder: (context) {
-                      final records = ref.watch(personalRecordsProvider).value;
-                      final pbs = records != null
-                          ? StatsEngine.detectPersonalBestsForSession(
-                              startedAt: widget.summary.startedAt,
-                              records: records,
-                            )
-                          : const <String>[];
-                      return ShareCardWidget(
-                        summary: widget.summary,
-                        theme: _theme,
-                        format: _format,
-                        hideRoute: _hideRoute,
-                        routePoints: _routePoints,
-                        backgroundImageBytes: _customImage,
-                        personalBests: pbs,
-                      );
-                    },
+                  child: ShareCardWidget(
+                    summary: widget.summary,
+                    theme: _theme,
+                    format: _format,
+                    hideRoute: _hideRoute,
+                    routePoints: _routePoints,
+                    segmentStarts: _segmentStarts,
+                    backgroundImageBytes: _customImage,
+                    personalBests: pbs,
                   ),
                 ),
               ),
@@ -427,28 +188,83 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
             const SizedBox(height: RwSpace.xs),
             Center(
               child: Text(
-                'Pratinjau kartu lari resolusi tinggi siap dibagikan',
-                style: TextStyle(
-                  fontFamily: RwType.family,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: RwColors.mutedTextOnLight.withValues(alpha: 0.8),
-                ),
+                s.sharePreview,
+                style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
-            const SizedBox(height: RwSpace.md),
-
-            // ── Action Buttons ────────────────────────────────────────
-            RwButton.primary(
-              label: 'Bagikan Gambar',
-              icon: Icons.share_rounded,
-              loading: _sharing,
-              onPressed: _share,
-            ),
+            const SizedBox(height: RwSpace.lg),
+            Text(s.shareFormat, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: RwSpace.xs),
-            RwButton.secondary(
-              label: 'Tutup',
-              onPressed: () => Navigator.pop(context),
+            RwSegmentedControl<ShareCardFormat>(
+              items: [
+                RwSegmentItem(
+                  value: ShareCardFormat.story,
+                  label: s.shareStory,
+                ),
+                RwSegmentItem(
+                  value: ShareCardFormat.square,
+                  label: s.shareSquare,
+                ),
+              ],
+              selectedValue: _format,
+              onChanged: (value) => setState(() => _format = value),
+            ),
+            const SizedBox(height: RwSpace.lg),
+            Text(s.shareTheme, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: RwSpace.xs),
+            RwSegmentedControl<ShareCardTheme>(
+              items: [
+                RwSegmentItem(
+                  value: ShareCardTheme.primeLime,
+                  label: s.shareLime,
+                ),
+                RwSegmentItem(
+                  value: ShareCardTheme.cleanPaper,
+                  label: s.sharePaper,
+                ),
+                RwSegmentItem(
+                  value: ShareCardTheme.boldCharcoal,
+                  label: s.shareCharcoal,
+                ),
+              ],
+              selectedValue: _theme,
+              onChanged: (value) => setState(() {
+                _theme = value;
+                _customImage = null;
+              }),
+            ),
+            const SizedBox(height: RwSpace.lg),
+            Text(s.sharePhoto, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: RwSpace.xs),
+            Wrap(
+              spacing: RwSpace.xs,
+              runSpacing: RwSpace.xs,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.camera),
+                  icon: const Icon(Icons.photo_camera_outlined),
+                  label: Text(s.shareCamera),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: Text(s.shareGallery),
+                ),
+                if (_customImage != null)
+                  TextButton(
+                    onPressed: () => setState(() => _customImage = null),
+                    child: Text(s.shareRemovePhoto),
+                  ),
+              ],
+            ),
+            const SizedBox(height: RwSpace.md),
+            const Divider(),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: Text(s.sharePrivate),
+              subtitle: Text(s.sharePrivateHint),
+              value: _hideRoute,
+              onChanged: (value) => setState(() => _hideRoute = value),
             ),
           ],
         ),

@@ -69,6 +69,10 @@ abstract final class RwSize {
   static const landscape = 104.0;
   static const homeArtwork = 180.0;
   static const homeAction = 224.0;
+  static const shareCanvas = 360.0;
+  static const shareStoryHeight = 640.0;
+  static const sharePreviewWidth = 252.0;
+  static const shareExportWidth = 1080.0;
   static const liveMapHeight = 360.0;
   static const countdownCircle = 160.0;
   static const skeleton = 20.0;

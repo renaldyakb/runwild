@@ -24,7 +24,43 @@ jobs:
           cache: true
       - run: flutter pub get --enforce-lockfile
       - run: flutter gen-l10n
-      - run: flutter build apk --release
+      - name: Build Android Release APK
+        env:
+          FIREBASE_CONFIG_JSON: ${{ secrets.FIREBASE_CONFIG_JSON }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+        run: |
+          mkdir -p config
+          DART_DEFINES=""
+          if [ -n "$FIREBASE_CONFIG_JSON" ]; then
+            echo "$FIREBASE_CONFIG_JSON" > config/prod.android.json
+            DART_DEFINES="--dart-define-from-file=config/prod.android.json"
+          else
+            if [ -n "$FIREBASE_API_KEY" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_API_KEY=$FIREBASE_API_KEY"
+            fi
+            if [ -n "$FIREBASE_APP_ID" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_APP_ID=$FIREBASE_APP_ID"
+            fi
+            if [ -n "$FIREBASE_MESSAGING_SENDER_ID" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID"
+            fi
+            if [ -n "$FIREBASE_PROJECT_ID" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID"
+            fi
+            if [ -n "$FIREBASE_STORAGE_BUCKET" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=FIREBASE_STORAGE_BUCKET=$FIREBASE_STORAGE_BUCKET"
+            fi
+            if [ -n "$GOOGLE_SERVER_CLIENT_ID" ]; then
+              DART_DEFINES="$DART_DEFINES --dart-define=GOOGLE_SERVER_CLIENT_ID=$GOOGLE_SERVER_CLIENT_ID"
+            fi
+          fi
+          
+          flutter build apk --release $DART_DEFINES
       - uses: actions/upload-artifact@v4
         with:
           name: runwild-release-apk

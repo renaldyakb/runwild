@@ -2331,6 +2331,174 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Gagal menghapus akun. Coba beberapa saat lagi.'**
   String get profileDeleteAccountError;
+
+  /// No description provided for @shareTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kartu bagikan'**
+  String get shareTitle;
+
+  /// No description provided for @sharePreview.
+  ///
+  /// In id, this message translates to:
+  /// **'Pratinjau'**
+  String get sharePreview;
+
+  /// No description provided for @shareFormat.
+  ///
+  /// In id, this message translates to:
+  /// **'Format'**
+  String get shareFormat;
+
+  /// No description provided for @shareTheme.
+  ///
+  /// In id, this message translates to:
+  /// **'Warna'**
+  String get shareTheme;
+
+  /// No description provided for @shareStory.
+  ///
+  /// In id, this message translates to:
+  /// **'Story (9:16)'**
+  String get shareStory;
+
+  /// No description provided for @shareSquare.
+  ///
+  /// In id, this message translates to:
+  /// **'Persegi (1:1)'**
+  String get shareSquare;
+
+  /// No description provided for @shareLime.
+  ///
+  /// In id, this message translates to:
+  /// **'Lime'**
+  String get shareLime;
+
+  /// No description provided for @sharePaper.
+  ///
+  /// In id, this message translates to:
+  /// **'Kertas'**
+  String get sharePaper;
+
+  /// No description provided for @shareCharcoal.
+  ///
+  /// In id, this message translates to:
+  /// **'Arang'**
+  String get shareCharcoal;
+
+  /// No description provided for @sharePhoto.
+  ///
+  /// In id, this message translates to:
+  /// **'Foto latar'**
+  String get sharePhoto;
+
+  /// No description provided for @shareCamera.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamera'**
+  String get shareCamera;
+
+  /// No description provided for @shareGallery.
+  ///
+  /// In id, this message translates to:
+  /// **'Galeri'**
+  String get shareGallery;
+
+  /// No description provided for @shareRemovePhoto.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus foto'**
+  String get shareRemovePhoto;
+
+  /// No description provided for @sharePrivate.
+  ///
+  /// In id, this message translates to:
+  /// **'Sembunyikan rute'**
+  String get sharePrivate;
+
+  /// No description provided for @sharePrivateHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Gambar hanya memuat statistik. Foto pilihanmu tetap terlihat.'**
+  String get sharePrivateHint;
+
+  /// No description provided for @shareAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Bagikan gambar'**
+  String get shareAction;
+
+  /// No description provided for @shareClose.
+  ///
+  /// In id, this message translates to:
+  /// **'Tutup'**
+  String get shareClose;
+
+  /// No description provided for @shareRouteHidden.
+  ///
+  /// In id, this message translates to:
+  /// **'Rute disembunyikan'**
+  String get shareRouteHidden;
+
+  /// No description provided for @shareNoRoute.
+  ///
+  /// In id, this message translates to:
+  /// **'Rute tidak direkam'**
+  String get shareNoRoute;
+
+  /// No description provided for @shareRun.
+  ///
+  /// In id, this message translates to:
+  /// **'SESI LARI'**
+  String get shareRun;
+
+  /// No description provided for @shareDistanceUnit.
+  ///
+  /// In id, this message translates to:
+  /// **'km'**
+  String get shareDistanceUnit;
+
+  /// No description provided for @shareDuration.
+  ///
+  /// In id, this message translates to:
+  /// **'Durasi'**
+  String get shareDuration;
+
+  /// No description provided for @sharePace.
+  ///
+  /// In id, this message translates to:
+  /// **'Pace /km'**
+  String get sharePace;
+
+  /// No description provided for @shareRecord.
+  ///
+  /// In id, this message translates to:
+  /// **'Rekor pribadi'**
+  String get shareRecord;
+
+  /// No description provided for @shareTagline.
+  ///
+  /// In id, this message translates to:
+  /// **'Run free.\nGo wild.'**
+  String get shareTagline;
+
+  /// No description provided for @shareImageError.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak dapat memuat gambar. Coba lagi.'**
+  String get shareImageError;
+
+  /// No description provided for @shareError.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum bisa membagikan kartu. Coba lagi.'**
+  String get shareError;
+
+  /// No description provided for @shareRouteError.
+  ///
+  /// In id, this message translates to:
+  /// **'Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.'**
+  String get shareRouteError;
 }
 
 class _AppLocalizationsDelegate
