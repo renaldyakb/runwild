@@ -10,6 +10,7 @@ permissions:
 jobs:
   android:
     name: Build Android APK
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,11 +76,20 @@ jobs:
           name: runwild-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Extract App Version
+      - name: Extract App Version and Release Notes
         id: app_version
+        shell: bash
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
-          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+          FULL_VERSION=$(sed -n 's/^version: *//p' pubspec.yaml | tr -d '\r')
+          if [[ ! "$FULL_VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)$ ]]; then
+            echo "Expected pubspec version: x.y.z+build" >&2
+            exit 1
+          fi
+          VERSION="${BASH_REMATCH[1]}"
+          NOTES="docs/releases/$VERSION.md"
+          test -s "$NOTES" || { echo "Missing release notes: $NOTES" >&2; exit 1; }
+          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
 
       - name: Publish to GitHub Releases
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -88,13 +98,7 @@ jobs:
           tag_name: ${{ steps.app_version.outputs.version }}
           name: "RUNWILD ${{ steps.app_version.outputs.version }}"
           make_latest: true
-          body: |
-            ### RUNWILD — RUN. TRACK. IMPROVE. GO WILD. 🏃‍♂️⚡
-            
-            Versi rilis terbaru aplikasi RUNWILD dari branch `main`.
-            
-            #### 📦 Berkas Instalasi:
-            - **`app-release.apk`**: APK Release Android resmi (siap diunduh dan dipasang langsung di HP).
+          body_path: ${{ steps.app_version.outputs.notes }}
           files: |
             build/app/outputs/flutter-apk/app-release.apk
         env:
@@ -114,4 +118,4 @@ jobs:
       - run: flutter gen-l10n
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
-      - run: flutter test test/app_update_test.dart test/share_card_test.dart test/personal_best_alert_test.dart test/run_preferences_integration_test.dart test/profile_settings_test.dart test/run_permissions_test.dart test/weekly_goal_celebration_test.dart test/activity_detail_test.dart test/activity_sync_test.dart test/home_progress_test.dart test/tracking_engine_test.dart
+      - run: flutter test test/release_notes_test.dart test/release_ui_test.dart test/app_update_test.dart test/share_card_test.dart test/personal_best_alert_test.dart test/run_preferences_integration_test.dart test/profile_settings_test.dart test/run_permissions_test.dart test/weekly_goal_celebration_test.dart test/activity_detail_test.dart test/activity_sync_test.dart test/home_progress_test.dart test/tracking_engine_test.dart

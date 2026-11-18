@@ -151,3 +151,12 @@ beranda tidak boleh mengklaim GPS terkunci atau menampilkan jarak rekaan.
 - Aktifkan sembunyikan rute: path GPS hilang dari pratinjau dan PNG, tidak ada perisai. Foto pilihan tetap terlihat sesuai keterangan privasi.
 - Pilih foto galeri/kamera, hapus foto, lalu bagikan melalui sheet Android. Pastikan hasil sesuai pratinjau dan teks terbaca.
 - Cek PNG di galeri/penerima: persegi 1080 × 1080, Story 1080 × 1920. Uji teks sistem 200% dan layar HP kecil; laporkan potongan teks/overflow.
+
+
+## Patch 0.1.2: versi, pembaruan, dan drawer
+- Setelah CI menghasilkan APK 0.1.2+3, pasang sebagai pembaruan atas 0.1.1 dengan signing key yang sama. Profil harus menampilkan 0.1.2 / build 3, sesuai informasi paket Android.
+- Periksa update pada versi yang sama: tidak boleh menawarkan 0.1.2 lagi. Dari APK lama, unduh melalui tombol pembaruan dan pastikan tujuan unduhan benar.
+- Catatan rilis memiliki heading dan bullet tanpa tanda Markdown mentah. Catatan kosong menampilkan keterangan jujur.
+- Edit judul/catatan dari detail: drawer naik dari bawah, tetap dapat digulir ketika keyboard terbuka. Simpan mengubah data; tutup/geser batal tidak mengubah data.
+- Home: mulai membuka persiapan sesi; rute kecil hanya tampil jika sesi sebelumnya memiliki GPS. Cek teks sistem 200%.
+- Tes lokal memakai mock info paket dan tile peta; belum membuktikan hasil build/release di GitHub atau instalasi perangkat fisik.

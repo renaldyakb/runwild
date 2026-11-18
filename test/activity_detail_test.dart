@@ -1,7 +1,10 @@
 import 'package:drift/native.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:runwild/core/services/map_service.dart';
 import 'package:runwild/design/theme/rw_theme.dart';
 import 'package:runwild/domain/interval/interval_config.dart';
 import 'package:runwild/domain/interval/interval_engine.dart';
@@ -25,6 +28,12 @@ Widget _testHost(Widget child) => MaterialApp(
   supportedLocales: AppLocalizations.supportedLocales,
   home: child,
 );
+
+class _Tiles extends TileProvider {
+  @override
+  ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
+      MemoryImage(TileProvider.transparentImage);
+}
 
 class _FakeSyncRepository implements ActivitySyncRepository {
   String? lastUpdatedActivityId;
@@ -58,6 +67,17 @@ class _FakeSyncRepository implements ActivitySyncRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await loadArchivo();
+    await (FontLoader('Google Sans Flex')
+          ..addFont(
+            rootBundle.load('assets/fonts/GoogleSansFlex_24pt-Regular.ttf'),
+          )
+          ..addFont(
+            rootBundle.load('assets/fonts/GoogleSansFlex_24pt-Black.ttf'),
+          ))
+        .load();
+  });
   setUpAll(loadArchivo);
 
   group('Activity detail domain tests', () {
@@ -246,6 +266,9 @@ void main() {
         ProviderScope(
           overrides: [
             runJournalProvider.overrideWithValue(db),
+            mapServiceProvider.overrideWithValue(
+              OpenStreetMapService(tileProviderFactory: _Tiles.new),
+            ),
             runOwnerProvider.overrideWithValue(() => 'runner'),
           ],
           child: _testHost(const ActivityDetailScreen(sessionId: 999)),
@@ -304,6 +327,9 @@ void main() {
         ProviderScope(
           overrides: [
             runJournalProvider.overrideWithValue(db),
+            mapServiceProvider.overrideWithValue(
+              OpenStreetMapService(tileProviderFactory: _Tiles.new),
+            ),
             runOwnerProvider.overrideWithValue(() => 'runner'),
             activitySyncRepositoryProvider.overrideWithValue(fakeSync),
           ],
@@ -325,14 +351,31 @@ void main() {
       // Open Edit Dialog
       await tester.tap(find.byIcon(Icons.edit_outlined));
       await tester.pumpAndSettle();
-      expect(find.text('Ubah Judul Sesi'), findsOneWidget);
+      expect(find.text('Judul & catatan'), findsOneWidget);
+      expect(find.byType(BottomSheet), findsOneWidget);
+      await expectLater(
+        find.byType(BottomSheet),
+        matchesGoldenFile('goldens/activity_edit_drawer.png'),
+      );
+      expect(find.byType(AlertDialog), findsNothing);
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+      expect(find.byType(BottomSheet), findsNothing);
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+      tester.view.viewInsets = const FakeViewPadding(bottom: 250);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
 
       // Enter new title
       await tester.enterText(
         find.byType(TextField).first,
         'Sesi Interval Pagi',
       );
-      await tester.tap(find.text('Simpan'));
+      await tester.ensureVisible(find.text('Simpan perubahan'));
+      await tester.tap(find.text('Simpan perubahan'));
+      tester.view.resetViewInsets();
       await tester.pumpAndSettle();
 
       // Verify new title is reflected

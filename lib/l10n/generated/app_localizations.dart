@@ -2499,6 +2499,78 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.'**
   String get shareRouteError;
+
+  /// No description provided for @updateTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaruan tersedia'**
+  String get updateTitle;
+
+  /// No description provided for @updateInstalled.
+  ///
+  /// In id, this message translates to:
+  /// **'Terpasang: v{version}'**
+  String updateInstalled(String version);
+
+  /// No description provided for @updateChanges.
+  ///
+  /// In id, this message translates to:
+  /// **'Yang baru'**
+  String get updateChanges;
+
+  /// No description provided for @updateEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Catatan perubahan belum tersedia untuk versi ini.'**
+  String get updateEmpty;
+
+  /// No description provided for @updateDownload.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduh pembaruan'**
+  String get updateDownload;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In id, this message translates to:
+  /// **'Nanti saja'**
+  String get updateLater;
+
+  /// No description provided for @updateDownloadError.
+  ///
+  /// In id, this message translates to:
+  /// **'Tautan unduhan belum dapat dibuka. Coba lagi.'**
+  String get updateDownloadError;
+
+  /// No description provided for @activityEditSheetTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Judul & catatan'**
+  String get activityEditSheetTitle;
+
+  /// No description provided for @activitySave.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan perubahan'**
+  String get activitySave;
+
+  /// No description provided for @homeSessionHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai dari langkahmu hari ini.'**
+  String get homeSessionHint;
+
+  /// No description provided for @homeLastRoute.
+  ///
+  /// In id, this message translates to:
+  /// **'Rute terakhir'**
+  String get homeLastRoute;
+
+  /// No description provided for @homeWeekLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Minggu ini'**
+  String get homeWeekLabel;
 }
 
 class _AppLocalizationsDelegate

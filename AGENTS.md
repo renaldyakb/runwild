@@ -71,3 +71,14 @@ Skill: https://github.com/miqdadbadjuber/anti-slop. Pasang SEKALI: `npx antislop
 1. Baca AGENTS.md + STATUS.md + tugas T-xx. 2. Rencana ≤5 baris. 3. Implementasi kecil. 4. Verifikasi terarah.
 2. Update STATUS.md (≤20 baris). 6. Laporan ≤15 baris: selesai / bukti / belum bisa diuji (perangkat nyata) / keputusan baru.
    Jangan klaim selesai tanpa bukti. Hal yang butuh perangkat fisik (GPS, background, audio) → katakan jujur + tambahkan langkah uji ke `docs/TESTING.md`.
+
+
+## 9. Versi dan catatan rilis GitHub Actions
+
+- Sumber versi hanya `pubspec.yaml` (`major.minor.patch+build`). Naikkan patch dan build untuk setiap APK pembaruan; jangan mengganti aset rilis lama dengan kode berbeda pada versi yang sama.
+- UI/pemeriksa update membaca versi paket terpasang lewat `AppVersion.initialize()` / `package_info_plus`. Jangan hardcode versi tampilan atau pembanding.
+- Sebelum rilis, tulis `docs/releases/<versi>.md`, misalnya `docs/releases/0.1.2.md`. CI memakai file ini sebagai `body_path`; tag `v<versi>` berasal dari pubspec.
+- Format yang didukung aplikasi: heading `## Diperbaiki` / `## Diperbarui` / `## Ditambahkan`, paragraf pendek, dan bullet `- Satu perubahan nyata per baris.` Gunakan hanya bagian yang ada isinya, idealnya 3-6 bullet singkat.
+- Tulis perubahan untuk pengguna dalam bahasa Indonesia. Jangan isi catatan dengan tagline, nama branch, daftar APK, perintah instalasi, HTML, tabel, gambar, emoji hias, atau code block.
+- Penebalan, backtick, dan tautan Markdown lama dinormalisasi menjadi teks; heading/bullet dirender sebagai komponen. Jangan menampilkan body GitHub mentah lewat `Text(releaseNotes)`.
+- Jangan mengarang klaim perbaikan/performa. Catatan kosong harus tampil jujur. Jalankan tes versi, parser catatan rilis dan UI pembaruan sebelum publikasi; publish harus menunggu job verify berhasil.

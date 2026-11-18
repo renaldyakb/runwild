@@ -57,235 +57,92 @@ class _HomeDashboardState extends ConsumerState<HomeDashboard> {
     return RwPage(
       children: [
         // ── Hero Action Card (Hitam Arang Atletis & Prime Lime) ───────
-        DecoratedBox(
+        Container(
           decoration: BoxDecoration(
             color: RwColors.ink950,
             borderRadius: BorderRadius.circular(RwRadius.lg),
-            border: Border.all(color: RwColors.ink800, width: 1),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x30000000),
-                blurRadius: 16,
-                offset: Offset(0, 6),
-              ),
-            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(RwSpace.screen),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+          padding: const EdgeInsets.all(RwSpace.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                s.homeReady,
+                style: const TextStyle(
+                  fontFamily: RwType.family,
+                  color: RwColors.paper200,
+                  fontSize: RwType.label,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: RwSpace.lg),
+              Text(
+                s.homeTitle,
+                style: const TextStyle(
+                  fontFamily: RwType.family,
+                  color: RwColors.paper100,
+                  fontSize: RwType.displayM,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                ),
+              ),
+              Text(
+                s.homeAccent,
+                style: const TextStyle(
+                  fontFamily: RwType.family,
+                  color: RwColors.lime500,
+                  fontSize: RwType.displayM,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: RwSpace.sm),
+              Text(
+                s.homeSessionHint,
+                style: const TextStyle(
+                  color: RwColors.paper200,
+                  fontSize: RwType.bodySmall,
+                ),
+              ),
+              const SizedBox(height: RwSpace.lg),
+              RwButton.primary(
+                label: s.homeStart,
+                icon: Icons.arrow_forward_rounded,
+                onPressed: widget.onStart,
+              ),
+              if (latestPoints.length >= 2) ...[
+                const SizedBox(height: RwSpace.lg),
+                const Divider(color: RwColors.ink700),
+                const SizedBox(height: RwSpace.sm),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: RwColors.lime500,
-                          borderRadius: BorderRadius.circular(RwRadius.pill),
-                        ),
-                        child: Text(
-                          s.homeReady,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontFamily: RwType.family,
-                            color: RwColors.ink950,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 11,
-                          ),
+                    Expanded(
+                      child: Text(
+                        s.homeLastRoute,
+                        style: const TextStyle(
+                          color: RwColors.paper200,
+                          fontSize: RwType.bodySmall,
                         ),
                       ),
                     ),
-                    const Icon(
-                      Icons.bolt_rounded,
-                      color: RwColors.lime500,
-                      size: 20,
+                    SizedBox(
+                      width: RwSize.landscape,
+                      height: RwSize.pause,
+                      child: RunRouteView(
+                        points: latestPoints,
+                        routeColor: RwColors.lime500,
+                        backgroundColor: RwColors.transparent,
+                        strokeWidth: RwSize.focus,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: RwSpace.md),
-                Semantics(
-                  header: true,
-                  child: Text(
-                    s.homeTitle,
-                    style: const TextStyle(
-                      fontFamily: RwType.family,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 26,
-                      letterSpacing: -0.5,
-                      color: Colors.white,
-                      height: 1.1,
-                    ),
-                  ),
-                ),
-                Text(
-                  s.homeAccent,
-                  style: const TextStyle(
-                    fontFamily: RwType.family,
-                    color: RwColors.lime500,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 26,
-                    letterSpacing: -0.5,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: RwSpace.md),
-
-                // Hero Route Visual Preview Box
-                Container(
-                  height: 125,
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: RwColors.ink900,
-                    borderRadius: BorderRadius.circular(RwRadius.md),
-                    border: Border.all(color: RwColors.ink800, width: 1),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (latestPoints.length >= 2) ...[
-                        RunRouteView(
-                          points: latestPoints,
-                          routeColor: RwColors.lime500,
-                          strokeWidth: 3.0,
-                        ),
-                        Positioned(
-                          left: 6,
-                          top: 6,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: RwColors.ink950.withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(
-                                RwRadius.pill,
-                              ),
-                            ),
-                            child: const Text(
-                              'RUTE TERAKHIR',
-                              style: TextStyle(
-                                fontFamily: RwType.family,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                color: RwColors.lime500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ] else ...[
-                        const RunRouteView(
-                          routeColor: RwColors.lime500,
-                          strokeWidth: 3.0,
-                        ),
-                        SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: RwColors.ink800,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.directions_run_rounded,
-                                  color: RwColors.lime500,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                s.homeRouteEmpty,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontFamily: RwType.family,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                s.homeRouteHint,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontFamily: RwType.family,
-                                  fontSize: 10,
-                                  color: RwColors.paper200,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: RwSpace.md),
-
-                // Quick Metrics Tile Row
-                weekAsync.when(
-                  loading: () => const _HeroMetricsSkeleton(),
-                  error: (_, _) => const _HeroMetricsEmpty(),
-                  data: (summary) {
-                    final distKm = (summary.totalDistanceMeters / 1000.0)
-                        .toStringAsFixed(1);
-                    final durMin = summary.totalMovingTime.inMinutes;
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: _HeroMetricTile(
-                            label: s.homeDistance,
-                            value: summary.totalDistanceMeters > 0
-                                ? '$distKm km'
-                                : s.homeMetricEmpty,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: _HeroMetricTile(
-                            label: s.homeDuration,
-                            value: summary.totalMovingTime > Duration.zero
-                                ? '$durMin m'
-                                : s.homeMetricEmpty,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: _HeroMetricTile(
-                            label: 'KALORI',
-                            value: summary.totalCalories > 0
-                                ? '${summary.totalCalories}'
-                                : s.homeMetricEmpty,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: RwSpace.lg),
-
-                // Tombol Mulai Berlari Menyala Kontras
-                RwButton.primary(
-                  label: s.homeStart,
-                  icon: Icons.play_arrow_rounded,
-                  onPressed: widget.onStart,
-                ),
               ],
-            ),
+            ],
           ),
         ),
         const SizedBox(height: RwSpace.md),
 
-        // ── Performa Minggu Ini Card (Dengan Grafik fl_chart) ────────
         weekAsync.when(
           loading: () => const _CardSkeleton(),
           error: (_, _) => const SizedBox.shrink(),
@@ -684,87 +541,6 @@ class _HomeDashboardState extends ConsumerState<HomeDashboard> {
       ],
     );
   }
-}
-
-class _HeroMetricTile extends StatelessWidget {
-  const _HeroMetricTile({required this.label, required this.value});
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: RwSpace.xs, vertical: 8),
-    decoration: BoxDecoration(
-      color: RwColors.ink900,
-      borderRadius: BorderRadius.circular(RwRadius.sm),
-      border: Border.all(color: RwColors.ink800, width: 1),
-    ),
-    child: Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: RwType.family,
-            color: RwColors.paper200,
-            fontWeight: FontWeight.w600,
-            fontSize: 10,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(
-            fontFamily: RwType.family,
-            fontWeight: FontWeight.w800,
-            fontSize: 14,
-            fontFeatures: [FontFeature.tabularFigures()],
-            color: Colors.white,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _HeroMetricsEmpty extends StatelessWidget {
-  const _HeroMetricsEmpty();
-  @override
-  Widget build(BuildContext context) => const Row(
-    children: [
-      Expanded(
-        child: _HeroMetricTile(label: 'JARAK', value: '—'),
-      ),
-      SizedBox(width: 4),
-      Expanded(
-        child: _HeroMetricTile(label: 'DURASI', value: '—'),
-      ),
-      SizedBox(width: 4),
-      Expanded(
-        child: _HeroMetricTile(label: 'KALORI', value: '—'),
-      ),
-    ],
-  );
-}
-
-class _HeroMetricsSkeleton extends StatelessWidget {
-  const _HeroMetricsSkeleton();
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      for (var i = 0; i < 3; i++)
-        Expanded(
-          child: Container(
-            height: 48,
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            decoration: BoxDecoration(
-              color: RwColors.ink900,
-              borderRadius: BorderRadius.circular(RwRadius.sm),
-            ),
-          ),
-        ),
-    ],
-  );
 }
 
 class _CardSkeleton extends StatelessWidget {

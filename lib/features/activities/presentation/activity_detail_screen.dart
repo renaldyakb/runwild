@@ -496,12 +496,17 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
 
   Future<void> _editTitleAndNote(BuildContext context) async {
     final detail = widget.detail;
-    final result = await showDialog<({String title, String note})>(
+    final result = await showModalBottomSheet<({String title, String note})>(
       context: context,
-      builder: (ctx) => _EditTitleDialog(
-        initialTitle: detail.title,
-        initialNote: detail.note,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      backgroundColor: RwColors.paper100,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(RwRadius.lg)),
       ),
+      builder: (ctx) =>
+          _EditTitleSheet(initialTitle: detail.title, initialNote: detail.note),
     );
 
     if (result != null && context.mounted) {
@@ -945,16 +950,16 @@ class _DetailError extends StatelessWidget {
   }
 }
 
-class _EditTitleDialog extends StatefulWidget {
-  const _EditTitleDialog({this.initialTitle, this.initialNote});
+class _EditTitleSheet extends StatefulWidget {
+  const _EditTitleSheet({this.initialTitle, this.initialNote});
   final String? initialTitle;
   final String? initialNote;
 
   @override
-  State<_EditTitleDialog> createState() => _EditTitleDialogState();
+  State<_EditTitleSheet> createState() => _EditTitleSheetState();
 }
 
-class _EditTitleDialogState extends State<_EditTitleDialog> {
+class _EditTitleSheetState extends State<_EditTitleSheet> {
   late final TextEditingController _titleController;
   late final TextEditingController _noteController;
 
@@ -975,45 +980,71 @@ class _EditTitleDialogState extends State<_EditTitleDialog> {
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(s.activityEditTitleDialog),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                labelText: s.activityTitleLabel,
-                hintText: s.activityTitleHint,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            RwSpace.screen,
+            0,
+            RwSpace.screen,
+            RwSpace.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      s.activityEditSheetTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: s.runCancel,
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
               ),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-            const SizedBox(height: RwSpace.md),
-            TextField(
-              controller: _noteController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: s.summaryNote,
-                hintText: s.summaryNoteHint,
+              const SizedBox(height: RwSpace.lg),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: s.activityTitleLabel,
+                  hintText: s.activityTitleHint,
+                ),
+                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.sentences,
               ),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-          ],
+              const SizedBox(height: RwSpace.lg),
+              TextField(
+                controller: _noteController,
+                minLines: 3,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  labelText: s.summaryNote,
+                  hintText: s.summaryNoteHint,
+                ),
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              const SizedBox(height: RwSpace.lg),
+              RwButton.primary(
+                label: s.activitySave,
+                onPressed: () => Navigator.of(context).pop((
+                  title: _titleController.text.trim(),
+                  note: _noteController.text.trim(),
+                )),
+              ),
+            ],
+          ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(s.runCancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context)
-              .pop((title: _titleController.text, note: _noteController.text)),
-          child: const Text('Simpan'),
-        ),
-      ],
     );
   }
 }

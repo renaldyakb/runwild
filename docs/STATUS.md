@@ -1,5 +1,12 @@
 # Status RUNWILD
 
+- 18 Nov 2026: patch versi/pembaruan dan UI sesi disiapkan sebagai 0.1.2+3 (belum dipublikasikan).
+  - Versi tampilan, pembanding update, dan metadata sync membaca paket terpasang; pubspec sumber versi build/tag.
+  - Catatan rilis dirender sebagai heading/bullet; CI memakai docs/releases/<versi>.md dan menunggu verify. Format di AGENTS.md bagian 9.
+  - Edit sesi memakai bottom drawer yang mengikuti keyboard. Home fokus pada aksi mulai, tanpa statistik duplikat/rute rekaan.
+  - Bukti: 35 tes terarah lulus, analisis bersih setelah perbaikan lint, YAML valid; golden Home/update/drawer diperiksa.
+  - Belum diuji: GitHub Actions, build/install APK release 0.1.2 dan unduhan pembaruan di HP.
+
 - 18 Nov 2026 · Pembaruan visual detail aktivitas & kartu bagikan selesai di kode.
   - Detail: peta OSM membingkai seluruh koordinat tersimpan di atas jejak rute; segmen GPS tetap terpisah, tanpa status GPS live pada riwayat.
   - Bagikan: pratinjau di atas, kontrol format/warna/foto, aksi tetap di bawah; ekspor tipografi minimal dengan tiga warna dan dua rasio.

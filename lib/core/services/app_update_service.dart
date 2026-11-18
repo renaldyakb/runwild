@@ -52,8 +52,22 @@ class GitHubAppUpdateService implements AppUpdateService {
       'Notifikasi saat versi terbaru RUNWILD tersedia';
 
   static bool isNewerVersion(String latest, String current) {
-    final cleanLatest = latest.replaceAll(RegExp(r'[^0-9.]'), '');
-    final cleanCurrent = current.replaceAll(RegExp(r'[^0-9.]'), '');
+    final cleanLatest = latest
+        .replaceFirst(RegExp(r'^v'), '')
+        .split('+')
+        .first
+        .split('-')
+        .first;
+    final cleanCurrent = current
+        .replaceFirst(RegExp(r'^v'), '')
+        .split('+')
+        .first
+        .split('-')
+        .first;
+    final valid = RegExp(r'^\d+\.\d+\.\d+$');
+    if (!valid.hasMatch(cleanLatest) || !valid.hasMatch(cleanCurrent)) {
+      return false;
+    }
     final lParts = cleanLatest
         .split('.')
         .map((e) => int.tryParse(e) ?? 0)

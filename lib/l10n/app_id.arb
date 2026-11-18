@@ -569,5 +569,24 @@
   "shareTagline": "Run free.\nGo wild.",
   "shareImageError": "Tidak dapat memuat gambar. Coba lagi.",
   "shareError": "Belum bisa membagikan kartu. Coba lagi.",
-  "shareRouteError": "Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi."
+  "shareRouteError": "Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.",
+  "updateTitle": "Pembaruan tersedia",
+  "updateInstalled": "Terpasang: v{version}",
+  "@updateInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateChanges": "Yang baru",
+  "updateEmpty": "Catatan perubahan belum tersedia untuk versi ini.",
+  "updateDownload": "Unduh pembaruan",
+  "updateLater": "Nanti saja",
+  "updateDownloadError": "Tautan unduhan belum dapat dibuka. Coba lagi.",
+  "activityEditSheetTitle": "Judul & catatan",
+  "activitySave": "Simpan perubahan",
+  "homeSessionHint": "Mulai dari langkahmu hari ini.",
+  "homeLastRoute": "Rute terakhir",
+  "homeWeekLabel": "Minggu ini"
 }

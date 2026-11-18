@@ -237,3 +237,5 @@ Sesuai permintaan pengguna untuk memakai grafik dari komunitas yang tersedia di 
 Tidak ada penambahan di luar roadmap PRD.
 
 - 2026-11-16: Sesuai permintaan pengguna, peta live memakai flutter_map 8.3.1 + latlong2 0.9.1 + url_launcher 6.3.2 melalui MapService, menggantikan rencana Google Maps untuk layar sesi. OSM Standard tanpa key; User-Agent RUNWILD, atribusi selalu terlihat, cache HTTP bawaan 128 MiB, tanpa bulk download. Tidak ada SLA tile publik; GPS tetap merekam jika tile gagal. Sumber: https://operations.osmfoundation.org/policies/tiles/ dan https://pub.dev/packages/flutter_map .
+
+- 18 Nov 2026: package_info_plus 10.2.2 dipin untuk membaca versi/build APK terpasang; pubspec menjadi sumber versi rilis. Patch perbaikan disiapkan sebagai 0.1.2+3 agar terdeteksi oleh pengguna 0.1.1.

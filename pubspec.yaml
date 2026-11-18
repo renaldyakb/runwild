@@ -1,7 +1,7 @@
 name: runwild
 description: RUNWILD, pelacak jalan dan lari ramah pemula.
 publish_to: none
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ">=3.14.0 <4.0.0"
@@ -22,6 +22,7 @@ dependencies:
   permission_handler: 13.0.0
   geolocator: 14.1.2
   intl: 0.20.3
+  package_info_plus: 10.2.2
   shared_preferences: 2.5.5
   drift: 2.35.4
   path_provider: 2.1.6

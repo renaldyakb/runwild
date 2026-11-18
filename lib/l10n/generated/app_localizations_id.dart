@@ -1319,4 +1319,43 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get shareRouteError =>
       'Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.';
+
+  @override
+  String get updateTitle => 'Pembaruan tersedia';
+
+  @override
+  String updateInstalled(String version) {
+    return 'Terpasang: v$version';
+  }
+
+  @override
+  String get updateChanges => 'Yang baru';
+
+  @override
+  String get updateEmpty => 'Catatan perubahan belum tersedia untuk versi ini.';
+
+  @override
+  String get updateDownload => 'Unduh pembaruan';
+
+  @override
+  String get updateLater => 'Nanti saja';
+
+  @override
+  String get updateDownloadError =>
+      'Tautan unduhan belum dapat dibuka. Coba lagi.';
+
+  @override
+  String get activityEditSheetTitle => 'Judul & catatan';
+
+  @override
+  String get activitySave => 'Simpan perubahan';
+
+  @override
+  String get homeSessionHint => 'Mulai dari langkahmu hari ini.';
+
+  @override
+  String get homeLastRoute => 'Rute terakhir';
+
+  @override
+  String get homeWeekLabel => 'Minggu ini';
 }

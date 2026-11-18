@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_version.dart';
 import '../../../design/components/rw_route_view.dart';
 import '../../../domain/interval/interval_config.dart';
 import '../../../domain/tracking/activity_record.dart';
@@ -116,6 +117,7 @@ class FirestoreActivitySyncRepository implements ActivitySyncRepository {
             session.title ?? ActivityRecord.defaultTitle(session.startedAt);
 
         final record = ActivityRecord(
+          appVersion: AppVersion.current,
           id: activityId,
           ownerId: owner,
           type: mode == ActivityMode.interval
