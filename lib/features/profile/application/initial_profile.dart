@@ -38,8 +38,9 @@ Future<String> destinationAfterSignIn(
   try {
     if (await repository.exists()) return '/';
   } on Exception {
-    // The setup screen offers retry when the profile cannot be read.
-    return '/profile/setup';
+    // If reading profile fails (offline, connection, or unconfigured firestore),
+    // let authenticated user proceed to home screen rather than locking them out.
+    return '/';
   }
   return '/profile/setup';
 }

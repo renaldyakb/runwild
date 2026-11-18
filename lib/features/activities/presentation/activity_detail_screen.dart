@@ -123,12 +123,20 @@ class ActivityDetailScreen extends ConsumerWidget {
   }
 }
 
-class _DetailContent extends ConsumerWidget {
+class _DetailContent extends ConsumerStatefulWidget {
   const _DetailContent({required this.detail});
   final ActivityDetail detail;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DetailContent> createState() => _DetailContentState();
+}
+
+class _DetailContentState extends ConsumerState<_DetailContent> {
+  bool _showMap = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final detail = widget.detail;
     final s = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
@@ -198,7 +206,7 @@ class _DetailContent extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.edit_outlined, size: 20),
               tooltip: s.activityEditTitle,
-              onPressed: () => _editTitleAndNote(context, ref),
+              onPressed: () => _editTitleAndNote(context),
             ),
           ],
         ),
@@ -206,67 +214,84 @@ class _DetailContent extends ConsumerWidget {
 
         // ── Route Map Preview ───────────────────────────────────────
         if (routePoints.length >= 2) ...[
-          ref
-              .watch(mapServiceProvider)
-              .buildLiveMap(
-                route: (segments: segments, position: null, age: null),
-                locked: false,
-                historical: true,
-              ),
-          const SizedBox(height: RwSpace.md),
-          Container(
-            height: RwSize.liveMapHeight,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(RwRadius.lg),
-              border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                RunRouteView(
-                  points: routePoints,
-                  segmentStarts: segmentStarts,
-                  routeColor: RwColors.lime700,
-                  strokeWidth: 3.5,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                s.activityRouteTitle,
+                style: const TextStyle(
+                  fontFamily: RwType.family,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: RwColors.ink950,
                 ),
-                Positioned(
-                  left: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: RwColors.ink950.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(RwRadius.pill),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.route_rounded,
-                          size: 12,
-                          color: RwColors.lime500,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          s.activityRouteTitle.toUpperCase(),
-                          style: const TextStyle(
-                            fontFamily: RwType.family,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+              ),
+              InkWell(
+                onTap: () => setState(() => _showMap = !_showMap),
+                borderRadius: BorderRadius.circular(RwRadius.pill),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _showMap ? RwColors.lime100 : RwColors.paper100,
+                    borderRadius: BorderRadius.circular(RwRadius.pill),
+                    border: Border.all(
+                      color: _showMap
+                          ? RwColors.lime500
+                          : const Color(0xFFE2E6DC),
                     ),
                   ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _showMap ? Icons.map_rounded : Icons.route_rounded,
+                        size: 14,
+                        color: RwColors.ink950,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _showMap ? 'Map: ON' : 'Map: OFF',
+                        style: const TextStyle(
+                          fontFamily: RwType.family,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: RwColors.ink950,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+          const SizedBox(height: RwSpace.xs),
+          if (_showMap)
+            ref
+                .watch(mapServiceProvider)
+                .buildLiveMap(
+                  route: (segments: segments, position: null, age: null),
+                  locked: false,
+                  historical: true,
+                )
+          else
+            Container(
+              height: RwSize.liveMapHeight,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(RwRadius.lg),
+                border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: RunRouteView(
+                points: routePoints,
+                segmentStarts: segmentStarts,
+                routeColor: RwColors.lime700,
+                strokeWidth: 3.5,
+              ),
+            ),
           const SizedBox(height: RwSpace.md),
         ] else ...[
           RwCard(
@@ -406,7 +431,7 @@ class _DetailContent extends ConsumerWidget {
                 label: s.activityEditTitle,
                 icon: Icons.edit_note_rounded,
                 fullWidth: true,
-                onPressed: () => _editTitleAndNote(context, ref),
+                onPressed: () => _editTitleAndNote(context),
               ),
             ],
           ),
@@ -462,14 +487,15 @@ class _DetailContent extends ConsumerWidget {
           label: s.activityDelete,
           icon: Icons.delete_outline_rounded,
           fullWidth: true,
-          onPressed: () => _confirmDelete(context, ref),
+          onPressed: () => _confirmDelete(context),
         ),
         const SizedBox(height: RwSpace.xl),
       ],
     );
   }
 
-  Future<void> _editTitleAndNote(BuildContext context, WidgetRef ref) async {
+  Future<void> _editTitleAndNote(BuildContext context) async {
+    final detail = widget.detail;
     final result = await showDialog<({String title, String note})>(
       context: context,
       builder: (ctx) => _EditTitleDialog(
@@ -490,7 +516,8 @@ class _DetailContent extends ConsumerWidget {
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+  Future<void> _confirmDelete(BuildContext context) async {
+    final detail = widget.detail;
     final s = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,

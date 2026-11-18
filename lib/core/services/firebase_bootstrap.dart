@@ -11,6 +11,10 @@ class FirebaseBootstrap implements BackendInitializer {
 
   @override
   Future<BackendStatus> initialize() async {
+    if (Firebase.apps.isNotEmpty) {
+      return BackendStatus.ready;
+    }
+
     const apiKey = String.fromEnvironment('FIREBASE_API_KEY');
     const appId = String.fromEnvironment('FIREBASE_APP_ID');
     const senderId = String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID');
@@ -18,10 +22,9 @@ class FirebaseBootstrap implements BackendInitializer {
     const bucket = String.fromEnvironment('FIREBASE_STORAGE_BUCKET');
     const bundleId = String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID');
     const values = [apiKey, appId, senderId, projectId];
-    if (values.every((value) => value.isEmpty)) return BackendStatus.local;
-    if (values.any((value) => value.isEmpty)) return BackendStatus.invalid;
+
     try {
-      if (Firebase.apps.isEmpty) {
+      if (values.every((value) => value.isNotEmpty)) {
         await Firebase.initializeApp(
           options: const FirebaseOptions(
             apiKey: apiKey,
@@ -32,10 +35,14 @@ class FirebaseBootstrap implements BackendInitializer {
             iosBundleId: bundleId,
           ),
         );
+        return BackendStatus.ready;
       }
+
+      await Firebase.initializeApp();
       return BackendStatus.ready;
     } on Exception {
-      // Never forward configuration or exception payloads to telemetry.
+      if (values.every((value) => value.isEmpty)) return BackendStatus.local;
+      if (values.any((value) => value.isEmpty)) return BackendStatus.invalid;
       return BackendStatus.failed;
     }
   }

@@ -100,7 +100,7 @@ class ShareCardWidget extends StatelessWidget {
                     ColoredBox(color: RwColors.ink950.withValues(alpha: 0.70)),
                   ],
                   Padding(
-                    padding: const EdgeInsets.all(RwSpace.lg),
+                    padding: EdgeInsets.all(story ? RwSpace.lg : RwSpace.md),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -108,19 +108,25 @@ class ShareCardWidget extends StatelessWidget {
                           children: [
                             Text(
                               'RUNWILD',
-                              style: type(RwType.body, weight: FontWeight.w900),
+                              style: type(
+                                story ? RwType.body : 13,
+                                weight: FontWeight.w900,
+                              ),
                             ),
                             const Spacer(),
                             Text(
                               DateFormat('dd.MM.yyyy')
                                   .format(summary.startedAt),
-                              style: type(RwType.label),
+                              style: type(story ? RwType.label : 11),
                             ),
                           ],
                         ),
-                        SizedBox(height: story ? RwSpace.xxl : RwSpace.md),
-                        Text(s.shareRun, style: type(RwType.label)),
-                        const SizedBox(height: RwSpace.xs),
+                        SizedBox(height: story ? RwSpace.xxl : RwSpace.xs),
+                        Text(
+                          s.shareRun,
+                          style: type(story ? RwType.label : 10),
+                        ),
+                        SizedBox(height: story ? RwSpace.xs : 2),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
@@ -132,7 +138,7 @@ class ShareCardWidget extends StatelessWidget {
                                   (summary.distanceMeters / 1000)
                                       .toStringAsFixed(2),
                                   style: type(
-                                    RwType.displayXL,
+                                    story ? RwType.displayXL : 34.0,
                                     weight: FontWeight.w900,
                                   ).copyWith(letterSpacing: RwType.tight),
                                 ),
@@ -141,10 +147,11 @@ class ShareCardWidget extends StatelessWidget {
                             const SizedBox(width: RwSpace.xs),
                             Text(
                               s.shareDistanceUnit,
-                              style: type(RwType.title),
+                              style: type(story ? RwType.title : 16.0),
                             ),
                           ],
                         ),
+                        SizedBox(height: story ? RwSpace.xs : 2),
                         Expanded(
                           child: SizedBox.expand(
                             child: hasRoute
@@ -157,8 +164,8 @@ class ShareCardWidget extends StatelessWidget {
                                     startMarkerColor: ink,
                                     finishMarkerColor: ink,
                                     backgroundColor: RwColors.transparent,
-                                    padding: RwSpace.lg,
-                                    strokeWidth: RwSize.focus,
+                                    padding: story ? RwSpace.lg : RwSpace.xs,
+                                    strokeWidth: story ? RwSize.focus : 2.5,
                                   )
                                 : Align(
                                     alignment: Alignment.centerLeft,
@@ -175,13 +182,16 @@ class ShareCardWidget extends StatelessWidget {
                         if (personalBests.isNotEmpty) ...[
                           Text(
                             s.shareRecord,
-                            style: type(RwType.label, weight: FontWeight.w800),
+                            style: type(
+                              story ? RwType.label : 10,
+                              weight: FontWeight.w800,
+                            ),
                           ),
-                          const SizedBox(height: RwSpace.xs),
+                          SizedBox(height: story ? RwSpace.xs : 2),
                         ],
                         Divider(
                           color: ink.withValues(alpha: 0.35),
-                          height: RwSpace.md,
+                          height: story ? RwSpace.md : RwSpace.xs,
                         ),
                         Row(
                           children: [
@@ -190,6 +200,7 @@ class ShareCardWidget extends StatelessWidget {
                                 label: s.shareDuration,
                                 value: _formatDuration(summary.movingTime),
                                 color: ink,
+                                compact: !story,
                               ),
                             ),
                             Expanded(
@@ -197,18 +208,15 @@ class ShareCardWidget extends StatelessWidget {
                                 label: s.sharePace,
                                 value: _formatPace(summary.averagePace),
                                 color: ink,
+                                compact: !story,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: story ? RwSpace.lg : RwSpace.sm),
+                        SizedBox(height: story ? RwSpace.lg : RwSpace.xs),
                         Text(
-                          hideRoute
-                              ? s.shareRouteHidden
-                              : hasRoute
-                              ? 'RUN. TRACK. IMPROVE. GO WILD.'
-                              : s.shareNoRoute,
-                          style: type(RwType.label),
+                          'RUN. TRACK. IMPROVE. GO WILD.',
+                          style: type(story ? RwType.label : 10),
                         ),
                       ],
                     ),
@@ -228,10 +236,12 @@ class _Metric extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    this.compact = false,
   });
   final String label;
   final String value;
   final Color color;
+  final bool compact;
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,16 +251,16 @@ class _Metric extends StatelessWidget {
         style: TextStyle(
           fontFamily: RwType.family,
           color: color,
-          fontSize: RwType.label,
+          fontSize: compact ? 9.0 : RwType.label,
         ),
       ),
-      const SizedBox(height: RwSpace.xxs),
+      SizedBox(height: compact ? 1 : RwSpace.xxs),
       Text(
         value,
         style: TextStyle(
           fontFamily: RwType.family,
           color: color,
-          fontSize: RwType.title,
+          fontSize: compact ? 14.0 : RwType.title,
           fontWeight: FontWeight.w800,
         ),
       ),

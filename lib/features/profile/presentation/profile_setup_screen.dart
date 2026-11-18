@@ -102,6 +102,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               label: s.retry,
               onPressed: () => ref.invalidate(initialProfileExistsProvider),
             ),
+            const SizedBox(height: RwSpace.sm),
+            RwButton.secondary(
+              label: s.backHome,
+              onPressed: () => context.go('/'),
+            ),
             const SizedBox(height: RwSpace.md),
             const AccountActions(showLinkOptions: false),
           ] else ...[
@@ -182,6 +187,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               loading: _saving,
               loadingLabel: s.authWorking,
             ),
+            if (_failed) ...[
+              const SizedBox(height: RwSpace.sm),
+              RwButton.secondary(
+                label: s.backHome,
+                onPressed: () => context.go('/'),
+              ),
+            ],
             const SizedBox(height: RwSpace.md),
             if (!_saving) const AccountActions(showLinkOptions: false),
           ],
