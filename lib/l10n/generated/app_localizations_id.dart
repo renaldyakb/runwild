@@ -776,13 +776,6 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get runStart => 'Mulai Lari';
-
-  @override
-  String get runLocationExplanation =>
-      'Lokasi digunakan untuk mencatat rute dan menghitung jarak saat kamu berlari.';
-
-  @override
   String get runLocationDenied =>
       'Izin lokasi belum diberikan. Izinkan lokasi agar RUNWILD bisa mencatat rute.';
 
@@ -795,25 +788,15 @@ class AppLocalizationsId extends AppLocalizations {
       'Perangkat membatasi akses lokasi untuk RUNWILD.';
 
   @override
-  String get runLocationReady => 'Izin lokasi sudah diberikan.';
-
-  @override
-  String get runNotificationsExplanation =>
-      'Notifikasi opsional untuk melihat status sesi saat berlari.';
-
-  @override
   String get runNotificationsEnable => 'Izinkan notifikasi';
 
   @override
   String get runNotificationsDenied =>
-      'Notifikasi belum diizinkan. Kamu tetap bisa lanjut tanpa notifikasi.';
+      'Notifikasi belum diizinkan. Aktifkan agar status sesi tetap terlihat saat layar mati.';
 
   @override
   String get runNotificationsBlocked =>
-      'Jika ingin notifikasi sesi, aktifkan lewat pengaturan perangkat.';
-
-  @override
-  String get runNotificationsReady => 'Notifikasi sudah diizinkan.';
+      'Aktifkan izin notifikasi RUNWILD lewat pengaturan perangkat.';
 
   @override
   String get runPermissionError => 'Izin belum bisa diperiksa. Coba lagi.';
@@ -826,6 +809,111 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get runPermissionRefresh => 'Periksa izin lagi';
+
+  @override
+  String get runPermissionSettingsFailed =>
+      'Pengaturan perangkat tidak bisa dibuka. Buka manual dari Pengaturan sistem.';
+
+  @override
+  String get runPermissionsRequiredTitle => 'Lokasi dan notifikasi perlu aktif';
+
+  @override
+  String get runPermissionsRequiredBody =>
+      'Rute hanya terekam saat lokasi aktif. Notifikasi menjaga status sesi tetap terlihat ketika layar mati.';
+
+  @override
+  String get runLocationEnable => 'Aktifkan lokasi';
+
+  @override
+  String get runLocationServiceOff =>
+      'Lokasi perangkat sedang mati. Hidupkan lokasi agar rute bisa direkam.';
+
+  @override
+  String get runLocationServiceEnable => 'Hidupkan lokasi';
+
+  @override
+  String get calibrationTitle => 'Kalibrasi GPS';
+
+  @override
+  String get calibrationIntro =>
+      'Berdiri di area terbuka, jauh dari gedung dan pohon tinggi. Diam selama beberapa detik.';
+
+  @override
+  String get calibrationStart => 'Mulai kalibrasi';
+
+  @override
+  String get calibrationMeasuring => 'Mengukur sinyal GPS';
+
+  @override
+  String calibrationProgress(int seconds, int total) {
+    return '$seconds dari $total detik';
+  }
+
+  @override
+  String calibrationAccuracy(int meters) {
+    return 'Akurasi ±$meters m';
+  }
+
+  @override
+  String get calibrationGoodTitle => 'Sinyal GPS bagus';
+
+  @override
+  String calibrationGoodBody(int meters) {
+    return 'Akurasi ±$meters m. Rute sesi ini akan lebih stabil.';
+  }
+
+  @override
+  String get calibrationFairTitle => 'Sinyal GPS cukup';
+
+  @override
+  String calibrationFairBody(int meters) {
+    return 'Akurasi ±$meters m. Tetap di area terbuka saat mulai berlari.';
+  }
+
+  @override
+  String get calibrationPoorTitle => 'Sinyal GPS lemah';
+
+  @override
+  String calibrationPoorBody(int meters) {
+    return 'Akurasi ±$meters m. Coba di area lebih terbuka lalu ulangi kalibrasi.';
+  }
+
+  @override
+  String get calibrationRetry => 'Ulangi kalibrasi';
+
+  @override
+  String get calibrationDone => 'Selesai';
+
+  @override
+  String get calibrationServiceOff =>
+      'Lokasi perangkat mati. Hidupkan lokasi untuk mengukur sinyal.';
+
+  @override
+  String get calibrationFailed =>
+      'Kalibrasi belum berhasil. Periksa izin lokasi lalu coba lagi.';
+
+  @override
+  String get calibrationSaveFailed =>
+      'Hasil kalibrasi tidak tersimpan, tetapi sesi tetap bisa dimulai.';
+
+  @override
+  String get calibrationDueTitle => 'Kalibrasi GPS';
+
+  @override
+  String get calibrationDueBody =>
+      'Akurasi lebih stabil bila dikalibrasi di area terbuka.';
+
+  @override
+  String get calibrationCta => 'Kalibrasi';
+
+  @override
+  String get calibrationCancel => 'Batalkan';
+
+  @override
+  String get runSetupSubtitle => 'Pilih mode lari dan pastikan sensor siap.';
+
+  @override
+  String get runStartBlocked => 'Aktifkan lokasi dan notifikasi untuk mulai.';
 
   @override
   String get close => 'Tutup';

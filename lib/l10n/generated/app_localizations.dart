@@ -1480,18 +1480,6 @@ abstract class AppLocalizations {
   /// **'{points} titik GPS · {meters} m'**
   String runGpsMetrics(int points, int meters);
 
-  /// No description provided for @runStart.
-  ///
-  /// In id, this message translates to:
-  /// **'Mulai Lari'**
-  String get runStart;
-
-  /// No description provided for @runLocationExplanation.
-  ///
-  /// In id, this message translates to:
-  /// **'Lokasi digunakan untuk mencatat rute dan menghitung jarak saat kamu berlari.'**
-  String get runLocationExplanation;
-
   /// No description provided for @runLocationDenied.
   ///
   /// In id, this message translates to:
@@ -1510,18 +1498,6 @@ abstract class AppLocalizations {
   /// **'Perangkat membatasi akses lokasi untuk RUNWILD.'**
   String get runLocationRestricted;
 
-  /// No description provided for @runLocationReady.
-  ///
-  /// In id, this message translates to:
-  /// **'Izin lokasi sudah diberikan.'**
-  String get runLocationReady;
-
-  /// No description provided for @runNotificationsExplanation.
-  ///
-  /// In id, this message translates to:
-  /// **'Notifikasi opsional untuk melihat status sesi saat berlari.'**
-  String get runNotificationsExplanation;
-
   /// No description provided for @runNotificationsEnable.
   ///
   /// In id, this message translates to:
@@ -1531,20 +1507,14 @@ abstract class AppLocalizations {
   /// No description provided for @runNotificationsDenied.
   ///
   /// In id, this message translates to:
-  /// **'Notifikasi belum diizinkan. Kamu tetap bisa lanjut tanpa notifikasi.'**
+  /// **'Notifikasi belum diizinkan. Aktifkan agar status sesi tetap terlihat saat layar mati.'**
   String get runNotificationsDenied;
 
   /// No description provided for @runNotificationsBlocked.
   ///
   /// In id, this message translates to:
-  /// **'Jika ingin notifikasi sesi, aktifkan lewat pengaturan perangkat.'**
+  /// **'Aktifkan izin notifikasi RUNWILD lewat pengaturan perangkat.'**
   String get runNotificationsBlocked;
-
-  /// No description provided for @runNotificationsReady.
-  ///
-  /// In id, this message translates to:
-  /// **'Notifikasi sudah diizinkan.'**
-  String get runNotificationsReady;
 
   /// No description provided for @runPermissionError.
   ///
@@ -1569,6 +1539,180 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Periksa izin lagi'**
   String get runPermissionRefresh;
+
+  /// No description provided for @runPermissionSettingsFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan perangkat tidak bisa dibuka. Buka manual dari Pengaturan sistem.'**
+  String get runPermissionSettingsFailed;
+
+  /// No description provided for @runPermissionsRequiredTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Lokasi dan notifikasi perlu aktif'**
+  String get runPermissionsRequiredTitle;
+
+  /// No description provided for @runPermissionsRequiredBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Rute hanya terekam saat lokasi aktif. Notifikasi menjaga status sesi tetap terlihat ketika layar mati.'**
+  String get runPermissionsRequiredBody;
+
+  /// No description provided for @runLocationEnable.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan lokasi'**
+  String get runLocationEnable;
+
+  /// No description provided for @runLocationServiceOff.
+  ///
+  /// In id, this message translates to:
+  /// **'Lokasi perangkat sedang mati. Hidupkan lokasi agar rute bisa direkam.'**
+  String get runLocationServiceOff;
+
+  /// No description provided for @runLocationServiceEnable.
+  ///
+  /// In id, this message translates to:
+  /// **'Hidupkan lokasi'**
+  String get runLocationServiceEnable;
+
+  /// No description provided for @calibrationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalibrasi GPS'**
+  String get calibrationTitle;
+
+  /// No description provided for @calibrationIntro.
+  ///
+  /// In id, this message translates to:
+  /// **'Berdiri di area terbuka, jauh dari gedung dan pohon tinggi. Diam selama beberapa detik.'**
+  String get calibrationIntro;
+
+  /// No description provided for @calibrationStart.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai kalibrasi'**
+  String get calibrationStart;
+
+  /// No description provided for @calibrationMeasuring.
+  ///
+  /// In id, this message translates to:
+  /// **'Mengukur sinyal GPS'**
+  String get calibrationMeasuring;
+
+  /// No description provided for @calibrationProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'{seconds} dari {total} detik'**
+  String calibrationProgress(int seconds, int total);
+
+  /// No description provided for @calibrationAccuracy.
+  ///
+  /// In id, this message translates to:
+  /// **'Akurasi ±{meters} m'**
+  String calibrationAccuracy(int meters);
+
+  /// No description provided for @calibrationGoodTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Sinyal GPS bagus'**
+  String get calibrationGoodTitle;
+
+  /// No description provided for @calibrationGoodBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Akurasi ±{meters} m. Rute sesi ini akan lebih stabil.'**
+  String calibrationGoodBody(int meters);
+
+  /// No description provided for @calibrationFairTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Sinyal GPS cukup'**
+  String get calibrationFairTitle;
+
+  /// No description provided for @calibrationFairBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Akurasi ±{meters} m. Tetap di area terbuka saat mulai berlari.'**
+  String calibrationFairBody(int meters);
+
+  /// No description provided for @calibrationPoorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Sinyal GPS lemah'**
+  String get calibrationPoorTitle;
+
+  /// No description provided for @calibrationPoorBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Akurasi ±{meters} m. Coba di area lebih terbuka lalu ulangi kalibrasi.'**
+  String calibrationPoorBody(int meters);
+
+  /// No description provided for @calibrationRetry.
+  ///
+  /// In id, this message translates to:
+  /// **'Ulangi kalibrasi'**
+  String get calibrationRetry;
+
+  /// No description provided for @calibrationDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get calibrationDone;
+
+  /// No description provided for @calibrationServiceOff.
+  ///
+  /// In id, this message translates to:
+  /// **'Lokasi perangkat mati. Hidupkan lokasi untuk mengukur sinyal.'**
+  String get calibrationServiceOff;
+
+  /// No description provided for @calibrationFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalibrasi belum berhasil. Periksa izin lokasi lalu coba lagi.'**
+  String get calibrationFailed;
+
+  /// No description provided for @calibrationSaveFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Hasil kalibrasi tidak tersimpan, tetapi sesi tetap bisa dimulai.'**
+  String get calibrationSaveFailed;
+
+  /// No description provided for @calibrationDueTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalibrasi GPS'**
+  String get calibrationDueTitle;
+
+  /// No description provided for @calibrationDueBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Akurasi lebih stabil bila dikalibrasi di area terbuka.'**
+  String get calibrationDueBody;
+
+  /// No description provided for @calibrationCta.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalibrasi'**
+  String get calibrationCta;
+
+  /// No description provided for @calibrationCancel.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan'**
+  String get calibrationCancel;
+
+  /// No description provided for @runSetupSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih mode lari dan pastikan sensor siap.'**
+  String get runSetupSubtitle;
+
+  /// No description provided for @runStartBlocked.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan lokasi dan notifikasi untuk mulai.'**
+  String get runStartBlocked;
 
   /// No description provided for @close.
   ///

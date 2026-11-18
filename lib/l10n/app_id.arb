@@ -380,21 +380,71 @@
       }
     }
   },
-  "runStart": "Mulai Lari",
-  "runLocationExplanation": "Lokasi digunakan untuk mencatat rute dan menghitung jarak saat kamu berlari.",
   "runLocationDenied": "Izin lokasi belum diberikan. Izinkan lokasi agar RUNWILD bisa mencatat rute.",
   "runLocationBlocked": "Aktifkan izin lokasi untuk RUNWILD lewat pengaturan perangkat.",
   "runLocationRestricted": "Perangkat membatasi akses lokasi untuk RUNWILD.",
-  "runLocationReady": "Izin lokasi sudah diberikan.",
-  "runNotificationsExplanation": "Notifikasi opsional untuk melihat status sesi saat berlari.",
   "runNotificationsEnable": "Izinkan notifikasi",
-  "runNotificationsDenied": "Notifikasi belum diizinkan. Kamu tetap bisa lanjut tanpa notifikasi.",
-  "runNotificationsBlocked": "Jika ingin notifikasi sesi, aktifkan lewat pengaturan perangkat.",
-  "runNotificationsReady": "Notifikasi sudah diizinkan.",
+  "runNotificationsDenied": "Notifikasi belum diizinkan. Aktifkan agar status sesi tetap terlihat saat layar mati.",
+  "runNotificationsBlocked": "Aktifkan izin notifikasi RUNWILD lewat pengaturan perangkat.",
   "runPermissionError": "Izin belum bisa diperiksa. Coba lagi.",
   "runPermissionBusy": "Memeriksa izin…",
   "runPermissionSettings": "Buka pengaturan",
   "runPermissionRefresh": "Periksa izin lagi",
+  "runPermissionSettingsFailed": "Pengaturan perangkat tidak bisa dibuka. Buka manual dari Pengaturan sistem.",
+  "runPermissionsRequiredTitle": "Lokasi dan notifikasi perlu aktif",
+  "runPermissionsRequiredBody": "Rute hanya terekam saat lokasi aktif. Notifikasi menjaga status sesi tetap terlihat ketika layar mati.",
+  "runLocationEnable": "Aktifkan lokasi",
+  "runLocationServiceOff": "Lokasi perangkat sedang mati. Hidupkan lokasi agar rute bisa direkam.",
+  "runLocationServiceEnable": "Hidupkan lokasi",
+  "calibrationTitle": "Kalibrasi GPS",
+  "calibrationIntro": "Berdiri di area terbuka, jauh dari gedung dan pohon tinggi. Diam selama beberapa detik.",
+  "calibrationStart": "Mulai kalibrasi",
+  "calibrationMeasuring": "Mengukur sinyal GPS",
+  "calibrationProgress": "{seconds} dari {total} detik",
+  "@calibrationProgress": {
+    "placeholders": {
+      "seconds": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "calibrationAccuracy": "Akurasi ±{meters} m",
+  "@calibrationAccuracy": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "calibrationGoodTitle": "Sinyal GPS bagus",
+  "calibrationGoodBody": "Akurasi ±{meters} m. Rute sesi ini akan lebih stabil.",
+  "@calibrationGoodBody": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "calibrationFairTitle": "Sinyal GPS cukup",
+  "calibrationFairBody": "Akurasi ±{meters} m. Tetap di area terbuka saat mulai berlari.",
+  "@calibrationFairBody": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "calibrationPoorTitle": "Sinyal GPS lemah",
+  "calibrationPoorBody": "Akurasi ±{meters} m. Coba di area lebih terbuka lalu ulangi kalibrasi.",
+  "@calibrationPoorBody": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "calibrationRetry": "Ulangi kalibrasi",
+  "calibrationDone": "Selesai",
+  "calibrationServiceOff": "Lokasi perangkat mati. Hidupkan lokasi untuk mengukur sinyal.",
+  "calibrationFailed": "Kalibrasi belum berhasil. Periksa izin lokasi lalu coba lagi.",
+  "calibrationSaveFailed": "Hasil kalibrasi tidak tersimpan, tetapi sesi tetap bisa dimulai.",
+  "calibrationDueTitle": "Kalibrasi GPS",
+  "calibrationDueBody": "Akurasi lebih stabil bila dikalibrasi di area terbuka.",
+  "calibrationCta": "Kalibrasi",
+  "calibrationCancel": "Batalkan",
+  "runSetupSubtitle": "Pilih mode lari dan pastikan sensor siap.",
+  "runStartBlocked": "Aktifkan lokasi dan notifikasi untuk mulai.",
   "close": "Tutup",
   "backHome": "Kembali ke Home",
   "catalogTitle": "DIBUAT\nUNTUK GERAK.",

@@ -13,9 +13,10 @@ file mengacu `lib/features/`. Dokumen ini menggantikan status shell Fase 0.
 | S-07 Profil awal | Implementasi | `/profile/setup` |
 | S-10 Home | Implementasi | `/` → `foundation/presentation/home_dashboard.dart`: hero, target mingguan, grafik 7 hari, rekomendasi sesi |
 | S-11 Ringkasan minggu | Sebagian | Kartu target mingguan ada di Home; layar detail terpisah belum dibuat |
-| S-20 Pra-sesi | Implementasi | Bottom sheet `run/presentation/run_permission_sheet.dart` |
+| S-20 Pra-sesi | Implementasi | Bottom sheet `run/presentation/run_permission_sheet.dart`: hanya izin yang belum aktif, plus kartu kalibrasi GPS saat jatuh tempo |
 | S-21/S-22 Preset & kustom interval | Implementasi | `run/presentation/interval_options.dart` + `run_setup_sheet.dart`: Bebas ↔ Interval, preset, form kustom |
-| S-23 Penjelasan izin | Implementasi | `run/presentation/run_permission_sheet.dart`, status izin per sensor |
+| S-23 Penjelasan izin | Implementasi | `run/presentation/run_permission_sheet.dart`, status izin per sensor dan status layanan lokasi |
+| Kalibrasi GPS | Implementasi | `run/presentation/gps_calibration_sheet.dart`: 12–20 detik, grade bagus/cukup/lemah, animasi Lottie dengan fallback ikon |
 | S-24 Countdown | Implementasi | Bagian awal `run/presentation/run_active_screen.dart` |
 | S-25 Lari aktif | Implementasi | `/run/active`: HUD jarak/durasi/pace, panel fase interval, Live/Rute/Riwayat, kunci layar |
 | S-26 Ringkasan sesi | Implementasi | `/run/summary` |

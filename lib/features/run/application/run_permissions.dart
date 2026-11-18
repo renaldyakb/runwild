@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum RunPermission { location, notifications }
@@ -9,6 +10,8 @@ abstract interface class RunPermissions {
   Future<RunPermissionStatus> status(RunPermission permission);
   Future<RunPermissionStatus> request(RunPermission permission);
   Future<bool> openSettings();
+  Future<bool> isLocationServiceEnabled();
+  Future<bool> openLocationSettings();
 }
 
 final runPermissionsProvider = Provider<RunPermissions>(
@@ -41,4 +44,11 @@ class _SystemRunPermissions implements RunPermissions {
 
   @override
   Future<bool> openSettings() => openAppSettings();
+
+  @override
+  Future<bool> isLocationServiceEnabled() =>
+      Geolocator.isLocationServiceEnabled();
+
+  @override
+  Future<bool> openLocationSettings() => Geolocator.openLocationSettings();
 }

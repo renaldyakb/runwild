@@ -144,14 +144,23 @@ dan pastikan navigasi tidak menutupi konten. Peta dan statistik belum tersedia;
 beranda tidak boleh mengklaim GPS terkunci atau menampilkan jarak rekaan.
 
 
-## Pembaruan detail & bagikan · 18 November 2026
+## Pembaruan detail & bagikan ï¿½ 18 November 2026
 - Buka aktivitas dengan GPS: peta di atas jejak rute, seluruh rute masuk bingkai; geser/zoom peta, atribusi OSM tetap terbaca. Aktivitas tanpa GPS menampilkan pesan jujur.
 - Buka saat offline: jejak rute tetap terlihat; tile yang belum tersimpan boleh tidak tersedia dan harus memberi pesan kegagalan peta.
 - Buka kartu bagikan: pratinjau tampil dahulu, pilih Story/persegi dan Lime/Kertas/Arang; tombol bagikan tetap di bawah.
 - Aktifkan sembunyikan rute: path GPS hilang dari pratinjau dan PNG, tidak ada perisai. Foto pilihan tetap terlihat sesuai keterangan privasi.
 - Pilih foto galeri/kamera, hapus foto, lalu bagikan melalui sheet Android. Pastikan hasil sesuai pratinjau dan teks terbaca.
-- Cek PNG di galeri/penerima: persegi 1080 × 1080, Story 1080 × 1920. Uji teks sistem 200% dan layar HP kecil; laporkan potongan teks/overflow.
+- Cek PNG di galeri/penerima: persegi 1080 ï¿½ 1080, Story 1080 ï¿½ 1920. Uji teks sistem 200% dan layar HP kecil; laporkan potongan teks/overflow.
 
+
+## Persiapan lari & kalibrasi GPS â€” 18 November 2026
+- Android 13+: buka tab Lari. Bila izin sudah aktif, baris izin tidak boleh muncul; hanya pilihan mode dan tombol mulai.
+- Cabut izin lokasi atau notifikasi dari pengaturan, buka lagi sheet: peringatan muncul, tombol "Aktifkan lokasi"/"Izinkan notifikasi" berfungsi, dan tombol "Mulai sesi lari" nonaktif sampai keduanya aktif.
+- Matikan lokasi perangkat: sheet menampilkan pesan lokasi mati; "Hidupkan lokasi" membuka pengaturan lokasi, lalu status diperbarui setelah kembali.
+- Kalibrasi di area terbuka: tekan "Kalibrasi", diam 12â€“20 detik. Progres berjalan, hasil (bagus/cukup/lemah) muncul, dan setelah ditutup kartu kalibrasi hilang karena belum jatuh tempo.
+- Ulangi di dalam gedung: hasil harus "lemah", dan kalibrasi diminta lagi setelah sehari.
+- iOS: ulangi izin lokasi/notifikasi termasuk izin ditolak permanen (harus lewat pengaturan), lalu kalibrasi di luar ruang.
+- Atur interval: tidak boleh ada angka mentah (mis. 60, 300, 8) yang mengambang di atas judul kartu; nilai hanya tampil sebagai mm:ss atau chip.
 
 ## Patch 0.1.2: versi, pembaruan, dan drawer
 - Setelah CI menghasilkan APK 0.1.2+3, pasang sebagai pembaruan atas 0.1.1 dengan signing key yang sama. Profil harus menampilkan 0.1.2 / build 3, sesuai informasi paket Android.

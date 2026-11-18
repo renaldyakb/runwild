@@ -706,19 +706,25 @@ class _SportIntervalField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            width: 1,
-            height: 1,
-            child: TextFormField(
-              controller: controller,
-              onChanged: (_) => onChanged(),
-              decoration: InputDecoration(
-                labelText: labelText,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
+          // Field hanya untuk validasi Form; isinya tidak boleh terlihat. Tanpa clip,
+          // label dan nilai TextFormField bocor sebagai angka mengambang di kartu.
+          ExcludeSemantics(
+            child: ClipRect(
+              child: SizedBox(
+                width: 1,
+                height: 1,
+                child: TextFormField(
+                  controller: controller,
+                  onChanged: (_) => onChanged(),
+                  decoration: InputDecoration(
+                    labelText: labelText,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  validator: validator,
+                ),
               ),
-              validator: validator,
             ),
           ),
           Row(
@@ -899,19 +905,25 @@ class _RoundsField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            width: 1,
-            height: 1,
-            child: TextFormField(
-              controller: controller,
-              onChanged: (_) => onChanged(),
-              decoration: InputDecoration(
-                labelText: s.intervalRounds,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
+          // Field hanya untuk validasi Form; isinya tidak boleh terlihat. Tanpa clip,
+          // label dan nilai TextFormField bocor sebagai angka mengambang di kartu.
+          ExcludeSemantics(
+            child: ClipRect(
+              child: SizedBox(
+                width: 1,
+                height: 1,
+                child: TextFormField(
+                  controller: controller,
+                  onChanged: (_) => onChanged(),
+                  decoration: InputDecoration(
+                    labelText: s.intervalRounds,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  validator: validator,
+                ),
               ),
-              validator: validator,
             ),
           ),
           Row(

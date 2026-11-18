@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../design/components/rw_button.dart';
+import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_page.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../application/gps_calibration.dart';
 import '../application/run_gps_probe.dart';
 import '../application/run_permissions.dart';
+import 'gps_calibration_sheet.dart';
 import 'interval_options.dart';
 
 Future<bool?> showRunPermissionSheet(BuildContext context) =>
@@ -33,13 +36,18 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
   final _statuses = <RunPermission, RunPermissionStatus>{};
   bool _busy = false;
   bool _failed = false;
+  bool _settingsFailed = false;
   bool _returningFromSettings = false;
   bool _refreshOnIdle = false;
+  bool? _serviceEnabled;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_refresh());
+    });
   }
 
   @override
@@ -87,7 +95,12 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
     final result = current == RunPermissionStatus.denied
         ? await service.request(permission)
         : current;
-    if (mounted) setState(() => _statuses[permission] = result);
+    final serviceEnabled = await _serviceEnabledFor(service);
+    if (!mounted) return;
+    setState(() {
+      _statuses[permission] = result;
+      if (serviceEnabled != null) _serviceEnabled = serviceEnabled;
+    });
   });
 
   Future<void> _refresh() => _run((service) async {
@@ -95,16 +108,46 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
       for (final permission in RunPermission.values)
         permission: await service.status(permission),
     };
-    if (mounted) setState(() => _statuses.addAll(results));
+    final serviceEnabled = await _serviceEnabledFor(service);
+    if (!mounted) return;
+    setState(() {
+      _statuses.addAll(results);
+      _settingsFailed = false;
+      if (serviceEnabled != null) _serviceEnabled = serviceEnabled;
+    });
   });
+
+  Future<bool?> _serviceEnabledFor(RunPermissions service) async {
+    try {
+      return await service.isLocationServiceEnabled();
+    } on Exception catch (error) {
+      debugPrint('Location service check failed: ${error.runtimeType}');
+      return null;
+    }
+  }
 
   Future<void> _openSettings() => _run((service) async {
     _returningFromSettings = true;
     try {
-      if (await service.openSettings()) return;
-      if (mounted) setState(() => _failed = true);
+      final opened = await service.openSettings();
+      if (opened) return;
+      if (mounted) setState(() => _settingsFailed = true);
     } finally {
-      if (_failed || !mounted) {
+      if (_settingsFailed || !mounted) {
+        _returningFromSettings = false;
+      }
+    }
+  });
+
+  Future<void> _openLocationSettings() => _run((service) async {
+    _returningFromSettings = true;
+    try {
+      var opened = await service.openLocationSettings();
+      if (!opened) opened = await service.openSettings();
+      if (opened) return;
+      if (mounted) setState(() => _settingsFailed = true);
+    } finally {
+      if (_settingsFailed || !mounted) {
         _returningFromSettings = false;
       }
     }
@@ -115,23 +158,19 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
     final s = AppLocalizations.of(context);
     final location = _statuses[RunPermission.location];
     final notifications = _statuses[RunPermission.notifications];
-    final needsSettings =
-        location == RunPermissionStatus.blocked ||
-        notifications == RunPermissionStatus.blocked;
-    final locationMessage = switch (location) {
-      RunPermissionStatus.granted => s.runLocationReady,
-      RunPermissionStatus.denied => s.runLocationDenied,
-      RunPermissionStatus.blocked => s.runLocationBlocked,
-      RunPermissionStatus.restricted => s.runLocationRestricted,
-      null => null,
-    };
-    final notificationsMessage = switch (notifications) {
-      RunPermissionStatus.granted => s.runNotificationsReady,
-      RunPermissionStatus.denied ||
-      RunPermissionStatus.restricted => s.runNotificationsDenied,
-      RunPermissionStatus.blocked => s.runNotificationsBlocked,
-      null => null,
-    };
+    final permissionsKnown = _statuses.length == RunPermission.values.length;
+    final locationGranted = location == RunPermissionStatus.granted;
+    final notificationsGranted = notifications == RunPermissionStatus.granted;
+    final serviceOff = _serviceEnabled == false;
+    final missing = <RunPermission>[
+      if (!locationGranted) RunPermission.location,
+      if (!notificationsGranted) RunPermission.notifications,
+    ];
+    final canStart = locationGranted && notificationsGranted && !serviceOff;
+    final showNotice =
+        _failed ||
+        _settingsFailed ||
+        (permissionsKnown && (missing.isNotEmpty || serviceOff));
 
     return RwPage(
       children: [
@@ -179,205 +218,22 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
         ),
         const SizedBox(height: RwSpace.md),
 
-        // ── Status Sensor Kompak ────────────────────────────────────
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: location == RunPermissionStatus.granted
-                    ? const Color(0xFFF7FCE8)
-                    : const Color(0xFFFEF3C7),
-                borderRadius: BorderRadius.circular(RwRadius.pill),
-                border: Border.all(
-                  color: location == RunPermissionStatus.granted
-                      ? RwColors.lime600
-                      : const Color(0xFFFDE68A),
-                ),
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width - 64,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      location == RunPermissionStatus.granted
-                          ? Icons.check_circle_rounded
-                          : Icons.location_on_outlined,
-                      size: 14,
-                      color: location == RunPermissionStatus.granted
-                          ? RwColors.lime700
-                          : const Color(0xFFB45309),
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        location == RunPermissionStatus.granted
-                            ? 'GPS Siap'
-                            : 'Perlu Izin Lokasi',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: location == RunPermissionStatus.granted
-                              ? RwColors.ink950
-                              : const Color(0xFFB45309),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: notifications == RunPermissionStatus.granted
-                    ? const Color(0xFFF7FCE8)
-                    : RwColors.paper50,
-                borderRadius: BorderRadius.circular(RwRadius.pill),
-                border: Border.all(
-                  color: notifications == RunPermissionStatus.granted
-                      ? RwColors.lime600
-                      : const Color(0xFFE2E6DC),
-                ),
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width - 64,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      notifications == RunPermissionStatus.granted
-                          ? Icons.notifications_active_rounded
-                          : Icons.notifications_none_rounded,
-                      size: 14,
-                      color: notifications == RunPermissionStatus.granted
-                          ? RwColors.lime700
-                          : RwColors.mutedTextOnLight,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        notifications == RunPermissionStatus.granted
-                            ? 'Notifikasi Aktif'
-                            : 'Perlu Notifikasi',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: notifications == RunPermissionStatus.granted
-                              ? RwColors.ink950
-                              : RwColors.mutedTextOnLight,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: RwSpace.sm),
+        // ── Peringatan hanya bila ada yang belum aktif ──────────────
+        if (showNotice) ...[
+          _permissionNotice(
+            s,
+            missing: permissionsKnown ? missing : const [],
+            serviceOff: permissionsKnown && serviceOff,
+          ),
+        ],
 
-        // ── Info Sensor Ringkas & Rapi ──────────────────────────────
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: RwColors.paper50,
-            borderRadius: BorderRadius.circular(RwRadius.sm),
-            border: Border.all(color: const Color(0xFFE2E6DC)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.info_outline_rounded,
-                size: 15,
-                color: RwColors.ink500,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      s.runLocationExplanation,
-                      style: const TextStyle(
-                        fontFamily: RwType.family,
-                        fontSize: 11,
-                        color: RwColors.mutedTextOnLight,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      s.runNotificationsExplanation,
-                      style: const TextStyle(
-                        fontFamily: RwType.family,
-                        fontSize: 11,
-                        color: RwColors.mutedTextOnLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        if (canStart) ...[
+          const SizedBox(height: RwSpace.sm),
+          _calibrationCard(s),
+        ],
         const SizedBox(height: RwSpace.md),
 
         IntervalOptions(enabled: !_busy),
-
-        if (locationMessage != null ||
-            notificationsMessage != null ||
-            _failed) ...[
-          const SizedBox(height: RwSpace.sm),
-          Semantics(
-            liveRegion: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (locationMessage != null)
-                  Text(
-                    locationMessage,
-                    style: const TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 12,
-                      color: RwColors.mutedTextOnLight,
-                    ),
-                  ),
-                if (notificationsMessage != null)
-                  Text(
-                    notificationsMessage,
-                    style: const TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 12,
-                      color: RwColors.mutedTextOnLight,
-                    ),
-                  ),
-                if (_failed)
-                  Text(
-                    s.runPermissionError,
-                    style: const TextStyle(
-                      fontFamily: RwType.family,
-                      fontSize: 12,
-                      color: RwColors.danger500,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
 
         if (_busy) ...[
           const SizedBox(height: RwSpace.md),
@@ -385,40 +241,23 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
         ],
         const SizedBox(height: RwSpace.lg),
 
-        if (location == RunPermissionStatus.granted) ...[
-          RwButton.primary(
-            label: s.runBeginSession,
-            onPressed: _busy
-                ? null
-                : () => _run((_) async {
-                    await ref.read(runGpsProbeProvider.notifier).stop();
-                    if (context.mounted) Navigator.of(context).pop(true);
-                  }),
-          ),
-        ],
-        if (location == null || location == RunPermissionStatus.denied)
-          RwButton.primary(
-            label: s.runStart,
-            onPressed: _busy ? null : () => _request(RunPermission.location),
-          ),
-        if (notifications == null ||
-            notifications == RunPermissionStatus.denied) ...[
+        RwButton.primary(
+          label: s.runBeginSession,
+          onPressed: canStart && !_busy ? _startSession : null,
+        ),
+        if (!canStart && permissionsKnown) ...[
           const SizedBox(height: RwSpace.xs),
-          RwButton.secondary(
-            label: s.runNotificationsEnable,
-            onPressed: _busy
-                ? null
-                : () => _request(RunPermission.notifications),
+          Text(
+            s.runStartBlocked,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 12,
+              color: RwColors.mutedTextOnLight,
+            ),
           ),
         ],
-        if (needsSettings) ...[
-          const SizedBox(height: RwSpace.xs),
-          RwButton.secondary(
-            label: s.runPermissionSettings,
-            onPressed: _busy ? null : _openSettings,
-          ),
-        ],
-        if (needsSettings || _failed) ...[
+        if (!canStart || _settingsFailed || _failed) ...[
           const SizedBox(height: RwSpace.xs),
           RwButton.secondary(
             label: s.runPermissionRefresh,
@@ -433,4 +272,189 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
       ],
     );
   }
+
+  String _permissionMessage(AppLocalizations s, RunPermission permission) {
+    final status = _statuses[permission];
+    return switch (permission) {
+      RunPermission.location => switch (status) {
+        RunPermissionStatus.blocked => s.runLocationBlocked,
+        RunPermissionStatus.restricted => s.runLocationRestricted,
+        _ => s.runLocationDenied,
+      },
+      RunPermission.notifications => switch (status) {
+        RunPermissionStatus.blocked => s.runNotificationsBlocked,
+        _ => s.runNotificationsDenied,
+      },
+    };
+  }
+
+  bool _needsSettings(RunPermission permission) =>
+      _statuses[permission] == RunPermissionStatus.blocked ||
+      _statuses[permission] == RunPermissionStatus.restricted;
+
+  Widget _permissionNotice(
+    AppLocalizations s, {
+    required List<RunPermission> missing,
+    required bool serviceOff,
+  }) {
+    return RwCard(
+      padding: const EdgeInsets.all(RwSpace.md),
+      color: RwColors.paper50,
+      borderColor: RwColors.lime600,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                size: 18,
+                color: RwColors.ink950,
+              ),
+              const SizedBox(width: RwSpace.xs),
+              Expanded(
+                child: Text(
+                  s.runPermissionsRequiredTitle,
+                  style: const TextStyle(
+                    fontFamily: RwType.family,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: RwColors.ink950,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: RwSpace.xs),
+          Text(
+            s.runPermissionsRequiredBody,
+            style: const TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 12,
+              color: RwColors.mutedTextOnLight,
+            ),
+          ),
+          if (serviceOff) ...[
+            const SizedBox(height: RwSpace.sm),
+            Text(
+              s.runLocationServiceOff,
+              style: const TextStyle(
+                fontFamily: RwType.family,
+                fontSize: 12,
+                color: RwColors.ink950,
+              ),
+            ),
+            const SizedBox(height: RwSpace.xs),
+            RwButton.secondary(
+              label: s.runLocationServiceEnable,
+              onPressed: _busy ? null : _openLocationSettings,
+            ),
+          ],
+          for (final permission in missing) ...[
+            const SizedBox(height: RwSpace.sm),
+            Text(
+              _permissionMessage(s, permission),
+              style: const TextStyle(
+                fontFamily: RwType.family,
+                fontSize: 12,
+                color: RwColors.ink950,
+              ),
+            ),
+            const SizedBox(height: RwSpace.xs),
+            RwButton.secondary(
+              label: _needsSettings(permission)
+                  ? s.runPermissionSettings
+                  : permission == RunPermission.location
+                  ? s.runLocationEnable
+                  : s.runNotificationsEnable,
+              onPressed: _busy
+                  ? null
+                  : _needsSettings(permission)
+                  ? _openSettings
+                  : () => _request(permission),
+            ),
+          ],
+          if (_failed) ...[
+            const SizedBox(height: RwSpace.sm),
+            Text(
+              s.runPermissionError,
+              style: const TextStyle(
+                fontFamily: RwType.family,
+                fontSize: 12,
+                color: RwColors.danger500,
+              ),
+            ),
+          ],
+          if (_settingsFailed) ...[
+            const SizedBox(height: RwSpace.sm),
+            Text(
+              s.runPermissionSettingsFailed,
+              style: const TextStyle(
+                fontFamily: RwType.family,
+                fontSize: 12,
+                color: RwColors.danger500,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _calibrationCard(AppLocalizations s) {
+    final status = ref.watch(gpsCalibrationStatusProvider).asData?.value;
+    if (status == null || !status.isDue) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: RwSpace.md),
+      child: RwCard(
+        padding: const EdgeInsets.all(RwSpace.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const GpsCalibrationBadge(size: 56),
+                const SizedBox(width: RwSpace.sm),
+                Expanded(
+                  child: Text(
+                    s.calibrationDueTitle,
+                    style: const TextStyle(
+                      fontFamily: RwType.family,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: RwColors.ink950,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: RwSpace.xs),
+            Text(
+              s.calibrationDueBody,
+              style: const TextStyle(
+                fontFamily: RwType.family,
+                fontSize: 12,
+                color: RwColors.mutedTextOnLight,
+              ),
+            ),
+            const SizedBox(height: RwSpace.sm),
+            RwButton.secondary(
+              label: s.calibrationCta,
+              onPressed: _openCalibration,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCalibration() async {
+    await showGpsCalibrationSheet(context);
+    if (mounted) ref.invalidate(gpsCalibrationStatusProvider);
+  }
+
+  Future<void> _startSession() => _run((_) async {
+    await ref.read(runGpsProbeProvider.notifier).stop();
+    if (mounted) Navigator.of(context).pop(true);
+  });
 }

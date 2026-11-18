@@ -239,6 +239,20 @@ Sesuai permintaan pengguna untuk memakai grafik dari komunitas yang tersedia di 
 3. Rekor pace diberi label "Pace Rata-rata Terbaik (≥1 km/≥5 km)" karena memang dihitung dari pace rata-rata sesi, bukan split tercepat. Perhitungan berbasis split ditunda sampai split disimpan untuk seluruh sesi.
 4. Estimasi kalori tetap memakai 65 kg: ringkasan/detail berlabel "perkiraan", Progress menambah catatan. Berat badan opsional menyusul.
 
+## ADR-029: Izin adaptif dan kalibrasi GPS
+
+1. Sheet persiapan hanya menampilkan izin yang belum aktif. Lokasi dan notifikasi sama-sama wajib sebelum sesi dimulai karena foreground service membutuhkan notifikasi; status layanan lokasi (GPS perangkat) diperiksa terpisah dan bisa dibuka dari sheet.
+2. Kalibrasi memakai 8 sampel/12 detik minimum dan berhenti pada 13 sampel atau 20 detik. Grade baik bila median akurasi ≤8 m dan drift ≤12 m, cukup ≤15 m/≤20 m, selain itu lemah. Kalibrasi diminta ulang hanya bila belum pernah, hasil lemah lebih dari 1 hari, atau lebih dari 30 hari, agar tidak menjadi langkah rutin.
+3. `lottie: 3.8.2` (MIT) ditambahkan untuk animasi ring sinyal. Aset dibuat sendiri (`assets/lottie/gps_calibration.json`), bukan unduhan pihak ketiga, supaya lisensi jelas dan warna mengikuti Prime Lime. Saat reduced-motion atau aset gagal dimuat, tampil ikon satelit statis.
+4. Hasil kalibrasi disimpan lokal (SharedPreferences) dan tidak disinkronkan: menjaga privasi dan menghindari biaya cloud.
+
+## ADR-030: Lisensi non-komersial
+
+1. MIT tidak lagi dipakai sesuai permintaan pemilik proyek: aplikasi hanya untuk pemakaian pribadi dan pengembangan komunitas.
+2. `LICENSE` diganti dengan **RUNWILD Personal & Community License** (source-available): boleh dipakai, dipelajari, dimodifikasi, dan di-fork secara non-komersial dengan lisensi yang sama dan atribusi; dilarang dijual, dipasang iklan, dilanggankan, dipakai dalam produk/jasa komersial, atau di-relicense.
+3. README memuat ringkasan izin/larangan, batasan merek, serta catatan bahwa lisensi pihak ketiga (Flutter, paket Dart, font, OpenStreetMap) tetap berlaku.
+4. Permintaan komersial harus lewat pemilik repositori; tidak ada izin komersial otomatis.
+
 ## Ide nanti
 
 Tidak ada penambahan di luar roadmap PRD.

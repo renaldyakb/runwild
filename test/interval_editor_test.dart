@@ -9,6 +9,33 @@ import 'support.dart';
 
 void main() {
   setUpAll(loadArchivo);
+
+  testWidgets('Hidden validator fields never paint outside their box', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [runOwnerProvider.overrideWithValue(() => null)],
+        child: componentHost(
+          const IntervalEditor(initial: defaultIntervalConfig),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final fields = find.byType(TextFormField);
+    expect(fields, findsNWidgets(5));
+    for (final element in fields.evaluate()) {
+      final finder = find.byWidget(element.widget);
+      // Kolom meregangkan lebar, tetapi tingginya tetap 1 px dan ter-clip.
+      expect(tester.getSize(finder).height, 1);
+      expect(
+        find.ancestor(of: finder, matching: find.byType(ClipRect)),
+        findsWidgets,
+      );
+    }
+  });
+
   for (final dark in [false, true]) {
     for (final scale in [1.0, 2.0]) {
       testWidgets('Interval editor layout dark=$dark scale=$scale', (

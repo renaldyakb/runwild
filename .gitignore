@@ -88,3 +88,5 @@ ui-debug.log
 
 # Environment & Secrets
 .env*
+# Flutter widget preview generated workspace
+.widget_preview/

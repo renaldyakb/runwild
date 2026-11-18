@@ -30,28 +30,40 @@ class _Permissions implements RunPermissions {
   final requests = <RunPermission>[];
   var location = RunPermissionStatus.denied;
   var nextLocation = RunPermissionStatus.granted;
+  var notifications = RunPermissionStatus.granted;
+  var nextNotifications = RunPermissionStatus.granted;
+  var serviceEnabled = true;
   int settingsOpened = 0;
+  int locationSettingsOpened = 0;
   bool fail = false;
 
   @override
   Future<RunPermissionStatus> status(RunPermission permission) async {
     if (fail) throw Exception('Permission service unavailable');
-    return permission == RunPermission.location
-        ? location
-        : RunPermissionStatus.denied;
+    return permission == RunPermission.location ? location : notifications;
   }
 
   @override
   Future<RunPermissionStatus> request(RunPermission permission) async {
     requests.add(permission);
+    if (fail) throw Exception('Permission service unavailable');
     return permission == RunPermission.location
         ? location = nextLocation
-        : RunPermissionStatus.denied;
+        : notifications = nextNotifications;
   }
 
   @override
   Future<bool> openSettings() async {
     settingsOpened++;
+    return true;
+  }
+
+  @override
+  Future<bool> isLocationServiceEnabled() async => serviceEnabled;
+
+  @override
+  Future<bool> openLocationSettings() async {
+    locationSettingsOpened++;
     return true;
   }
 }
@@ -102,7 +114,7 @@ void main() {
       await tester.enterText(run, '10');
       await tester.pumpAndSettle();
       await _tap(tester, 'Gunakan interval');
-      await _tap(tester, 'Mulai Lari');
+      await _tap(tester, 'Aktifkan lokasi');
       await _tap(tester, 'Mulai sesi lari');
       now = const Duration(seconds: 3);
       await tester.pump(now);
@@ -125,7 +137,7 @@ void main() {
         countdownClock: () => Duration.zero,
       );
       await _tap(tester, 'Mulai berlari');
-      await _tap(tester, 'Mulai Lari');
+      await _tap(tester, 'Aktifkan lokasi');
       await _tap(tester, 'Mulai sesi lari');
       expect(find.text('Bersiap'), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
@@ -150,7 +162,7 @@ void main() {
       ),
     );
     await _tap(tester, 'Lari');
-    await _tap(tester, 'Mulai Lari');
+    await _tap(tester, 'Aktifkan lokasi');
     await _tap(tester, 'Mulai sesi lari');
     expect(find.text('Lanjutkan sesi'), findsOneWidget);
     expect(find.text('Bersiap'), findsNothing);
@@ -169,7 +181,7 @@ void main() {
         countdownClock: () => now,
       );
       await _tap(tester, 'Lari');
-      await _tap(tester, 'Mulai Lari');
+      await _tap(tester, 'Aktifkan lokasi');
       await _tap(tester, 'Mulai sesi lari');
       expect(find.text('3'), findsOneWidget);
       expect(source.fixes.hasListener, isFalse);
@@ -250,9 +262,10 @@ void main() {
     expect(source.fixes.hasListener, isFalse);
   });
   testWidgets(
-    'Lokasi hanya diminta setelah penjelasan dan notifikasi terpisah',
+    'Izin aktif disembunyikan dan peringatan hanya untuk yang belum aktif',
     (tester) async {
-      final permissions = _Permissions();
+      final permissions = _Permissions()
+        ..notifications = RunPermissionStatus.denied;
       await pumpRunwild(
         tester,
         runPermissions: permissions,
@@ -261,23 +274,25 @@ void main() {
       );
       expect(permissions.requests, isEmpty);
       await _tap(tester, 'Lari');
+      expect(find.text('Lokasi dan notifikasi perlu aktif'), findsOneWidget);
       expect(
-        find.textContaining('Lokasi digunakan untuk mencatat rute'),
+        find.textContaining('Izin lokasi belum diberikan'),
         findsOneWidget,
       );
+      expect(find.textContaining('Notifikasi belum diizinkan'), findsOneWidget);
       expect(permissions.requests, isEmpty);
-      await _tap(tester, 'Mulai Lari');
+
+      await _tap(tester, 'Aktifkan lokasi');
       expect(permissions.requests, [RunPermission.location]);
-      expect(find.text('Izin lokasi sudah diberikan.'), findsOneWidget);
+      expect(find.textContaining('Izin lokasi belum diberikan'), findsNothing);
+      expect(find.textContaining('Notifikasi belum diizinkan'), findsOneWidget);
+
       await _tap(tester, 'Izinkan notifikasi');
       expect(permissions.requests, [
         RunPermission.location,
         RunPermission.notifications,
       ]);
-      expect(
-        find.textContaining('tetap bisa lanjut tanpa notifikasi'),
-        findsOneWidget,
-      );
+      expect(find.text('Lokasi dan notifikasi perlu aktif'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
@@ -289,7 +304,7 @@ void main() {
       ..nextLocation = RunPermissionStatus.blocked;
     await pumpRunwild(tester, runPermissions: permissions);
     await _tap(tester, 'Lari');
-    await _tap(tester, 'Mulai Lari');
+    await _tap(tester, 'Aktifkan lokasi');
     expect(find.textContaining('lewat pengaturan perangkat'), findsOneWidget);
     await _tap(tester, 'Buka pengaturan');
     expect(permissions.settingsOpened, 1);
@@ -297,7 +312,7 @@ void main() {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpAndSettle();
-    expect(find.text('Izin lokasi sudah diberikan.'), findsOneWidget);
+    expect(find.textContaining('Izin lokasi belum diberikan'), findsNothing);
     expect(find.text('Buka pengaturan'), findsNothing);
     expect(permissions.requests, [RunPermission.location]);
   });
@@ -306,11 +321,10 @@ void main() {
     final permissions = _Permissions()..fail = true;
     await pumpRunwild(tester, runPermissions: permissions);
     await _tap(tester, 'Lari');
-    await _tap(tester, 'Mulai Lari');
     expect(find.text('Izin belum bisa diperiksa. Coba lagi.'), findsOneWidget);
     permissions.fail = false;
     await _tap(tester, 'Periksa izin lagi');
-    await _tap(tester, 'Mulai Lari');
-    expect(find.text('Izin lokasi sudah diberikan.'), findsOneWidget);
+    await _tap(tester, 'Aktifkan lokasi');
+    expect(find.textContaining('Izin lokasi belum diberikan'), findsNothing);
   });
 }

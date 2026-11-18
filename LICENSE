@@ -1,0 +1,136 @@
+# RUNWILD PERSONAL & COMMUNITY LICENSE
+Version 1.0 — 18 November 2026
+
+Copyright (c) 2026 RUNWILD contributors. All rights reserved.
+
+This license is **source-available**, not an open-source license approved by
+the OSI. It allows personal use and community development only. Commercial use
+of any kind is prohibited.
+
+By using, copying, modifying, or distributing this software, you agree to the
+terms below.
+
+---
+
+## 1. Definitions
+
+- **"Software"** means the RUNWILD application source code, assets, texts,
+  documentation, and any files in this repository, including modified versions.
+- **"You"** means an individual or group using the Software.
+- **"Personal use"** means use by an individual for their own non-commercial
+  running, walking, health, or learning activities, without any payment,
+  advertising, sponsorship, or business purpose.
+- **"Community development"** means non-commercial study, experimentation,
+  bug fixing, translation, documentation, and contributions that are shared
+  back to this project or to other non-commercial forks under this same
+  license.
+- **"Commercial use"** means any use intended for or directed toward commercial
+  advantage or monetary compensation. This includes (without limitation)
+  selling the Software or derivative apps, paid distribution, in-app
+  purchases, subscriptions, advertising, sponsorship, affiliate promotion,
+  paid support or hosting, bundling with a paid product or service, or using
+  the Software to operate a commercial service.
+- **"Derivative"** means any modified, translated, extended, or rebranded
+  version of the Software.
+
+## 2. Grant of rights
+
+Subject to this license, you are granted a worldwide, royalty-free,
+non-exclusive, non-transferable right to:
+
+1. **Use** the Software for personal, non-commercial purposes.
+2. **Study** the source code and learn from it.
+3. **Modify** the Software for personal use or community development.
+4. **Distribute** the Software or a Derivative **only** free of charge, only
+   for personal or community use, and only under this exact license.
+
+## 3. Conditions
+
+If you copy, modify, or distribute the Software or a Derivative, you must:
+
+1. Keep this license file and all copyright notices intact.
+2. License the entire Derivative under this same license, without adding
+   commercial permissions.
+3. Give clear attribution to the RUNWILD project and link to this repository.
+4. State prominently in the Derivative that it is an unofficial modification.
+5. Not remove or hide the license, attribution, or non-commercial notice from
+   the app's about screen or documentation.
+6. Not use the RUNWILD name, wordmark, logo, or visual identity to promote a
+   Derivative or imply official endorsement.
+
+## 4. Prohibited uses
+
+You may **not**, without prior written permission from the copyright holders:
+
+1. Sell, resell, rent, lease, sublicense, or otherwise charge for the Software
+   or any Derivative.
+2. Publish the Software or a Derivative on any paid app store, paid download
+   platform, or behind a paywall.
+3. Monetize the Software or a Derivative through advertising, sponsorships,
+   affiliate links, in-app purchases, subscriptions, or donations tied to a
+   business.
+4. Use the Software or a Derivative in a commercial product, commercial
+   service, commercial training program, or commercial event.
+5. Relicense the Software or a Derivative under different terms, including
+   permissive or commercial licenses.
+6. Remove, bypass, or alter license notices, attribution, or the
+   non-commercial restriction.
+
+## 5. Contributions
+
+By submitting a contribution (code, documentation, translation, design, or
+asset), you agree that:
+
+1. You have the right to submit it.
+2. It is licensed to this project under this same license.
+3. It may be used, modified, and distributed as part of the Software under
+   this license.
+
+## 6. Third-party components
+
+The Software depends on third-party packages, fonts, and services. Those
+components remain under their own licenses and terms, which you must follow.
+This license does not grant rights to third-party components beyond what their
+licenses allow.
+
+Map tiles are provided by OpenStreetMap contributors and must follow the OSM
+Tile Usage Policy. Do not use public OSM tile servers for heavy or commercial
+traffic.
+
+## 7. Health and privacy notice
+
+RUNWILD is not a medical device. Distance, pace, and calorie values are
+estimates, not medical measurements. Consult a professional before starting a
+new exercise program if you have health concerns.
+
+Location data stays on the device and in the user's own Firebase project when
+configured. Do not upload other people's location data without consent.
+
+## 8. No warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, AND NON-INFRINGEMENT. YOU USE THE
+SOFTWARE AT YOUR OWN RISK.
+
+## 9. Limitation of liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE AUTHORS AND CONTRIBUTORS ARE NOT
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES, INCLUDING LOSS OF DATA, INJURY, OR LOST PROFITS,
+ARISING FROM THE USE OF OR INABILITY TO USE THE SOFTWARE.
+
+## 10. Termination
+
+Your rights under this license terminate automatically if you breach any term.
+On termination you must stop using and distributing the Software and destroy
+copies you control. Sections 3, 4, 6, 7, 8, 9, and 11 survive termination.
+
+## 11. General
+
+1. This license is the entire agreement regarding the Software.
+2. If a provision is unenforceable, the remaining provisions stay in effect.
+3. This license is governed by the laws of the Republic of Indonesia, without
+   regard to conflict-of-law rules.
+4. For commercial licensing requests, contact the repository owner through
+   the issue tracker or the contact listed in the repository.

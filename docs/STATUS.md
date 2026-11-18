@@ -1,5 +1,27 @@
 # Status RUNWILD
 
+- 18 Nov 2026: rilis 0.1.4+5 (izin adaptif, kalibrasi GPS, perbaikan drawer interval, lisensi non-komersial).
+  - `pubspec.yaml` 0.1.4+5; catatan rilis `docs/releases/0.1.4.md` (3 bagian, 5 bullet, bahasa pengguna).
+  - README ditulis ulang: kegunaan, cara pakai, arsitektur, pengembangan, batasan, dan lisensi non-komersial; badge lisensi diperbarui.
+  - `LICENSE` baru: RUNWILD Personal & Community License (source-available, hanya pribadi dan komunitas; dilarang komersial). ADR-030 dicatat.
+  - Isi kode rilis: kalibrasi GPS + Lottie, sheet izin adaptif (mulai diblokir sampai lokasi & notifikasi aktif), layanan lokasi diperiksa, angka mentah di drawer interval di-clip.
+  - Verifikasi sebelum push: 86 tes daftar CI + tes kalibrasi/izin lulus, `flutter analyze --fatal-infos` bersih, format 0 perubahan.
+  - Menunggu: GitHub Actions membuat tag v0.1.4 dan APK; uji perangkat fisik (GPS/kalibrasi/notifikasi) masih tertunda.
+
+- 18 Nov 2026: perbaikan kebocoran angka di drawer Atur interval.
+  - Field validasi tersembunyi pada durasi dan putaran tingginya hanya 1 px dan dibungkus `ClipRect` + `ExcludeSemantics`, sehingga label/nilai internal (60, 300, 8, 10) tidak lagi bocor sebagai angka mengambang di atas judul kartu.
+  - Validasi Form dan input tes tetap bekerja; ditambah tes regresi yang memastikan kelima field tetap 1×1 dan berada di dalam `ClipRect`.
+  - Bukti: analyze bersih, format 0 perubahan, `run_permissions_test` (mengetik nilai lewat label) lulus, tes regresi baru lulus.
+  - Catatan: golden `interval_*`, `home_*`, `catalog_*`, `run_live` masih usang (latar Fase 0 dan font tes Ahem), bukan akibat perubahan ini; tidak diubah.
+
+- 18 Nov 2026: persiapan lari adaptif dan kalibrasi GPS.
+  - Sheet persiapan hanya menampilkan izin yang belum aktif. Peringatan muncul bila lokasi atau notifikasi mati, dengan tombol izin/pengaturan; tombol mulai nonaktif sampai keduanya aktif. Status layanan lokasi perangkat juga diperiksa dan bisa dibuka dari sheet.
+  - Kalibrasi GPS: minimal 8 sampel/12 detik, berhenti pada 13 sampel atau 20 detik. Grade baik bila median akurasi ≤8 m dan drift ≤12 m; cukup ≤15 m/≤20 m; selain itu lemah.
+  - Kalibrasi diminta hanya bila belum pernah, hasil lemah >1 hari, atau >30 hari. Hasil disimpan lokal (SharedPreferences) dan kartu kalibrasi hanya tampil saat jatuh tempo; sesi tetap bisa dimulai tanpa kalibrasi.
+  - Animasi Lottie `assets/lottie/gps_calibration.json` dibuat sendiri (lisensi aman), dengan fallback ikon satelit saat reduced-motion atau aset gagal dimuat. Dependensi `lottie: 3.8.2` dipin.
+  - Bukti: `flutter analyze --fatal-infos` bersih, 86 tes (daftar CI + tes kalibrasi baru) lulus, tes memastikan berkas Lottie valid, `run_permissions_test` diperbarui untuk perilaku baru.
+  - Belum: uji perangkat fisik (izin notifikasi Android 13+, GPS luar ruang, lokasi perangkat dimatikan) — langkahnya di `docs/TESTING.md`. Golden `screens_test` (home/catalog) ternyata juga usang sejak Fase 0; jangan diperbarui tanpa inspeksi visual.
+
 - 18 Nov 2026: rilis 0.1.3+4 disiapkan dan dipush ke `main`.
   - `pubspec.yaml` 0.1.3+4; catatan rilis `docs/releases/0.1.3.md` (Diperbaiki/Diperbarui, 6 bullet, bahasa pengguna).
   - Isi: badge rekor pribadi, data interval aktual (Drift v6 + sinkron cloud), label pace rata-rata, catatan kalori, format durasi lebih dari satu jam.
