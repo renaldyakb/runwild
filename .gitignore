@@ -45,7 +45,6 @@ test/failures/
 android/key.properties
 *.jks
 *.keystore
-!android/app/debug.keystore
 
 # iOS/macOS related
 **/ios/**/*.mode1v3
