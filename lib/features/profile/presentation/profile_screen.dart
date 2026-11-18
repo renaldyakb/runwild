@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/constants/app_version.dart';
+import '../../../core/services/app_update_service.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_page.dart';
@@ -11,6 +13,7 @@ import '../../../design/tokens/rw_tokens.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../auth/presentation/account_actions.dart';
 import '../../foundation/application/home_stats_provider.dart';
+import '../../foundation/presentation/app_update_dialog.dart';
 import '../application/initial_profile.dart';
 import '../application/profile_service.dart';
 import '../domain/user_profile.dart';
@@ -24,6 +27,39 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isSaving = false;
+  bool _isCheckingUpdate = false;
+
+  Future<void> _handleCheckUpdate() async {
+    setState(() => _isCheckingUpdate = true);
+    try {
+      final updateService = ref.read(appUpdateServiceProvider);
+      final updateInfo = await updateService.checkForUpdate(notify: false);
+      if (!mounted) return;
+      if (updateInfo != null && updateInfo.hasUpdate) {
+        await AppUpdateDialog.show(context, updateInfo);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Aplikasi kamu sudah menggunakan versi terbaru (v${AppVersion.current})! 🎉',
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tidak dapat memeriksa pembaruan saat ini.'),
+            backgroundColor: RwColors.danger500,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isCheckingUpdate = false);
+    }
+  }
 
   Future<void> _updateProfile(UserProfile updated) async {
     final user = ref.read(currentProfileUserProvider);
@@ -665,7 +701,74 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     _SectionHeader(title: s.profileSectionSecurity),
                     const SizedBox(height: RwSpace.xs),
                     const AccountActions(),
-                    const SizedBox(height: RwSpace.md),
+                    const SizedBox(height: RwSpace.lg),
+
+                    // ── Bagian 5: Versi & Pembaruan Aplikasi ─────────
+                    const _SectionHeader(title: 'Versi & Pembaruan'),
+                    const SizedBox(height: RwSpace.xs),
+                    RwCard(
+                      padding: const EdgeInsets.all(RwSpace.md),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: RwColors.paper100,
+                                  borderRadius: BorderRadius.circular(
+                                    RwRadius.sm,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 20,
+                                  color: RwColors.ink800,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'RUNWILD App',
+                                      style: TextStyle(
+                                        fontFamily: RwType.family,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                        color: RwColors.ink950,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      'Versi ${AppVersion.current} (Build ${AppVersion.buildNumber})',
+                                      style: TextStyle(
+                                        fontFamily: RwType.family,
+                                        fontSize: 12,
+                                        color: RwColors.mutedTextOnLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: RwSpace.md),
+                          RwButton.secondary(
+                            label: _isCheckingUpdate
+                                ? 'Memeriksa...'
+                                : 'Periksa Pembaruan',
+                            icon: Icons.sync_rounded,
+                            onPressed: _isCheckingUpdate
+                                ? null
+                                : _handleCheckUpdate,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: RwSpace.lg),
 
                     // Tombol Hapus Akun (Danger Zone T4.7)
                     RwCard(

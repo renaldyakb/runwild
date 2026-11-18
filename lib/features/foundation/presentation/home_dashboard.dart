@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../core/services/app_update_service.dart';
 import '../../../design/components/rw_bar_chart.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
@@ -11,14 +14,39 @@ import '../../../design/components/rw_route_view.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../application/home_stats_provider.dart';
+import 'app_update_dialog.dart';
 
-class HomeDashboard extends ConsumerWidget {
+class HomeDashboard extends ConsumerStatefulWidget {
   const HomeDashboard({required this.onStart, super.key});
 
   final VoidCallback? onStart;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends ConsumerState<HomeDashboard> {
+  static bool _hasCheckedUpdateThisSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_hasCheckedUpdateThisSession) {
+      _hasCheckedUpdateThisSession = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkAppUpdate());
+    }
+  }
+
+  Future<void> _checkAppUpdate() async {
+    final updateService = ref.read(appUpdateServiceProvider);
+    final updateInfo = await updateService.checkForUpdate(notify: true);
+    if (mounted && updateInfo != null && updateInfo.hasUpdate) {
+      unawaited(AppUpdateDialog.show(context, updateInfo));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final weekAsync = ref.watch(weekSummaryProvider);
     final routePointsAsync = ref.watch(latestRoutePointsProvider);
@@ -249,7 +277,7 @@ class HomeDashboard extends ConsumerWidget {
                 RwButton.primary(
                   label: s.homeStart,
                   icon: Icons.play_arrow_rounded,
-                  onPressed: onStart,
+                  onPressed: widget.onStart,
                 ),
               ],
             ),
@@ -593,7 +621,7 @@ class HomeDashboard extends ConsumerWidget {
                   label: 'Pilih & Mulai Lari',
                   icon: Icons.play_arrow_rounded,
                   fullWidth: true,
-                  onPressed: onStart,
+                  onPressed: widget.onStart,
                 ),
               ],
             ),

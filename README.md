@@ -1,62 +1,176 @@
-# RUNWILD
+# RUNWILD 🏃‍♂️⚡
 
-Fondasi aplikasi mobile Flutter untuk Android dan iOS sesuai [PRD](docs/PRD.md).
-Status: Fase 0 sudah diimplementasikan secara lokal, tetapi belum ditutup.
-Proyek Firebase dev/prod belum dibuat; Android SDK dan perangkat mobile belum
-tersedia. Fase 1 dan fitur tracking belum dimulai.
+> **RUN. TRACK. IMPROVE. GO WILD.**  
+> Aplikasi pelacak jalan dan lari ramah pemula (Android & iOS) yang fokus pada kemudahan penggunaan, estetika atletis modern, dan privasi penuh.
 
-## Menjalankan
+[![Build & Checks](https://github.com/renaldyakb/runwild/actions/workflows/ci.yml/badge.svg)](https://github.com/renaldyakb/runwild/actions/workflows/ci.yml)
+[![Flutter](https://img.shields.io/badge/Flutter-3.50.0-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.14.0-0175C2?logo=dart)](https://dart.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Toolchain terverifikasi: Flutter 3.50.0 / Dart 3.14.0. SDK lokal tersedia di
-`.tooling/flutter` pada workspace ini, tidak disertakan dalam Git.
+---
 
-Windows pada workspace ini:
+## 🌟 Fitur Utama
 
-```powershell
-./tool/flutter.ps1 pub get
-./tool/flutter.ps1 test
-./tool/flutter.ps1 run -d <id-perangkat>
+### 📍 1. Pelacakan GPS Presisi & Auto-Pause Monotonik
+- Perekaman rute akurat dengan penyaringan loncatan sinyal GPS (*kalman/distance filter*).
+- **Jeda Otomatis Pintar**: Terhenti saat lampu merah atau istirahat, dan otomatis lanjut saat mulai bergerak lagi.
+- Penghitungan metrik esensial: Jarak tempuh, durasi total, pace rata-rata (menit/km), dan estimasi kalori terbakar.
+
+### ⏱️ 2. Mode Lari Bebas & Lari Interval Kustom
+- **Lari Bebas**: Mulai lari tanpa tekanan target, cocok untuk santai (*recovery run*).
+- **Lari Interval (Couch-to-5K Friendly)**:
+  - Preset pemula yang dirancang khusus untuk transisi dari jalan santai ke lari teratur.
+  - Kustomisasi fase jalan, fase lari, dan jumlah putaran (*rounds*).
+  - Tampilan fase aktif visual yang jelas dan kontras saat sesi berlangsung.
+
+### 🎧 3. Panduan Suara & Haptik (Audio Coach)
+- Umpan balik suara dalam Bahasa Indonesia yang jernih (*text-to-speech*).
+- Pengumuman progres berkala setiap kilometer (waktu, pace, sisa jarak).
+- Hitung mundur suara 3-2-1 dan tanda pergantian fase interval dengan getaran haptik.
+
+### 📊 4. Dasbor Progres & Rekor Pribadi (Personal Best)
+- Grafik performa jarak 7 hari terakhir secara visual.
+- Pelacak *Weekly Goal* dan *Streak* mingguan untuk menjaga konsistensi latihan.
+- Deteksi otomatis rekor terbaik (*Personal Best*): 1 KM tercepat, 5 KM tercepat, 10 KM tercepat, dan jarak terjauh.
+
+### 🎨 5. Kartu Bagikan Estetik (Social Share Card)
+- Hasilkan kartu ringkasan sesi beresolusi tinggi untuk dibagikan ke Instagram Stories, WhatsApp, atau media sosial lainnya.
+- Pilihan format tampilan: *Story (9:16)*, *Square (1:1)*, atau *Banner (16:9)*.
+- **Privasi Terjaga**: Tombol instan untuk menyamarkan titik awal dan akhir rute rumah demi keamanan Anda.
+
+### 🚀 6. Pembaruan Otomatis Terintegrasi (In-App Updates)
+- Terhubung langsung dengan GitHub Releases.
+- Menampilkan notifikasi di ponsel saat versi baru rilis.
+- Dialog pembaruan interaktif di dalam aplikasi untuk mengunduh APK terbaru hanya dalam satu ketukan.
+
+---
+
+## 🎨 Desain & Antarmuka
+
+- **Tipografi**: Menggunakan **Google Sans Flex** berbobot variabel (*dynamic weights*) untuk keterbacaan optimal saat bergerak.
+- **Palet Warna**: Sentuhan atletis berenergi tinggi dengan warna aksen **Prime Lime** (`#C5FF41`) berpadu dengan **Hitam Arang Atletis** (`#171A14`).
+- **Bahasa**: Antarmuka 100% Bahasa Indonesia yang ramah, hangat, dan mudah dipahami oleh pelari pemula hingga mahir.
+
+---
+
+## 🏗️ Arsitektur & Teknologi
+
+RUNWILD dibangun dengan arsitektur bersih (*Clean Architecture* berbasis fitur):
+
+```
+lib/
+├── app/               # Inisialisasi aplikasi, router (go_router), & tema
+├── core/              # Layanan inti, utilitas, konstanta, & error handling
+│   ├── constants/     # Ambang batas metrik, batas GPS, versi app
+│   └── services/      # GPS probe, notifikasi lokal, audio, app update
+├── data/              # Model data, DAO Drift SQLite, sinkronisasi remote
+├── design/            # Sistem desain (tokens warna, tipografi, komponen Rw)
+├── domain/            # Logika murni (mesin interval, pelacakan rute, kalkulasi pace)
+├── features/          # Modul fitur:
+│   ├── activities/    # Riwayat sesi, detail aktivitas, grafik rute
+│   ├── auth/          # Masuk anonim & akun Firebase
+│   ├── foundation/    # Beranda (dashboard), progres mingguan, dialog update
+│   ├── profile/       # Pengaturan profil, preferensi suara, target lari
+│   └── run/           # Sesi lari aktif, kontrol jeda/selesai, izin sensor
+└── l10n/              # Lokalisasi bahasa (ARB format)
 ```
 
-Pada mesin lain dengan Flutter 3.50.0:
+- **State Management**: [flutter_riverpod](https://pub.dev/packages/flutter_riverpod)
+- **Local Storage**: [drift](https://pub.dev/packages/drift) (SQLite terindeks dengan antrean sinkronisasi offline)
+- **Peta Rute**: [flutter_map](https://pub.dev/packages/flutter_map) + OpenStreetMap (ringan tanpa lisensi komersial)
+- **Audio Engine**: [just_audio](https://pub.dev/packages/just_audio) & [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
 
-```sh
-flutter pub get --enforce-lockfile
-flutter gen-l10n
-flutter run
+---
+
+## 💻 Memulai untuk Pengembang Komunitas
+
+Kami sangat menyambut kontribusi dari komunitas! Berikut langkah-langkah untuk menyiapkan proyek di komputer lokal Anda:
+
+### Prasyarat
+- **Flutter SDK**: `v3.50.0` atau versi stabil terbaru ([Panduan Instalasi Flutter](https://docs.flutter.dev/get-started/install)).
+- **Dart SDK**: `v3.14.0+`.
+- **Java**: JDK 17.
+- **Android Studio** atau **VS Code** dengan ekstensi Flutter & Dart.
+
+### Langkah Instalasi
+
+1. **Clone repositori**:
+   ```bash
+   git clone https://github.com/renaldyakb/runwild.git
+   cd runwild
+   ```
+
+2. **Pasang dependensi**:
+   ```bash
+   flutter pub get
+   ```
+
+3. **Generate file lokalisasi**:
+   ```bash
+   flutter gen-l10n
+   ```
+
+4. **Jalankan tes otomatis**:
+   ```bash
+   flutter test
+   ```
+
+5. **Jalankan aplikasi di perangkat atau emulator**:
+   ```bash
+   flutter run
+   ```
+
+---
+
+## 📦 Membangun Versi Rilis (Release APK)
+
+### 1. Build Lokal
+Untuk menghasilkan APK rilis yang optimal dan siap dipasang langsung di perangkat Android:
+```bash
+flutter build apk --release
 ```
+File APK akan berada di:  
+`build/app/outputs/flutter-apk/app-release.apk`
 
-Android memerlukan SDK Android dan JDK 17. iOS memerlukan macOS, Xcode,
-minimal iOS 15, dan signing untuk perangkat fisik. Package ID: id.runwild.app.
-Tidak ada target web/desktop. Tanpa Firebase, shell dan katalog tetap berjalan
-lokal. Tekan Buka katalog komponen pada Home versi debug untuk menguji komponen.
+### 2. Unduh dari GitHub Actions
+Setiap kali ada commit atau Pull Request ke branch `main`, GitHub Actions secara otomatis memvalidasi kode dan mem-build APK Release:
+1. Buka tab **[Actions](https://github.com/renaldyakb/runwild/actions)** di repositori GitHub.
+2. Pilih workflow run terbaru.
+3. Unduh berkas dari bagian **Artifacts**: `runwild-release-apk`.
 
-## Pemeriksaan
+---
 
-```sh
-dart format --output=none --set-exit-if-changed lib test
-flutter analyze --fatal-infos
-flutter test --coverage
-flutter build apk --debug
-```
+## 🤝 Panduan Berkontribusi (Contributing)
 
-Golden dibuat pada Windows dengan font Archivo dan Material Icons yang
-benar-benar dimuat. Job verifikasi CI menggunakan Windows agar rasterisasi
-baseline konsisten; build APK memakai Linux. Jangan memperbarui golden tanpa
-memeriksa gambar hasil render.
+Ingin menambahkan fitur baru, memperbaiki bug, atau menyempurnakan desain?
 
-## Dokumentasi
+1. **Fork repositori** ini ke akun GitHub Anda.
+2. Buat branch baru untuk fitur Anda:
+   ```bash
+   git checkout -b fitur/nama-fitur-baru
+   ```
+3. Pastikan kode mengikuti standar linting dan format:
+   ```bash
+   dart format lib test
+   flutter analyze
+   flutter test
+   ```
+4. Commit perubahan Anda dengan pesan yang jelas:
+   ```bash
+   git commit -m "feat: tambahkan ringkasan mingguan pada smartwatch"
+   ```
+5. Push ke branch Anda dan buat **Pull Request (PR)**.
 
-- [Hasil tes dan batas verifikasi](docs/TESTING.md)
-- [Status fase](docs/CHANGELOG.md)
-- [Delivery Gate](docs/DELIVERY_GATE.md)
-- [Arah desain](DESIGN.md), [keputusan](docs/DECISIONS.md)
-- [Arsitektur](docs/ARCHITECTURE.md), [layar](docs/SCREENS.md)
-- [Konfigurasi Firebase](config/README.md), [model data](docs/DATA_MODEL.md)
+---
 
-Referensi implementasi: [migrasi Material resmi](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui),
-[Riverpod](https://riverpod.dev/docs/introduction/getting_started),
-[go_router](https://pub.dev/packages/go_router).
+## 📄 Lisensi
 
-Ikon launcher bawaan scaffold adalah placeholder (PRD 14.3), bukan ikon rilis.
-Konfigurasi Firebase, signing, cache SDK, dan build tidak masuk Git.
+Proyek ini dilisensikan di bawah lisensi open-source [MIT](LICENSE).
+
+---
+
+<p align="center">
+  Dibuat dengan ❤️ untuk komunitas pelari di Indonesia.<br>
+  <b>RUNWILD — RUN. TRACK. IMPROVE. GO WILD.</b>
+</p>

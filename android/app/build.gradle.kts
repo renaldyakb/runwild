@@ -29,7 +29,8 @@ android {
 
     buildTypes {
         release {
-            // PRD Fase 8: release signing must be supplied before distribution.
+            // Signing dengan debug key agar APK release bisa langsung di-install pada perangkat pengujian/distribusi
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
