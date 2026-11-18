@@ -19,8 +19,8 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-subprojects {
-    afterEvaluate {
+gradle.projectsEvaluated {
+    allprojects {
         tasks.configureEach {
             if (name.startsWith("lintVital")) {
                 enabled = false
