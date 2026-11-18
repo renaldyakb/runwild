@@ -4,6 +4,7 @@ import '../../../domain/stats/stats_engine.dart';
 import '../../auth/application/auth_session.dart';
 import '../../profile/application/initial_profile.dart';
 import '../../profile/application/profile_service.dart';
+import '../../profile/domain/user_profile.dart';
 import '../../run/application/run_journal.dart';
 
 final allFinishedSessionsProvider =
@@ -37,7 +38,12 @@ final weekSummaryProvider = FutureProvider.autoDispose<WeekSummary>((
   ref,
 ) async {
   final records = await ref.watch(allFinishedSessionsProvider.future);
-  final profile = await ref.watch(userProfileProvider.future);
+  UserProfile? profile;
+  try {
+    profile = await ref.watch(userProfileProvider.future);
+  } catch (_) {
+    profile = null;
+  }
   final targetSessions =
       profile?.weeklyGoalSessions ?? ProfileLimits.initialSessions;
   return StatsEngine.calculateWeekSummary(

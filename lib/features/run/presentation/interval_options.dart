@@ -329,22 +329,25 @@ class _IntervalEditorState extends ConsumerState<IntervalEditor> {
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(RwRadius.sm),
                         ),
-                        child: Text(
-                          presetLabels[i],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: RwType.family,
-                            fontSize: 12,
-                            fontWeight:
-                                config ==
-                                    intervalPreset(IntervalPreset.values[i])
-                                ? FontWeight.w800
-                                : FontWeight.w600,
-                            color:
-                                config ==
-                                    intervalPreset(IntervalPreset.values[i])
-                                ? RwColors.ink950
-                                : RwColors.mutedTextOnLight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            presetLabels[i],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 12,
+                              fontWeight:
+                                  config ==
+                                      intervalPreset(IntervalPreset.values[i])
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color:
+                                  config ==
+                                      intervalPreset(IntervalPreset.values[i])
+                                  ? RwColors.ink950
+                                  : RwColors.mutedTextOnLight,
+                            ),
                           ),
                         ),
                       ),
@@ -801,16 +804,19 @@ class _SportIntervalField extends StatelessWidget {
                                   width: 1,
                                 ),
                               ),
-                              child: Text(
-                                _formatChip(val),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: RwType.family,
-                                  fontSize: 10.5,
-                                  fontWeight: current == val
-                                      ? FontWeight.w800
-                                      : FontWeight.w600,
-                                  color: RwColors.ink950,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _formatChip(val),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: RwType.family,
+                                    fontSize: 10.5,
+                                    fontWeight: current == val
+                                        ? FontWeight.w800
+                                        : FontWeight.w600,
+                                    color: RwColors.ink950,
+                                  ),
                                 ),
                               ),
                             ),
@@ -1023,16 +1029,19 @@ class _RoundsField extends StatelessWidget {
                                     width: 1,
                                   ),
                                 ),
-                                child: Text(
-                                  '$val×',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: RwType.family,
-                                    fontSize: 11,
-                                    fontWeight: current == val
-                                        ? FontWeight.w800
-                                        : FontWeight.w600,
-                                    color: RwColors.ink950,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '$val×',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: RwType.family,
+                                      fontSize: 11,
+                                      fontWeight: current == val
+                                          ? FontWeight.w800
+                                          : FontWeight.w600,
+                                      color: RwColors.ink950,
+                                    ),
                                   ),
                                 ),
                               ),

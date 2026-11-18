@@ -310,20 +310,25 @@ class _DetailContent extends ConsumerWidget {
               const Divider(color: Color(0xFFE2E6DC), height: 1),
               const SizedBox(height: RwSpace.md),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _SummaryStat(
-                    label: s.runMovingTime,
-                    value: _formatDuration(detail.moving),
+                  Expanded(
+                    child: _SummaryStat(
+                      label: s.runMovingTime,
+                      value: _formatDuration(detail.moving),
+                    ),
                   ),
-                  _SummaryStat(
-                    label: s.runAveragePace,
-                    value: _formatPace(detail.averagePace),
+                  Expanded(
+                    child: _SummaryStat(
+                      label: s.runAveragePace,
+                      value: _formatPace(detail.averagePace),
+                    ),
                   ),
-                  _SummaryStat(
-                    label: s.summaryCalories,
-                    value: '${detail.estimatedCalories}',
-                    unit: ' kkal',
+                  Expanded(
+                    child: _SummaryStat(
+                      label: s.summaryCalories,
+                      value: '${detail.estimatedCalories}',
+                      unit: ' kkal',
+                    ),
                   ),
                 ],
               ),
@@ -547,38 +552,44 @@ class _SummaryStat extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Text(
-        label,
-        style: const TextStyle(
-          fontFamily: RwType.family,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: RwColors.mutedTextOnLight,
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: RwType.family,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: RwColors.mutedTextOnLight,
+          ),
         ),
       ),
       const SizedBox(height: 2),
-      RichText(
-        text: TextSpan(
-          text: value,
-          style: const TextStyle(
-            fontFamily: RwType.family,
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            fontFeatures: [FontFeature.tabularFigures()],
-            color: RwColors.ink950,
-          ),
-          children: [
-            if (unit != null)
-              TextSpan(
-                text: unit,
-                style: const TextStyle(
-                  fontFamily: RwType.family,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: RwColors.mutedTextOnLight,
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: RichText(
+          text: TextSpan(
+            text: value,
+            style: const TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              fontFeatures: [FontFeature.tabularFigures()],
+              color: RwColors.ink950,
+            ),
+            children: [
+              if (unit != null)
+                TextSpan(
+                  text: unit,
+                  style: const TextStyle(
+                    fontFamily: RwType.family,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: RwColors.mutedTextOnLight,
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     ],
@@ -623,16 +634,21 @@ class _IntervalSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: RwSpace.sm),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _IntervalStat(label: 'PUTARAN', value: roundsText),
-              _IntervalStat(
-                label: 'WAKTU LARI',
-                value: _formatDuration(interval.runTime),
+              Expanded(
+                child: _IntervalStat(label: 'PUTARAN', value: roundsText),
               ),
-              _IntervalStat(
-                label: 'WAKTU JALAN',
-                value: _formatDuration(interval.walkTime),
+              Expanded(
+                child: _IntervalStat(
+                  label: 'WAKTU LARI',
+                  value: _formatDuration(interval.runTime),
+                ),
+              ),
+              Expanded(
+                child: _IntervalStat(
+                  label: 'WAKTU JALAN',
+                  value: _formatDuration(interval.walkTime),
+                ),
               ),
             ],
           ),
@@ -651,24 +667,30 @@ class _IntervalStat extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Text(
-        label,
-        style: const TextStyle(
-          fontFamily: RwType.family,
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: RwColors.mutedTextOnLight,
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: RwType.family,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: RwColors.mutedTextOnLight,
+          ),
         ),
       ),
       const SizedBox(height: 2),
-      Text(
-        value,
-        style: const TextStyle(
-          fontFamily: RwType.family,
-          fontSize: 15,
-          fontWeight: FontWeight.w800,
-          fontFeatures: [FontFeature.tabularFigures()],
-          color: RwColors.ink950,
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          value,
+          style: const TextStyle(
+            fontFamily: RwType.family,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            fontFeatures: [FontFeature.tabularFigures()],
+            color: RwColors.ink950,
+          ),
         ),
       ),
     ],

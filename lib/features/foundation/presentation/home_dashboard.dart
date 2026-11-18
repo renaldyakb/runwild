@@ -290,32 +290,41 @@ class HomeDashboard extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        s.homeThisWeek.toUpperCase(),
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: RwColors.mutedTextOnLight,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: RwColors.paper100,
-                          borderRadius: BorderRadius.circular(RwRadius.pill),
-                        ),
+                      Expanded(
                         child: Text(
-                          rangeLabel,
+                          s.homeThisWeek.toUpperCase(),
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontFamily: RwType.family,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: RwColors.ink950,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                            color: RwColors.mutedTextOnLight,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: RwColors.paper100,
+                            borderRadius: BorderRadius.circular(RwRadius.pill),
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              rangeLabel,
+                              style: const TextStyle(
+                                fontFamily: RwType.family,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: RwColors.ink950,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -326,24 +335,29 @@ class HomeDashboard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(
-                        distKm,
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 36,
-                          fontWeight: FontWeight.w900,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                          letterSpacing: -1,
-                          color: RwColors.ink950,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            distKm,
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 36,
+                              fontWeight: FontWeight.w900,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                              letterSpacing: -1,
+                              color: RwColors.ink950,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
                       const Text(
-                        'KM MINGGU INI',
+                        'KM',
                         style: TextStyle(
                           fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
                           color: RwColors.mutedTextOnLight,
                         ),
                       ),
@@ -429,33 +443,43 @@ class HomeDashboard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       if (summary.streakWeeks > 0)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
-                            borderRadius: BorderRadius.circular(RwRadius.pill),
-                            border: Border.all(
-                              color: const Color(0xFFFDE68A),
-                              width: 1,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('🔥 ', style: TextStyle(fontSize: 12)),
-                              Text(
-                                s.homeStreak(summary.streakWeeks),
-                                style: const TextStyle(
-                                  fontFamily: RwType.family,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFFB45309),
-                                ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF3C7),
+                              borderRadius: BorderRadius.circular(
+                                RwRadius.pill,
                               ),
-                            ],
+                              border: Border.all(
+                                color: const Color(0xFFFDE68A),
+                                width: 1,
+                              ),
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    '🔥 ',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  Text(
+                                    s.homeStreak(summary.streakWeeks),
+                                    style: const TextStyle(
+                                      fontFamily: RwType.family,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFB45309),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                     ],
