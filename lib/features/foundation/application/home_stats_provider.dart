@@ -8,6 +8,8 @@ import '../../profile/application/profile_service.dart';
 import '../../profile/domain/user_profile.dart';
 import '../../run/application/run_journal.dart';
 
+final homeClockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 final allFinishedSessionsProvider =
     FutureProvider.autoDispose<List<FinishedSessionRecord>>((ref) async {
       ref.watch(authSessionProvider);

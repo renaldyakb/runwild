@@ -648,5 +648,140 @@
   "activitySave": "Simpan perubahan",
   "homeSessionHint": "Mulai dari langkahmu hari ini.",
   "homeLastRoute": "Rute terakhir",
-  "homeWeekLabel": "Minggu ini"
+  "homeWeekLabel": "Minggu ini",
+  "personalBestTitle": "Rekor pribadi baru",
+  "personalBestDetails": "Kamu memecahkan {records}.",
+  "@personalBestDetails": {"placeholders": {"records": {"type": "String"}}},
+  "weatherTitle": "Cuaca di lokasimu",
+  "weatherPermission": "Aktifkan izin lokasi untuk melihat cuaca di lokasimu.",
+  "weatherError": "Cuaca belum tersedia. Periksa koneksi lalu coba lagi.",
+  "weatherSource": "Sumber: Open-Meteo",
+  "weatherRetry": "Coba lagi",
+  "weatherLoading": "Memuat cuaca...",
+  "weatherHourlyTitle": "12 jam ke depan",
+  "weatherKindClear": "Cerah",
+  "weatherKindPartlyCloudy": "Berawan sebagian",
+  "weatherKindCloudy": "Mendung",
+  "weatherKindRain": "Hujan",
+  "weatherKindSnow": "Salju",
+  "weatherKindThunderstorm": "Badai guntur",
+  "weatherRainAtHour": "Hujan diperkirakan pukul {hour}",
+  "@weatherRainAtHour": {
+    "placeholders": {
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherDryHours": "Tidak ada hujan diperkirakan dalam 12 jam ini.",
+  "reminderTitle": "Pengingat lari",
+  "reminderEmpty": "Belum ada pengingat.",
+  "reminderSet": "Atur pengingat",
+  "reminderChange": "Ubah jadwal",
+  "reminderCancel": "Hapus pengingat",
+  "reminderScheduled": "Pengingat diatur untuk {date}",
+  "@reminderScheduled": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNotificationTitle": "Saatnya bersiap lari",
+  "reminderNotificationBody": "Siapkan perlengkapan dan mulai sesimu.",
+  "reminderError": "Pengingat belum dapat diatur. Periksa izin notifikasi dan coba lagi.",
+  "reminderPast": "Pilih waktu yang masih akan datang.",
+  "reminderInexact": "Notifikasi dapat datang beberapa menit setelah waktu yang dipilih.",
+  "reminderRowNone": "Belum ada jadwal lari",
+  "reminderRowNext": "Jadwal berikutnya {date}",
+  "@reminderRowNext": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderRowManage": "Kelola jadwal",
+  "remindersTitle": "Jadwal lari",
+  "remindersLoading": "Memuat jadwal...",
+  "remindersErrorTitle": "Jadwal belum bisa dimuat",
+  "remindersErrorBody": "Data jadwal lokal belum bisa dibaca. Coba lagi sebentar lagi.",
+  "remindersIntro": "Atur lebih dari satu jadwal. Kami mengingatkan lewat notifikasi bersuara walau aplikasi sedang tertutup.",
+  "remindersEmptyTitle": "Belum ada jadwal",
+  "remindersEmptyBody": "Tambahkan jadwal lari pertama, lalu kami ingatkan tepat waktu.",
+  "remindersAdd": "Tambah jadwal",
+  "remindersDelete": "Hapus jadwal",
+  "runnerFallbackName": "Pelari",
+  "remindersSaved": "Jadwal disimpan.",
+  "remindersDeleted": "Jadwal dihapus.",
+  "remindersGroupToday": "Hari ini",
+  "remindersGroupTomorrow": "Besok",
+  "remindersGroupLater": "Berikutnya",
+  "remindersSoundNote": "Notifikasi memakai suara RUNWILD dan tetap muncul saat aplikasi tertutup.",
+  "homeGreetingLine": "{greeting}, {name}",
+  "@homeGreetingLine": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingMorning": "Selamat pagi",
+  "greetingAfternoon": "Selamat siang",
+  "greetingEvening": "Selamat sore",
+  "greetingNight": "Selamat malam",
+  "homeKmUnit": "KM",
+  "homeWeekEmptyTitle": "Belum ada sesi minggu ini",
+  "homeWeekEmptyBody": "Jalan 10 menit saja sudah cukup untuk memulai. Sesi pertamamu akan muncul di sini.",
+  "homeWeekErrorTitle": "Ringkasan minggu ini belum bisa dimuat",
+  "homeWeekErrorBody": "Data sesi lokal belum bisa dibaca. Coba lagi sebentar lagi.",
+  "homeChartAnswer": "{days} dari {total} hari ada lari",
+  "@homeChartAnswer": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "chartLabel": "Grafik jarak lari harian minggu ini",
+  "chartEmpty": "Belum ada data grafik",
+  "chartTooltipKm": "{value} km",
+  "@chartTooltipKm": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "homeWeeklyGoalDone": "Target minggu ini tuntas",
+  "homeWeeklyGoalDoneDetail": "{completed} dari {target} sesi",
+  "@homeWeeklyGoalDoneDetail": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStartRecommended": "Atur sesi ini",
+  "weatherDetailTitle": "Kondisi cuaca",
+  "weatherDetailLink": "Cek cuaca 12 jam ke depan",
+  "weatherCityUnknown": "Nama kota belum tersedia",
+  "weatherLocationSource": "Lokasi: © OpenStreetMap contributors",
+  "heroWeek": "Langkah minggu ini",
+  "heroSessions": "Sesi",
+  "heroMinutes": "Menit bergerak",
+  "heroDistance": "Kilometer",
+  "weatherChance": "Peluang hujan",
+  "weatherForecastNote": "Prakiraan dapat berubah. Periksa kembali sebelum berangkat.",
+  "homeRouteMapToggle": "Tampilkan peta rute terakhir",
+  "heroNextReminder": "Jadwal lari terdekat"
 }

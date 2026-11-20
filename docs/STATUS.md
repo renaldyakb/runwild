@@ -1,5 +1,43 @@
 # Status RUNWILD
 
+- 20 Nov 2026: rilis 0.1.5+6 disiapkan untuk push ke main; catatan pengguna docs/releases/0.1.5.md.
+  - Isi: cuaca/kota dan detail 12 jam, pengingat bersuara serta jadwal terdekat, badge lime, hero terbaru tanpa rute terakhir.
+  - Verifikasi: 82 tes daftar CI lulus; analyze proyek fatal-infos bersih; helper tes terisolasi, sapaan/cuaca golden deterministik; format 134 file sesuai.
+  - GitHub Actions akan membuat APK dan release v0.1.5 setelah verify. Run baru tidak dimonitor sesuai preferensi pengguna. Uji perangkat tetap di docs/TESTING.md.
+
+- 20 Nov 2026: panel rute terakhir beserta toggle dihapus dari hero sesuai permintaan. Hero tidak lagi memuat titik rute. Analyze bersih, 11 tes lulus, golden hero diperbarui dan diperiksa.
+
+- 20 Nov 2026: fallback nama kota diperluas untuk state_district/city_district/borough/suburb; reverse geocoding memakai zoom 12. Respons layanan dengan koordinat contoh Jakarta terverifikasi mengembalikan Jakarta Barat.
+  - Seluruh kartu rute hero berasio 3:4, termasuk header/toggle. Peta historis mengikuti batas tinggi viewport; mode peta dan jejak tidak mengubah ukuran kartu.
+  - Hero menampilkan jadwal mendatang terdekat, terurut waktu, tertaut ke /reminders. Kosong/loading/error tidak menambah panel jadwal.
+  - Bukti: analyze bersih, 12 tes weather_reminder/activity_map lulus; rasio dan ukuran sebelum/sesudah toggle teruji; golden hero diperiksa dengan peta pengganti lokal. GPS kota dan tile di HP belum diverifikasi.
+
+- 20 Nov 2026: tautan teks cuaca di hero dihapus; ikon Meteocons membuka detail lewat tombol ber-tooltip. Reduced motion memakai bingkai statis Meteocons, bukan ikon buatan sendiri.
+  - Rute terakhir dipindah di bawah homeSessionHint; toggle peta historis ON / jejak rute OFF memakai MapService yang sama dengan detail aktivitas. Tanpa rute valid panel tidak ditampilkan.
+  - Bukti: 11 tes weather_reminder lulus (toggle, navigasi ikon, teks 200%); analisis UI bersih, lint import tes diperbaiki. Golden hero diperiksa dengan pengganti peta lokal; tile nyata perlu uji HP.
+
+- 20 Nov 2026: hero hitam menampilkan jarak, menit bergerak, sesi/target minggu ini dan cuaca saat ini. Prakiraan dipindah ke WeatherDetailScreen melalui ketukan area cuaca/link.
+  - Kota GPS memakai Nominatim dengan koordinat dibulatkan dan cache memori; pengguna menyetujui egress pada sesi ini. Gagal geocoding tetap menampilkan cuaca dengan nama kota belum tersedia.
+  - Detail: suhu, kondisi, 12 jam kondisi/peluang hujan, atribusi dan pesan prakiraan. Ikon beralas arang menjaga keterbacaan lime.
+  - Bukti: analyze fitur dan tes bersih; 11 tes weather_reminder lulus (navigasi pergi/kembali, parser kota, teks 200%); golden hero/detail diperiksa. Uji kota live dan perangkat tetap diperlukan.
+
+- 20 Nov 2026 (lanjutan): beranda dirombak, cuaca jadi piktogram, dan pengingat menjadi banyak jadwal.
+  - Cuaca: `weather_service.dart` mengambil `weather_code` per jam; strip 12 jam memakai piktogram Meteocons (persen dan mm tidak lagi ditampilkan) plus satu kalimat simpulan waktu hujan, dan suhu didampingi nama kondisi berbahasa Indonesia.
+  - Pengingat: `run_reminder.dart` menyimpan daftar jadwal (`RunReminderStore`, diuji tanpa plugin) dan menjadwalkan notifikasi bersuara `Sound_effect.mp3` (`android/app/src/main/res/raw/sound_effect.mp3`, kanal `run_reminders_v2`, tetap terjadwal walau aplikasi tertutup). Halaman baru `/reminders` (`run_reminders_screen.dart`): tambah, ubah lewat ketuk kartu, hapus, kelompok Hari ini/Besok/Berikutnya, plus catatan suara dan keterlambatan jadwal.
+  - Beranda: hero dirombak (sapaan per jam + nama depan, satu CTA, kondisi cuaca, rute terakhir), kartu "Minggu ini" digabung (jarak, durasi, sesi, grafik + jawaban satu kalimat, progres target, rentetan minggu), kartu saran memakai tautan teks, pengingat menjadi baris ringkas. Tiga kegagalan senyap diganti keadaan gagal/kosong yang menjelaskan sebab dan bisa dicoba lagi.
+  - Kerapian: token baru (`borderCard`, `borderControl`, `surfaceMuted`, `surfaceDisabled`, `chartBar`, `chartBarToday`, `chartTrack`, `chartTrackSoft`), batang grafik 1,42:1 → 6,61:1, emoji dan lima string hardcode pindah ke ARB, aksen lime dibatasi pada judul hero dan tombol utama.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, daftar tes CI 81 lulus (termasuk tes baru cuaca, jadwal, dan teks sistem 200%), golden `home_next_session`, `home_light/dark`, `catalog_light/dark` diperbarui lalu diperiksa visual (tanpa strip overflow).
+  - Belum: notifikasi bersuara saat aplikasi tertutup, pemulihan jadwal setelah reboot, dan animasi Lottie di perangkat belum diuji (langkah di `docs/TESTING.md`); suara khusus iOS perlu berkas ditambahkan ke bundel Xcode.
+  - Di luar daftar CI masih ada 30 kegagalan warisan Fase 0 (`app_test`, `auth_screen_test`, `profile_setup_test`, golden `activity_history`/`interval_*`/`components_*`/`run_live`, dan dua asersi `design_test`). Baseline kode sebelum perubahan ini juga 30 kegagalan di berkas yang sama, jadi bukan regresi dan tidak dikerjakan di sesi ini.
+
+
+- 20 Nov 2026: cuaca Home, pengingat lari, dan badge rekor lime selesai di kode (belum dirilis/commit).
+  - Cuaca (`lib/features/foundation/application/weather_service.dart`): memakai izin lokasi yang sudah ada (tidak meminta izin baru), data Open-Meteo (suhu, kode kondisi, 12 jam peluang hujan + mm), state loading/tanpa izin/error+retry, refresh saat resume lewat `WidgetsBindingObserver`. Animasi Meteocons (`fill`, MIT © Bas Milius) untuk enam jenis cuaca lewat `weather_kind.dart`, disimpan di `assets/lottie/meteocons/`; ikon Material statis saat reduced-motion atau aset gagal dimuat.
+  - Pengingat (`lib/features/foundation/application/run_reminder.dart`): sekali jalan, waktu lokal pilihan pengguna disimpan sebagai instant (SharedPreferences), bisa ubah/hapus, notifikasi bersuara, jadwal Android dipulihkan setelah reboot (`RECEIVE_BOOT_COMPLETED` + receiver plugin), mode inexact bisa terlambat. Dependensi baru `timezone: 0.11.2` dipin dan dicatat di `docs/DECISIONS.md`.
+  - Badge rekor ringkasan: kartu lime rata, ikon piala, judul/detail lewat ARB (`personalBestTitle`, `personalBestDetails`); ekspektasi teks `test/personal_best_alert_test.dart` ikut disesuaikan ke ARB baru.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format lib test` 130 berkas 0 perubahan, `flutter gen-l10n` stabil, 18 tes terarah lulus (5 cuaca/pengingat + 4 badge + 9 Home), dan `test/weather_reminder_test.dart` ditambahkan ke daftar tes CI.
+  - Belum/blokir: `test/release_ui_test.dart` (masuk daftar tes CI) GAGAL pada golden `goldens/home_next_session.png` (selisih +34%) karena kartu cuaca/pengingat baru di Home — terbukti regresi: tanpa perubahan `home_dashboard.dart` tes itu 4/4 lulus. Golden `test/screens_test.dart` (home sekitar 60%, catalog) juga masih gagal warisan Fase 0. Pemanggilan scheduler/notifikasi, cuaca nyata, dan tampilan animasi Meteocons di layar (baru diuji sebagai komposisi Lottie) belum diperiksa di perangkat — langkah di `docs/TESTING.md`; state loading cuaca hanya teks sementara tanpa state offline khusus.
+
 - 18 Nov 2026: rilis 0.1.4+5 (izin adaptif, kalibrasi GPS, perbaikan drawer interval, lisensi non-komersial).
   - `pubspec.yaml` 0.1.4+5; catatan rilis `docs/releases/0.1.4.md` (3 bagian, 5 bullet, bahasa pengguna).
   - README ditulis ulang: kegunaan, cara pakai, arsitektur, pengembangan, batasan, dan lisensi non-komersial; badge lisensi diperbarui.

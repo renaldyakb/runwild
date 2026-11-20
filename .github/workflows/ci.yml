@@ -118,4 +118,4 @@ jobs:
       - run: flutter gen-l10n
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
-      - run: flutter test test/release_notes_test.dart test/release_ui_test.dart test/app_update_test.dart test/share_card_test.dart test/personal_best_alert_test.dart test/run_preferences_integration_test.dart test/profile_settings_test.dart test/run_permissions_test.dart test/weekly_goal_celebration_test.dart test/activity_detail_test.dart test/activity_sync_test.dart test/home_progress_test.dart test/tracking_engine_test.dart
+      - run: flutter test test/release_notes_test.dart test/release_ui_test.dart test/app_update_test.dart test/share_card_test.dart test/personal_best_alert_test.dart test/run_preferences_integration_test.dart test/profile_settings_test.dart test/run_permissions_test.dart test/weekly_goal_celebration_test.dart test/activity_detail_test.dart test/activity_sync_test.dart test/home_progress_test.dart test/tracking_engine_test.dart test/weather_reminder_test.dart

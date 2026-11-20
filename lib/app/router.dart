@@ -16,6 +16,7 @@ import '../features/activities/presentation/progress_screen.dart';
 import '../features/auth/presentation/auth_screen.dart';
 import '../features/catalog/presentation/catalog_screen.dart';
 import '../features/foundation/presentation/foundation_screen.dart';
+import '../features/foundation/presentation/run_reminders_screen.dart';
 import '../features/onboarding/presentation/intro_screen.dart';
 import '../features/onboarding/presentation/startup_screen.dart';
 import '../features/profile/presentation/profile_setup_screen.dart';
@@ -57,6 +58,10 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
     GoRoute(
       path: '/progress',
       builder: (context, state) => const ProgressScreen(),
+    ),
+    GoRoute(
+      path: '/reminders',
+      builder: (context, state) => const RunRemindersScreen(),
     ),
     GoRoute(
       path: '/activities/:id',

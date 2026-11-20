@@ -169,3 +169,30 @@ beranda tidak boleh mengklaim GPS terkunci atau menampilkan jarak rekaan.
 - Edit judul/catatan dari detail: drawer naik dari bawah, tetap dapat digulir ketika keyboard terbuka. Simpan mengubah data; tutup/geser batal tidak mengubah data.
 - Home: mulai membuka persiapan sesi; rute kecil hanya tampil jika sesi sebelumnya memiliki GPS. Cek teks sistem 200%.
 - Tes lokal memakai mock info paket dan tile peta; belum membuktikan hasil build/release di GitHub atau instalasi perangkat fisik.
+
+
+## Cuaca dan pengingat - 20 November 2026
+- Izinkan lokasi, buka Home dan periksa suhu serta 12 jam peluang hujan dan mm. Matikan lokasi/internet untuk menguji pesan; kembali dari pengaturan untuk refresh. Pastikan aplikasi tidak meminta izin lokasi otomatis.
+- Atur pengingat beberapa menit ke depan, izinkan notifikasi, tutup aplikasi, pastikan notifikasi bersuara. Android menggunakan penjadwalan inexact sehingga bisa terlambat beberapa menit.
+- Ubah dan hapus jadwal, buka ulang aplikasi, dan uji setelah restart HP. Pastikan jadwal di masa lalu ditolak dan izin notifikasi yang ditolak menampilkan pesan.
+- Uji teks besar, animasi berkurang, layar kecil dan pergantian zona waktu. Uji iOS belum dilakukan.
+- Animasi cuaca: pastikan animasi Meteocons tampil sesuai kondisi (cerah, berawan sebagian, mendung, hujan, salju, badai) dan ikon statis muncul saat animasi sistem dikurangi; bandingkan dengan pratinjau di meteocons.com bila warna terasa berbeda.
+- Muat berkas cuaca pertama kali dari bundel aset, bukan internet: matikan data seluler dan pastikan animasi tetap muncul (hanya datanya yang gagal).
+
+## Jadwal lari bersuara - 20 November 2026
+- Di halaman Jadwal, tambah tiga jadwal (satu beberapa menit ke depan, satu besok, satu pekan depan). Pastikan daftarnya terurut dan terkelompok "Hari ini/Besok/Berikutnya".
+- Setel satu jadwal 2 menit ke depan, lalu tutup aplikasi sepenuhnya (keluarkan dari daftar tugas) dan tunggu: notifikasi harus muncul dengan suara RUNWILD. Penjadwalan tidak eksak, jadi boleh terlambat beberapa menit.
+- Tolak izin notifikasi saat menambah jadwal: jadwal tidak boleh ikut tersimpan (tidak ada jadwal "hantu") dan pesan kesalahan harus tampil.
+- Restart HP, buka aplikasi, dan pastikan jadwal yang belum lewat masih tampil dan tetap berbunyi.
+- Ketuk kartu jadwal untuk mengubah waktunya, dan hapus lewat ikon tong sampah. Ulangi dengan teks sistem 200% agar daftar dan tombol tidak terpotong.
+- iOS: suara khusus baru terdengar setelah `Sound_effect.mp3` ditambahkan ke bundel Xcode; sebelum itu iOS memakai suara notifikasi bawaan.
+
+
+## Hero dan detail cuaca - 20 November 2026
+- Dengan GPS dan koneksi aktif, periksa kota terdeteksi dan cuaca saat ini di hero. Nama kota berasal dari koordinat dibulatkan, sehingga wilayah perbatasan bisa berbeda.
+- Ketuk ikon atau link cuaca: detail memuat 12 jam prakiraan. Kembali harus mempertahankan Home. Uji teks 200% serta gulir hingga atribusi.
+- Tanpa izin lokasi/tanpa jaringan, pastikan pesan dan coba lagi tersedia. Kota yang gagal ditemukan tidak boleh diganti nama rekaan.
+
+- Hero rute terakhir: periksa posisi di bawah kalimat pengantar, toggle peta ON menampilkan tile dan OFF menampilkan jejak saja. Ikon cuaca membuka detail tanpa teks tautan. Reduced motion menampilkan Meteocons statis.
+
+- Perbaikan hero: buka ulang Home dengan GPS/internet aktif dan cek nama kota. Toggle peta/jejak harus mempertahankan ukuran kartu 3:4. Tambahkan dua jadwal berbeda; hero harus menampilkan yang paling dekat dan hilang saat tidak ada jadwal mendatang.

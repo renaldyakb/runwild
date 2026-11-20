@@ -12,7 +12,6 @@ abstract final class RwTheme {
     const surface = RwColors.paper50;
     const cardSurface = Color(0xFFFFFFFF);
     const muted = RwColors.mutedTextOnLight;
-    const border = Color(0xFFE2E6DC);
 
     final scheme = const ColorScheme(
       brightness: Brightness.light,
@@ -25,10 +24,10 @@ abstract final class RwTheme {
       surface: surface,
       onSurface: foreground,
       surfaceContainer: cardSurface,
-      surfaceContainerHigh: Color(0xFFF0F3EB),
+      surfaceContainerHigh: RwColors.surfaceMuted,
       onSurfaceVariant: muted,
-      outline: border,
-      outlineVariant: Color(0xFFECEFE7),
+      outline: RwColors.borderControl,
+      outlineVariant: RwColors.borderCard,
     );
 
     TextStyle display(double size) => TextStyle(
@@ -118,7 +117,10 @@ abstract final class RwTheme {
           foregroundColor: foreground,
         ),
       ),
-      dividerTheme: const DividerThemeData(color: border, thickness: 1),
+      dividerTheme: const DividerThemeData(
+        color: RwColors.borderControl,
+        thickness: 1,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: cardSurface,
@@ -128,11 +130,11 @@ abstract final class RwTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(RwRadius.md),
-          borderSide: const BorderSide(color: border, width: 1),
+          borderSide: const BorderSide(color: RwColors.borderControl, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(RwRadius.md),
-          borderSide: const BorderSide(color: border, width: 1),
+          borderSide: const BorderSide(color: RwColors.borderControl, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(RwRadius.md),
@@ -179,7 +181,7 @@ abstract final class RwTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RwRadius.md),
-          side: const BorderSide(color: border, width: 1),
+          side: const BorderSide(color: RwColors.borderCard, width: 1),
         ),
       ),
       snackBarTheme: SnackBarThemeData(

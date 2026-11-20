@@ -2775,6 +2775,462 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Minggu ini'**
   String get homeWeekLabel;
+
+  /// No description provided for @personalBestTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Rekor pribadi baru'**
+  String get personalBestTitle;
+
+  /// No description provided for @personalBestDetails.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu memecahkan {records}.'**
+  String personalBestDetails(String records);
+
+  /// No description provided for @weatherTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Cuaca di lokasimu'**
+  String get weatherTitle;
+
+  /// No description provided for @weatherPermission.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan izin lokasi untuk melihat cuaca di lokasimu.'**
+  String get weatherPermission;
+
+  /// No description provided for @weatherError.
+  ///
+  /// In id, this message translates to:
+  /// **'Cuaca belum tersedia. Periksa koneksi lalu coba lagi.'**
+  String get weatherError;
+
+  /// No description provided for @weatherSource.
+  ///
+  /// In id, this message translates to:
+  /// **'Sumber: Open-Meteo'**
+  String get weatherSource;
+
+  /// No description provided for @weatherRetry.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi'**
+  String get weatherRetry;
+
+  /// No description provided for @weatherLoading.
+  ///
+  /// In id, this message translates to:
+  /// **'Memuat cuaca...'**
+  String get weatherLoading;
+
+  /// No description provided for @weatherHourlyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'12 jam ke depan'**
+  String get weatherHourlyTitle;
+
+  /// No description provided for @weatherKindClear.
+  ///
+  /// In id, this message translates to:
+  /// **'Cerah'**
+  String get weatherKindClear;
+
+  /// No description provided for @weatherKindPartlyCloudy.
+  ///
+  /// In id, this message translates to:
+  /// **'Berawan sebagian'**
+  String get weatherKindPartlyCloudy;
+
+  /// No description provided for @weatherKindCloudy.
+  ///
+  /// In id, this message translates to:
+  /// **'Mendung'**
+  String get weatherKindCloudy;
+
+  /// No description provided for @weatherKindRain.
+  ///
+  /// In id, this message translates to:
+  /// **'Hujan'**
+  String get weatherKindRain;
+
+  /// No description provided for @weatherKindSnow.
+  ///
+  /// In id, this message translates to:
+  /// **'Salju'**
+  String get weatherKindSnow;
+
+  /// No description provided for @weatherKindThunderstorm.
+  ///
+  /// In id, this message translates to:
+  /// **'Badai guntur'**
+  String get weatherKindThunderstorm;
+
+  /// No description provided for @weatherRainAtHour.
+  ///
+  /// In id, this message translates to:
+  /// **'Hujan diperkirakan pukul {hour}'**
+  String weatherRainAtHour(String hour);
+
+  /// No description provided for @weatherDryHours.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada hujan diperkirakan dalam 12 jam ini.'**
+  String get weatherDryHours;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat lari'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada pengingat.'**
+  String get reminderEmpty;
+
+  /// No description provided for @reminderSet.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur pengingat'**
+  String get reminderSet;
+
+  /// No description provided for @reminderChange.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah jadwal'**
+  String get reminderChange;
+
+  /// No description provided for @reminderCancel.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus pengingat'**
+  String get reminderCancel;
+
+  /// No description provided for @reminderScheduled.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat diatur untuk {date}'**
+  String reminderScheduled(String date);
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Saatnya bersiap lari'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Siapkan perlengkapan dan mulai sesimu.'**
+  String get reminderNotificationBody;
+
+  /// No description provided for @reminderError.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat belum dapat diatur. Periksa izin notifikasi dan coba lagi.'**
+  String get reminderError;
+
+  /// No description provided for @reminderPast.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih waktu yang masih akan datang.'**
+  String get reminderPast;
+
+  /// No description provided for @reminderInexact.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi dapat datang beberapa menit setelah waktu yang dipilih.'**
+  String get reminderInexact;
+
+  /// No description provided for @reminderRowNone.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada jadwal lari'**
+  String get reminderRowNone;
+
+  /// No description provided for @reminderRowNext.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal berikutnya {date}'**
+  String reminderRowNext(String date);
+
+  /// No description provided for @reminderRowManage.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola jadwal'**
+  String get reminderRowManage;
+
+  /// No description provided for @remindersTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal lari'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersLoading.
+  ///
+  /// In id, this message translates to:
+  /// **'Memuat jadwal...'**
+  String get remindersLoading;
+
+  /// No description provided for @remindersErrorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal belum bisa dimuat'**
+  String get remindersErrorTitle;
+
+  /// No description provided for @remindersErrorBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Data jadwal lokal belum bisa dibaca. Coba lagi sebentar lagi.'**
+  String get remindersErrorBody;
+
+  /// No description provided for @remindersIntro.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur lebih dari satu jadwal. Kami mengingatkan lewat notifikasi bersuara walau aplikasi sedang tertutup.'**
+  String get remindersIntro;
+
+  /// No description provided for @remindersEmptyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada jadwal'**
+  String get remindersEmptyTitle;
+
+  /// No description provided for @remindersEmptyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambahkan jadwal lari pertama, lalu kami ingatkan tepat waktu.'**
+  String get remindersEmptyBody;
+
+  /// No description provided for @remindersAdd.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah jadwal'**
+  String get remindersAdd;
+
+  /// No description provided for @remindersDelete.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus jadwal'**
+  String get remindersDelete;
+
+  /// No description provided for @runnerFallbackName.
+  ///
+  /// In id, this message translates to:
+  /// **'Pelari'**
+  String get runnerFallbackName;
+
+  /// No description provided for @remindersSaved.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal disimpan.'**
+  String get remindersSaved;
+
+  /// No description provided for @remindersDeleted.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal dihapus.'**
+  String get remindersDeleted;
+
+  /// No description provided for @remindersGroupToday.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari ini'**
+  String get remindersGroupToday;
+
+  /// No description provided for @remindersGroupTomorrow.
+  ///
+  /// In id, this message translates to:
+  /// **'Besok'**
+  String get remindersGroupTomorrow;
+
+  /// No description provided for @remindersGroupLater.
+  ///
+  /// In id, this message translates to:
+  /// **'Berikutnya'**
+  String get remindersGroupLater;
+
+  /// No description provided for @remindersSoundNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi memakai suara RUNWILD dan tetap muncul saat aplikasi tertutup.'**
+  String get remindersSoundNote;
+
+  /// No description provided for @homeGreetingLine.
+  ///
+  /// In id, this message translates to:
+  /// **'{greeting}, {name}'**
+  String homeGreetingLine(String greeting, String name);
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In id, this message translates to:
+  /// **'Selamat pagi'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In id, this message translates to:
+  /// **'Selamat siang'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In id, this message translates to:
+  /// **'Selamat sore'**
+  String get greetingEvening;
+
+  /// No description provided for @greetingNight.
+  ///
+  /// In id, this message translates to:
+  /// **'Selamat malam'**
+  String get greetingNight;
+
+  /// No description provided for @homeKmUnit.
+  ///
+  /// In id, this message translates to:
+  /// **'KM'**
+  String get homeKmUnit;
+
+  /// No description provided for @homeWeekEmptyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada sesi minggu ini'**
+  String get homeWeekEmptyTitle;
+
+  /// No description provided for @homeWeekEmptyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Jalan 10 menit saja sudah cukup untuk memulai. Sesi pertamamu akan muncul di sini.'**
+  String get homeWeekEmptyBody;
+
+  /// No description provided for @homeWeekErrorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ringkasan minggu ini belum bisa dimuat'**
+  String get homeWeekErrorTitle;
+
+  /// No description provided for @homeWeekErrorBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Data sesi lokal belum bisa dibaca. Coba lagi sebentar lagi.'**
+  String get homeWeekErrorBody;
+
+  /// No description provided for @homeChartAnswer.
+  ///
+  /// In id, this message translates to:
+  /// **'{days} dari {total} hari ada lari'**
+  String homeChartAnswer(int days, int total);
+
+  /// No description provided for @chartLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Grafik jarak lari harian minggu ini'**
+  String get chartLabel;
+
+  /// No description provided for @chartEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada data grafik'**
+  String get chartEmpty;
+
+  /// No description provided for @chartTooltipKm.
+  ///
+  /// In id, this message translates to:
+  /// **'{value} km'**
+  String chartTooltipKm(double value);
+
+  /// No description provided for @homeWeeklyGoalDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Target minggu ini tuntas'**
+  String get homeWeeklyGoalDone;
+
+  /// No description provided for @homeWeeklyGoalDoneDetail.
+  ///
+  /// In id, this message translates to:
+  /// **'{completed} dari {target} sesi'**
+  String homeWeeklyGoalDoneDetail(int completed, int target);
+
+  /// No description provided for @homeStartRecommended.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur sesi ini'**
+  String get homeStartRecommended;
+
+  /// No description provided for @weatherDetailTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kondisi cuaca'**
+  String get weatherDetailTitle;
+
+  /// No description provided for @weatherDetailLink.
+  ///
+  /// In id, this message translates to:
+  /// **'Cek cuaca 12 jam ke depan'**
+  String get weatherDetailLink;
+
+  /// No description provided for @weatherCityUnknown.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kota belum tersedia'**
+  String get weatherCityUnknown;
+
+  /// No description provided for @weatherLocationSource.
+  ///
+  /// In id, this message translates to:
+  /// **'Lokasi: © OpenStreetMap contributors'**
+  String get weatherLocationSource;
+
+  /// No description provided for @heroWeek.
+  ///
+  /// In id, this message translates to:
+  /// **'Langkah minggu ini'**
+  String get heroWeek;
+
+  /// No description provided for @heroSessions.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi'**
+  String get heroSessions;
+
+  /// No description provided for @heroMinutes.
+  ///
+  /// In id, this message translates to:
+  /// **'Menit bergerak'**
+  String get heroMinutes;
+
+  /// No description provided for @heroDistance.
+  ///
+  /// In id, this message translates to:
+  /// **'Kilometer'**
+  String get heroDistance;
+
+  /// No description provided for @weatherChance.
+  ///
+  /// In id, this message translates to:
+  /// **'Peluang hujan'**
+  String get weatherChance;
+
+  /// No description provided for @weatherForecastNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Prakiraan dapat berubah. Periksa kembali sebelum berangkat.'**
+  String get weatherForecastNote;
+
+  /// No description provided for @homeRouteMapToggle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tampilkan peta rute terakhir'**
+  String get homeRouteMapToggle;
+
+  /// No description provided for @heroNextReminder.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadwal lari terdekat'**
+  String get heroNextReminder;
 }
 
 class _AppLocalizationsDelegate

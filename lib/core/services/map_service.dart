@@ -184,263 +184,270 @@ class _LiveMapState extends State<_LiveMap> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (!widget.historical)
-          Container(
-            margin: const EdgeInsets.only(bottom: RwSpace.xs),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: stale ? const Color(0xFFFEF3C7) : Colors.white,
-              borderRadius: BorderRadius.circular(RwRadius.sm),
-              border: Border.all(
-                color: stale
-                    ? const Color(0xFFFDE68A)
-                    : const Color(0xFFE2E6DC),
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (!widget.historical)
+            Container(
+              margin: const EdgeInsets.only(bottom: RwSpace.xs),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: stale ? const Color(0xFFFEF3C7) : Colors.white,
+                borderRadius: BorderRadius.circular(RwRadius.sm),
+                border: Border.all(
+                  color: stale
+                      ? const Color(0xFFFDE68A)
+                      : const Color(0xFFE2E6DC),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  stale ? Icons.gps_not_fixed_rounded : Icons.gps_fixed_rounded,
-                  size: 14,
-                  color: stale ? const Color(0xFFD97706) : RwColors.lime700,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (position == null || stale)
-                        Text(
-                          s.mapStale,
-                          style: const TextStyle(
-                            fontFamily: RwType.family,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFB45309),
-                          ),
-                        ),
-                      if (widget.route.position case final fix?)
-                        Text(
-                          s.mapAccuracy(fix.accuracyMeters.ceil()),
-                          style: const TextStyle(
-                            fontFamily: RwType.family,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: RwColors.ink950,
-                          ),
-                        ),
-                    ],
+              child: Row(
+                children: [
+                  Icon(
+                    stale
+                        ? Icons.gps_not_fixed_rounded
+                        : Icons.gps_fixed_rounded,
+                    size: 14,
+                    color: stale ? const Color(0xFFD97706) : RwColors.lime700,
                   ),
-                ),
-              ],
-            ),
-          ),
-        const SizedBox(height: RwSpace.xs),
-
-        // Live Map View Frame
-        Container(
-          height: RwSize.liveMapHeight,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(RwRadius.lg),
-            border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(RwRadius.lg),
-            child: Stack(
-              children: [
-                FlutterMap(
-                  mapController: _controller,
-                  options: MapOptions(
-                    initialCenter: center,
-                    initialZoom: MapLimits.initialZoom,
-                    initialCameraFit: widget.historical
-                        ? CameraFit.coordinates(
-                            coordinates: [
-                              for (final segment in segments)
-                                for (final point in segment)
-                                  LatLng(point.latitude, point.longitude),
-                            ],
-                            padding: const EdgeInsets.all(RwSpace.xxl),
-                            maxZoom: MapLimits.initialZoom,
-                          )
-                        : null,
-                    minZoom: MapLimits.minZoom,
-                    maxZoom: MapLimits.maxZoom,
-                    backgroundColor: RwColors.paper200,
-                    interactionOptions: InteractionOptions(
-                      flags: widget.locked
-                          ? InteractiveFlag.none
-                          : InteractiveFlag.all & ~InteractiveFlag.rotate,
-                    ),
-                    onMapReady: () => _ready = true,
-                    onPositionChanged: (_, hasGesture) {
-                      if (hasGesture && _follow) {
-                        setState(() => _follow = false);
-                      }
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: MapLimits.tiles,
-                      tileProvider: _tiles ??= _provider(),
-                      userAgentPackageName: 'id.runwild.app',
-                      maxNativeZoom: MapLimits.maxZoom.toInt(),
-                      panBuffer: 0,
-                      errorTileCallback: (_, _, _) => _loadedTile(true),
-                      tileBuilder: (_, tile, image) {
-                        if (image.loadFinishedAt != null) {
-                          _loadedTile(image.loadError);
-                        }
-                        return tile;
-                      },
-                    ),
-                    PolylineLayer(
-                      polylines: [
-                        for (final segment in segments)
-                          if (segment.length >= 2)
-                            Polyline(
-                              points: [
-                                for (final point in segment)
-                                  LatLng(point.latitude, point.longitude),
-                              ],
-                              color: RwColors.lime700,
-                              strokeWidth: RwSize.focus + RwSize.hairline,
-                              borderColor: RwColors.lime500,
-                              borderStrokeWidth: RwSize.outline,
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (position == null || stale)
+                          Text(
+                            s.mapStale,
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFB45309),
                             ),
-                      ],
-                    ),
-                    if (position != null)
-                      CircleLayer(
-                        circles: [
-                          CircleMarker(
-                            point: position,
-                            radius: widget.route.position?.accuracyMeters ?? 0,
-                            useRadiusInMeter: true,
-                            color: RwColors.lime700.withValues(alpha: 0.15),
-                            borderColor: RwColors.lime700,
-                            borderStrokeWidth: RwSize.hairline,
                           ),
-                        ],
-                      ),
-                    MarkerLayer(
-                      markers: [
-                        if (segments.isNotEmpty && segments.first.isNotEmpty)
-                          Marker(
-                            point: LatLng(
-                              segments.first.first.latitude,
-                              segments.first.first.longitude,
-                            ),
-                            width: RwSize.icon,
-                            height: RwSize.icon,
-                            child: const Icon(
-                              Icons.trip_origin,
+                        if (widget.route.position case final fix?)
+                          Text(
+                            s.mapAccuracy(fix.accuracyMeters.ceil()),
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
                               color: RwColors.ink950,
                             ),
                           ),
-                        if (position != null)
-                          Marker(
-                            point: position,
-                            width: RwSize.touch,
-                            height: RwSize.touch,
-                            child: Semantics(
-                              label: stale ? s.mapStale : s.mapCurrent,
-                              child: Icon(
-                                Icons.my_location,
-                                size: RwSize.icon,
-                                color: stale
-                                    ? RwColors.ink500
-                                    : RwColors.lime700,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+            ),
+          if (!widget.historical) const SizedBox(height: RwSpace.xs),
 
-                // Attribution remains visible over map tiles.
-                Positioned(
-                  left: 8,
-                  bottom: 8,
-                  child: Opacity(
-                    opacity: 1,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
+          // Live Map View Frame
+          Container(
+            height: widget.historical && constraints.hasBoundedHeight
+                ? constraints.maxHeight
+                : RwSize.liveMapHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(RwRadius.lg),
+              border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(RwRadius.lg),
+              child: Stack(
+                children: [
+                  FlutterMap(
+                    mapController: _controller,
+                    options: MapOptions(
+                      initialCenter: center,
+                      initialZoom: MapLimits.initialZoom,
+                      initialCameraFit: widget.historical
+                          ? CameraFit.coordinates(
+                              coordinates: [
+                                for (final segment in segments)
+                                  for (final point in segment)
+                                    LatLng(point.latitude, point.longitude),
+                              ],
+                              padding: const EdgeInsets.all(RwSpace.xxl),
+                              maxZoom: MapLimits.initialZoom,
+                            )
+                          : null,
+                      minZoom: MapLimits.minZoom,
+                      maxZoom: MapLimits.maxZoom,
+                      backgroundColor: RwColors.paper200,
+                      interactionOptions: InteractionOptions(
+                        flags: widget.locked
+                            ? InteractiveFlag.none
+                            : InteractiveFlag.all & ~InteractiveFlag.rotate,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(4),
+                      onMapReady: () => _ready = true,
+                      onPositionChanged: (_, hasGesture) {
+                        if (hasGesture && _follow) {
+                          setState(() => _follow = false);
+                        }
+                      },
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: MapLimits.tiles,
+                        tileProvider: _tiles ??= _provider(),
+                        userAgentPackageName: 'id.runwild.app',
+                        maxNativeZoom: MapLimits.maxZoom.toInt(),
+                        panBuffer: 0,
+                        errorTileCallback: (_, _, _) => _loadedTile(true),
+                        tileBuilder: (_, tile, image) {
+                          if (image.loadFinishedAt != null) {
+                            _loadedTile(image.loadError);
+                          }
+                          return tile;
+                        },
                       ),
-                      child: GestureDetector(
-                        onTap: widget.locked
-                            ? null
-                            : () async {
-                                final opened = await launchUrl(
-                                  Uri.parse(
-                                    'https://www.openstreetmap.org/copyright',
-                                  ),
-                                  mode: LaunchMode.externalApplication,
-                                );
-                                if (!opened && context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(s.mapLinkError)),
-                                  );
-                                }
-                              },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.public,
-                              size: 11,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              s.mapAttribution,
-                              style: const TextStyle(
-                                fontFamily: RwType.family,
-                                fontSize: RwType.label,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: 0,
+                      PolylineLayer(
+                        polylines: [
+                          for (final segment in segments)
+                            if (segment.length >= 2)
+                              Polyline(
+                                points: [
+                                  for (final point in segment)
+                                    LatLng(point.latitude, point.longitude),
+                                ],
+                                color: RwColors.lime700,
+                                strokeWidth: RwSize.focus + RwSize.hairline,
+                                borderColor: RwColors.lime500,
+                                borderStrokeWidth: RwSize.outline,
                               ),
+                        ],
+                      ),
+                      if (position != null)
+                        CircleLayer(
+                          circles: [
+                            CircleMarker(
+                              point: position,
+                              radius:
+                                  widget.route.position?.accuracyMeters ?? 0,
+                              useRadiusInMeter: true,
+                              color: RwColors.lime700.withValues(alpha: 0.15),
+                              borderColor: RwColors.lime700,
+                              borderStrokeWidth: RwSize.hairline,
                             ),
                           ],
+                        ),
+                      MarkerLayer(
+                        markers: [
+                          if (segments.isNotEmpty && segments.first.isNotEmpty)
+                            Marker(
+                              point: LatLng(
+                                segments.first.first.latitude,
+                                segments.first.first.longitude,
+                              ),
+                              width: RwSize.icon,
+                              height: RwSize.icon,
+                              child: const Icon(
+                                Icons.trip_origin,
+                                color: RwColors.ink950,
+                              ),
+                            ),
+                          if (position != null)
+                            Marker(
+                              point: position,
+                              width: RwSize.touch,
+                              height: RwSize.touch,
+                              child: Semantics(
+                                label: stale ? s.mapStale : s.mapCurrent,
+                                child: Icon(
+                                  Icons.my_location,
+                                  size: RwSize.icon,
+                                  color: stale
+                                      ? RwColors.ink500
+                                      : RwColors.lime700,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // Attribution remains visible over map tiles.
+                  Positioned(
+                    left: 8,
+                    bottom: 8,
+                    child: Opacity(
+                      opacity: 1,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: GestureDetector(
+                          onTap: widget.locked
+                              ? null
+                              : () async {
+                                  final opened = await launchUrl(
+                                    Uri.parse(
+                                      'https://www.openstreetmap.org/copyright',
+                                    ),
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                  if (!opened && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(s.mapLinkError)),
+                                    );
+                                  }
+                                },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.public,
+                                size: 11,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                s.mapAttribution,
+                                style: const TextStyle(
+                                  fontFamily: RwType.family,
+                                  fontSize: RwType.label,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: RwSpace.sm),
+          if (!widget.historical) const SizedBox(height: RwSpace.sm),
 
-        // Recenter & Follow Button
-        if (!widget.historical)
-          RwButton.secondary(
-            label: _follow ? s.mapFollowing : s.mapRecenter,
-            icon: Icons.my_location,
-            fullWidth: true,
-            onPressed: widget.locked || position == null
-                ? null
-                : () {
-                    setState(() => _follow = true);
-                    if (_ready) {
-                      _controller.move(position, _controller.camera.zoom);
-                    }
-                  },
-          ),
-      ],
+          // Recenter & Follow Button
+          if (!widget.historical)
+            RwButton.secondary(
+              label: _follow ? s.mapFollowing : s.mapRecenter,
+              icon: Icons.my_location,
+              fullWidth: true,
+              onPressed: widget.locked || position == null
+                  ? null
+                  : () {
+                      setState(() => _follow = true);
+                      if (_ready) {
+                        _controller.move(position, _controller.camera.zoom);
+                      }
+                    },
+            ),
+        ],
+      ),
     );
   }
 }

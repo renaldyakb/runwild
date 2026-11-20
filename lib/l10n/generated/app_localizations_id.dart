@@ -1478,4 +1478,261 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get homeWeekLabel => 'Minggu ini';
+
+  @override
+  String get personalBestTitle => 'Rekor pribadi baru';
+
+  @override
+  String personalBestDetails(String records) {
+    return 'Kamu memecahkan $records.';
+  }
+
+  @override
+  String get weatherTitle => 'Cuaca di lokasimu';
+
+  @override
+  String get weatherPermission =>
+      'Aktifkan izin lokasi untuk melihat cuaca di lokasimu.';
+
+  @override
+  String get weatherError =>
+      'Cuaca belum tersedia. Periksa koneksi lalu coba lagi.';
+
+  @override
+  String get weatherSource => 'Sumber: Open-Meteo';
+
+  @override
+  String get weatherRetry => 'Coba lagi';
+
+  @override
+  String get weatherLoading => 'Memuat cuaca...';
+
+  @override
+  String get weatherHourlyTitle => '12 jam ke depan';
+
+  @override
+  String get weatherKindClear => 'Cerah';
+
+  @override
+  String get weatherKindPartlyCloudy => 'Berawan sebagian';
+
+  @override
+  String get weatherKindCloudy => 'Mendung';
+
+  @override
+  String get weatherKindRain => 'Hujan';
+
+  @override
+  String get weatherKindSnow => 'Salju';
+
+  @override
+  String get weatherKindThunderstorm => 'Badai guntur';
+
+  @override
+  String weatherRainAtHour(String hour) {
+    return 'Hujan diperkirakan pukul $hour';
+  }
+
+  @override
+  String get weatherDryHours =>
+      'Tidak ada hujan diperkirakan dalam 12 jam ini.';
+
+  @override
+  String get reminderTitle => 'Pengingat lari';
+
+  @override
+  String get reminderEmpty => 'Belum ada pengingat.';
+
+  @override
+  String get reminderSet => 'Atur pengingat';
+
+  @override
+  String get reminderChange => 'Ubah jadwal';
+
+  @override
+  String get reminderCancel => 'Hapus pengingat';
+
+  @override
+  String reminderScheduled(String date) {
+    return 'Pengingat diatur untuk $date';
+  }
+
+  @override
+  String get reminderNotificationTitle => 'Saatnya bersiap lari';
+
+  @override
+  String get reminderNotificationBody =>
+      'Siapkan perlengkapan dan mulai sesimu.';
+
+  @override
+  String get reminderError =>
+      'Pengingat belum dapat diatur. Periksa izin notifikasi dan coba lagi.';
+
+  @override
+  String get reminderPast => 'Pilih waktu yang masih akan datang.';
+
+  @override
+  String get reminderInexact =>
+      'Notifikasi dapat datang beberapa menit setelah waktu yang dipilih.';
+
+  @override
+  String get reminderRowNone => 'Belum ada jadwal lari';
+
+  @override
+  String reminderRowNext(String date) {
+    return 'Jadwal berikutnya $date';
+  }
+
+  @override
+  String get reminderRowManage => 'Kelola jadwal';
+
+  @override
+  String get remindersTitle => 'Jadwal lari';
+
+  @override
+  String get remindersLoading => 'Memuat jadwal...';
+
+  @override
+  String get remindersErrorTitle => 'Jadwal belum bisa dimuat';
+
+  @override
+  String get remindersErrorBody =>
+      'Data jadwal lokal belum bisa dibaca. Coba lagi sebentar lagi.';
+
+  @override
+  String get remindersIntro =>
+      'Atur lebih dari satu jadwal. Kami mengingatkan lewat notifikasi bersuara walau aplikasi sedang tertutup.';
+
+  @override
+  String get remindersEmptyTitle => 'Belum ada jadwal';
+
+  @override
+  String get remindersEmptyBody =>
+      'Tambahkan jadwal lari pertama, lalu kami ingatkan tepat waktu.';
+
+  @override
+  String get remindersAdd => 'Tambah jadwal';
+
+  @override
+  String get remindersDelete => 'Hapus jadwal';
+
+  @override
+  String get runnerFallbackName => 'Pelari';
+
+  @override
+  String get remindersSaved => 'Jadwal disimpan.';
+
+  @override
+  String get remindersDeleted => 'Jadwal dihapus.';
+
+  @override
+  String get remindersGroupToday => 'Hari ini';
+
+  @override
+  String get remindersGroupTomorrow => 'Besok';
+
+  @override
+  String get remindersGroupLater => 'Berikutnya';
+
+  @override
+  String get remindersSoundNote =>
+      'Notifikasi memakai suara RUNWILD dan tetap muncul saat aplikasi tertutup.';
+
+  @override
+  String homeGreetingLine(String greeting, String name) {
+    return '$greeting, $name';
+  }
+
+  @override
+  String get greetingMorning => 'Selamat pagi';
+
+  @override
+  String get greetingAfternoon => 'Selamat siang';
+
+  @override
+  String get greetingEvening => 'Selamat sore';
+
+  @override
+  String get greetingNight => 'Selamat malam';
+
+  @override
+  String get homeKmUnit => 'KM';
+
+  @override
+  String get homeWeekEmptyTitle => 'Belum ada sesi minggu ini';
+
+  @override
+  String get homeWeekEmptyBody =>
+      'Jalan 10 menit saja sudah cukup untuk memulai. Sesi pertamamu akan muncul di sini.';
+
+  @override
+  String get homeWeekErrorTitle => 'Ringkasan minggu ini belum bisa dimuat';
+
+  @override
+  String get homeWeekErrorBody =>
+      'Data sesi lokal belum bisa dibaca. Coba lagi sebentar lagi.';
+
+  @override
+  String homeChartAnswer(int days, int total) {
+    return '$days dari $total hari ada lari';
+  }
+
+  @override
+  String get chartLabel => 'Grafik jarak lari harian minggu ini';
+
+  @override
+  String get chartEmpty => 'Belum ada data grafik';
+
+  @override
+  String chartTooltipKm(double value) {
+    return '$value km';
+  }
+
+  @override
+  String get homeWeeklyGoalDone => 'Target minggu ini tuntas';
+
+  @override
+  String homeWeeklyGoalDoneDetail(int completed, int target) {
+    return '$completed dari $target sesi';
+  }
+
+  @override
+  String get homeStartRecommended => 'Atur sesi ini';
+
+  @override
+  String get weatherDetailTitle => 'Kondisi cuaca';
+
+  @override
+  String get weatherDetailLink => 'Cek cuaca 12 jam ke depan';
+
+  @override
+  String get weatherCityUnknown => 'Nama kota belum tersedia';
+
+  @override
+  String get weatherLocationSource => 'Lokasi: © OpenStreetMap contributors';
+
+  @override
+  String get heroWeek => 'Langkah minggu ini';
+
+  @override
+  String get heroSessions => 'Sesi';
+
+  @override
+  String get heroMinutes => 'Menit bergerak';
+
+  @override
+  String get heroDistance => 'Kilometer';
+
+  @override
+  String get weatherChance => 'Peluang hujan';
+
+  @override
+  String get weatherForecastNote =>
+      'Prakiraan dapat berubah. Periksa kembali sebelum berangkat.';
+
+  @override
+  String get homeRouteMapToggle => 'Tampilkan peta rute terakhir';
+
+  @override
+  String get heroNextReminder => 'Jadwal lari terdekat';
 }

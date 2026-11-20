@@ -462,6 +462,8 @@ kanal privat ke pemilik repositori.
 - Font: Google Sans Flex (dipakai sesuai lisensi font).
 - Paket Flutter/Dart: lihat `pubspec.yaml` dan lisensi masing-masing paket.
 - Animasi kalibrasi GPS: aset milik proyek ini.
+- Animasi cuaca: Meteocons oleh Bas Milius (MIT) —
+  https://github.com/basmilius/meteocons.
 
 ---
 

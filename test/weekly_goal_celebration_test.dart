@@ -55,15 +55,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.text('TUNTAS! 🔥'), findsOneWidget);
-        expect(
-          find.text('Target minggu ini tuntas! (4/3 sesi)'),
-          findsOneWidget,
-        );
-        expect(
-          find.text('Konsistensi lari luar biasa! Pertahankan semangatmu.'),
-          findsOneWidget,
-        );
+        expect(find.text('Target minggu ini tuntas'), findsOneWidget);
+        expect(find.text('4 dari 3 sesi'), findsOneWidget);
       },
     );
 

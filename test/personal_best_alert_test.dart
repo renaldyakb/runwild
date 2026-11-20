@@ -128,7 +128,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.text('REKOR PRIBADI BARU! 🏆'), findsOneWidget);
+        expect(find.text('Rekor pribadi baru'), findsOneWidget);
         expect(
           find.textContaining(
             'Kamu memecahkan Jarak Terjauh & Durasi Terlama.',

@@ -78,13 +78,13 @@ class RwButton extends StatelessWidget {
       }),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
-          return const Color(0xFFEFF2EA);
+          return RwColors.surfaceDisabled;
         }
         if (secondary) {
           if (states.contains(WidgetState.pressed)) {
-            return const Color(0xFFF0F3EB);
+            return RwColors.surfaceMuted;
           }
-          return const Color(0xFFFFFFFF);
+          return RwColors.paper100;
         }
         if (states.contains(WidgetState.pressed)) {
           return RwColors.lime600;
@@ -93,7 +93,10 @@ class RwButton extends StatelessWidget {
       }),
       side: WidgetStateProperty.resolveWith((states) {
         if (secondary) {
-          return const BorderSide(color: Color(0xFFE2E6DC), width: 1.2);
+          return const BorderSide(
+            color: RwColors.borderControl,
+            width: RwSize.outline,
+          );
         }
         return BorderSide.none;
       }),

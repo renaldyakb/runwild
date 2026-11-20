@@ -176,7 +176,7 @@ void main() {
     });
 
     testWidgets(
-      'HomeDashboard renders weekly goal, stats, and recommendation',
+      'HomeDashboard renders honest empty week state and recommendation',
       (tester) async {
         tester.view.physicalSize = const Size(1080, 2400);
         tester.view.devicePixelRatio = 2.0;
@@ -195,8 +195,11 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Mulai berlari'), findsOneWidget);
-        expect(find.text('MINGGU INI'), findsOneWidget);
-        expect(find.text('TARGET MINGGUAN'), findsOneWidget);
+        expect(find.text('Minggu ini'), findsOneWidget);
+        // Tanpa sesi minggu ini, kartu minggu menampilkan keadaan kosong yang
+        // jujur, bukan angka nol dan target yang menyesatkan.
+        expect(find.text('Belum ada sesi minggu ini'), findsOneWidget);
+        expect(find.text('Coba Pemula Santai'), findsOneWidget);
         expect(find.text('Progress & Rekor'), findsOneWidget);
       },
     );

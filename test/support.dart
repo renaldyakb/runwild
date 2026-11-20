@@ -1,3 +1,4 @@
+import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,7 @@ import 'package:runwild/core/services/map_service.dart';
 import 'package:runwild/design/theme/rw_theme.dart';
 import 'package:runwild/domain/tracking/gps_calibration.dart';
 import 'package:runwild/features/auth/application/auth_session.dart';
+import 'package:runwild/features/foundation/application/weather_service.dart';
 import 'package:runwild/features/onboarding/application/intro_preferences.dart';
 import 'package:runwild/features/profile/application/initial_profile.dart';
 import 'package:runwild/features/run/application/gps_calibration.dart';
@@ -65,11 +67,15 @@ Future<void> pumpRunwild(
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
   addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+  final journal = RunJournal(NativeDatabase.memory());
+  addTearDown(journal.close);
   final router = createRouter(initialLocation: path);
   addTearDown(router.dispose);
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        runJournalProvider.overrideWithValue(journal),
+        weatherProvider.overrideWith((ref) async => null),
         if (sessionClock != null)
           runClockFactoryProvider.overrideWithValue(() => sessionClock),
         if (mapService != null)

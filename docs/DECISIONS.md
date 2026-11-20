@@ -253,6 +253,22 @@ Sesuai permintaan pengguna untuk memakai grafik dari komunitas yang tersedia di 
 3. README memuat ringkasan izin/larangan, batasan merek, serta catatan bahwa lisensi pihak ketiga (Flutter, paket Dart, font, OpenStreetMap) tetap berlaku.
 4. Permintaan komersial harus lewat pemilik repositori; tidak ada izin komersial otomatis.
 
+## ADR-031: Sumber cuaca Open-Meteo dan animasi Meteocons
+
+1. Cuaca beranda memakai Open-Meteo (`api.open-meteo.com`) tanpa kunci dan tanpa akun; yang dipakai hanya izin lokasi yang sudah ada dan aplikasi tidak meminta izin lokasi sendiri. Data yang diambil: suhu, kode kondisi WMO, dan 12 jam peluang hujan + jumlah mm. Tidak ada cache maupun antrean offline; bila gagal tampil pesan singkat dan tombol coba lagi.
+2. Animasi cuaca memakai Meteocons (MIT, © Bas Milius, https://github.com/basmilius/meteocons). Repositori itu tidak menyimpan berkas Lottie di Git; berkas dihasilkan lalu diterbitkan sebagai paket npm `@meteocons/lottie`. Aset diambil dari paket versi 0.1.0 gaya `fill` dan disimpan di `assets/lottie/meteocons/`; salinan lisensi MIT ikut dibundel di folder yang sama. Aset matahari buatan sendiri sebelumnya dihapus.
+3. Enam tampilan cuaca dipetakan dari kode WMO di `weather_kind.dart`: cerah, berawan sebagian, mendung, hujan, salju, badai guntur. Saat reduced-motion aktif atau aset gagal dimuat, tampil ikon Material statis supaya ruang cuaca tidak pernah kosong.
+
+
+## ADR-032: Cuaca piktogram, jadwal lari bersuara, dan kerapian beranda
+
+1. Prakiraan 12 jam tidak lagi menampilkan peluang hujan dalam persen atau jumlah mm. Pengguna membaca piktogram cuaca per jam (Meteocons, MIT) ditambah satu kalimat simpulan "Hujan diperkirakan pukul HH.mm" atau "Tidak ada hujan diperkirakan dalam 12 jam ini". Ambang jam basah: kode WMO hujan/salju/badai guntur, atau peluang hujan ≥ 50% (`rainLikelyThreshold` di `weather_kind.dart`).
+2. Pengingat lari berubah dari satu jadwal menjadi banyak jadwal dengan halaman khusus `/reminders`. Penyimpanan di `SharedPreferences` (JSON, kunci `run_reminders_v1`) dengan ID notifikasi berurutan yang stabil; jadwal yang sudah lewat dipangkas saat dibaca. `RunReminderStore` sengaja tidak menyentuh plugin notifikasi supaya aturan jadwal (urutan, pemangkasan, ID unik) dapat diuji tanpa perangkat.
+3. Notifikasi memakai suara khusus `assets/audio/Sound_effect.mp3`, disalin ke `android/app/src/main/res/raw/sound_effect.mp3` karena Android hanya menerima suara notifikasi dari resource mentah. Kanal baru `run_reminders_v2` dipakai karena Android tidak mengubah suara kanal yang sudah pernah dibuat. Penjadwalan tetap `inexactAllowWhileIdle` (tanpa izin alarm tepat waktu), sehingga notifikasi dapat terlambat beberapa menit; jadwal dipulihkan sistem setelah reboot lewat `ScheduledNotificationBootReceiver`. iOS memakai berkas suara dari bundel app; penambahan berkas ke target Xcode belum dikerjakan sehingga iOS masih memakai suara bawaan.
+4. Beranda dirapikan: satu aksi utama (tombol di hero), kartu minggu digabung (jarak, durasi, sesi, grafik, target, rentetan minggu), kartu saran memakai tautan teks, pengingat menjadi baris ringkas di bawah informasi minggu, dan tiga kegagalan senyap (`SizedBox.shrink`) diganti keadaan gagal/kosong yang menjelaskan sebab serta menyediakan aksi. Grafik mendapat jawaban satu kalimat dan label semantik karena kanvas tidak terbaca pembaca layar.
+5. Warna dan aksen dirapikan: hex liar di widget diganti token (`borderCard`, `borderControl`, `surfaceMuted`, `surfaceDisabled`, `chartBar`, `chartBarToday`, `chartTrack`, `chartTrackSoft`), batang grafik dinaikkan dari 1,42:1 menjadi 6,61:1 di atas putih, dan aksen lime dibatasi pada judul hero dan tombol utama. Emoji dekoratif dan lima string hardcode diganti kunci ARB.
+
+
 ## Ide nanti
 
 Tidak ada penambahan di luar roadmap PRD.
@@ -262,3 +278,5 @@ Tidak ada penambahan di luar roadmap PRD.
 - 18 Nov 2026: package_info_plus 10.2.2 dipin untuk membaca versi/build APK terpasang; pubspec menjadi sumber versi rilis. Patch perbaikan disiapkan sebagai 0.1.2+3 agar terdeteksi oleh pengguna 0.1.1.
 
 - 18 Nov 2026: audit sisa `catch (_)` di layanan notifikasi, audio, sync, dan share card agar setiap kegagalan tercatat (tanpa koordinat); belum dikerjakan karena butuh verifikasi perangkat.
+
+- 20 Nov 2026: timezone 0.11.2 dipin untuk penjadwalan notifikasi satu kali dalam UTC; waktu lokal dipilih pengguna dan disimpan sebagai instant.

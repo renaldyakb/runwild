@@ -21,6 +21,19 @@ abstract final class RwColors {
   static const go500 = Color(0xFF2ECC71);
   static const warn500 = Color(0xFFFFB020);
   static const danger500 = Color(0xFFE5484D);
+
+  // Garis & permukaan terang. Batas kartu harus benar-benar terlihat di atas
+  // latar paper50; lihat DESIGN.md bagian batas dan kontras.
+  static const borderCard = Color(0xFFDEE3D6);
+  static const borderControl = Color(0xFFE2E6DC);
+  static const surfaceMuted = Color(0xFFF0F3EB);
+  static const surfaceDisabled = Color(0xFFEFF2EA);
+
+  // Grafik: warna data wajib lolos kontras non-teks 3:1 di atas putih.
+  static const chartBar = Color(0xFF486600);
+  static const chartBarToday = Color(0xFF171A14);
+  static const chartTrack = Color(0xFFE2E6DC);
+  static const chartTrackSoft = Color(0xFFF0F3EB);
 }
 
 abstract final class RwSpace {
@@ -73,6 +86,7 @@ abstract final class RwSize {
   static const shareStoryHeight = 640.0;
   static const sharePreviewWidth = 252.0;
   static const shareExportWidth = 1080.0;
+  static const routePortraitRatio = 3 / 4;
   static const liveMapHeight = 360.0;
   static const countdownCircle = 160.0;
   static const skeleton = 20.0;

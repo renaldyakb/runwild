@@ -6,6 +6,7 @@ import 'package:runwild/core/services/app_update_service.dart';
 import 'package:runwild/design/components/rw_route_view.dart';
 import 'package:runwild/domain/stats/stats_engine.dart';
 import 'package:runwild/features/foundation/application/home_stats_provider.dart';
+import 'package:runwild/features/foundation/application/weather_service.dart';
 import 'package:runwild/features/foundation/presentation/app_update_dialog.dart';
 import 'package:runwild/features/foundation/presentation/home_dashboard.dart';
 
@@ -86,6 +87,10 @@ void main() {
         ProviderScope(
           overrides: [
             appUpdateServiceProvider.overrideWithValue(_Updates()),
+            weatherProvider.overrideWith((ref) async => null),
+            homeClockProvider.overrideWithValue(
+              () => DateTime(2026, 11, 20, 12),
+            ),
             latestRoutePointsProvider.overrideWith((ref) async => []),
             weekSummaryProvider.overrideWith(
               (ref) async => StatsEngine.calculateWeekSummary(

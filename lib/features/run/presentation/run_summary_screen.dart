@@ -174,18 +174,8 @@ class _RunSummaryScreenState extends ConsumerState<RunSummaryScreen> {
                   vertical: RwSpace.sm,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFEAF854), Color(0xFFC7F000)],
-                  ),
+                  color: RwColors.lime500,
                   borderRadius: BorderRadius.circular(RwRadius.md),
-                  border: Border.all(color: RwColors.lime700, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: RwColors.lime500.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
                 ),
                 child: Row(
                   children: [
@@ -196,7 +186,7 @@ class _RunSummaryScreenState extends ConsumerState<RunSummaryScreen> {
                         borderRadius: BorderRadius.circular(RwRadius.pill),
                       ),
                       child: const Icon(
-                        Icons.local_fire_department_rounded,
+                        Icons.emoji_events_outlined,
                         color: RwColors.lime500,
                         size: 20,
                       ),
@@ -206,8 +196,8 @@ class _RunSummaryScreenState extends ConsumerState<RunSummaryScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'REKOR PRIBADI BARU! 🏆',
+                          Text(
+                            s.personalBestTitle,
                             style: TextStyle(
                               fontFamily: RwType.family,
                               fontWeight: FontWeight.w900,
@@ -217,7 +207,7 @@ class _RunSummaryScreenState extends ConsumerState<RunSummaryScreen> {
                             ),
                           ),
                           Text(
-                            'Luar biasa! Kamu memecahkan ${pbs.join(' & ')}.',
+                            s.personalBestDetails(pbs.join(' & ')),
                             style: const TextStyle(
                               fontFamily: RwType.family,
                               fontWeight: FontWeight.w700,
