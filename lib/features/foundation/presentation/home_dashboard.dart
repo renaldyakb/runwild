@@ -63,10 +63,16 @@ class _HomeDashboardState extends ConsumerState<HomeDashboard>
   }
 
   Future<void> _checkAppUpdate() async {
-    final updateService = ref.read(appUpdateServiceProvider);
-    final updateInfo = await updateService.checkForUpdate(notify: true);
-    if (mounted && updateInfo != null && updateInfo.hasUpdate) {
-      unawaited(AppUpdateDialog.show(context, updateInfo));
+    try {
+      final updateService = ref.read(appUpdateServiceProvider);
+      final updateInfo = await updateService.checkForUpdate(notify: true);
+      if (mounted && updateInfo != null && updateInfo.hasUpdate) {
+        unawaited(AppUpdateDialog.show(context, updateInfo));
+      }
+    } on Object catch (error) {
+      // Kegagalan cek pembaruan tidak boleh mengganggu beranda maupun
+      // menyisakan error asinkron setelah layar selesai dirender.
+      debugPrint('App update check failed: ${error.runtimeType}');
     }
   }
 

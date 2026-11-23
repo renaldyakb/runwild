@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:runwild/core/services/app_update_service.dart';
 import 'package:runwild/design/theme/rw_theme.dart';
 import 'package:runwild/domain/stats/stats_engine.dart';
 import 'package:runwild/features/activities/presentation/activities_screen.dart';
@@ -18,6 +19,11 @@ Widget _testHost(Widget child) => MaterialApp(
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: child),
 );
+
+class _NoUpdates implements AppUpdateService {
+  @override
+  Future<AppUpdateInfo?> checkForUpdate({bool notify = true}) async => null;
+}
 
 void main() {
   group('Upgrade #4: Weekly Goal Celebration & Progress Shortcut', () {
@@ -39,6 +45,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              appUpdateServiceProvider.overrideWithValue(_NoUpdates()),
               weekSummaryProvider.overrideWith((ref) => Future.value(summary)),
               recommendedSessionProvider.overrideWith(
                 (ref) => Future.value((

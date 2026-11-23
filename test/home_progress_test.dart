@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:runwild/core/services/app_update_service.dart';
 import 'package:runwild/design/theme/rw_theme.dart';
 import 'package:runwild/domain/interval/interval_config.dart';
 import 'package:runwild/domain/stats/stats_engine.dart';
@@ -25,6 +26,11 @@ Widget _testHost(Widget child) => MaterialApp(
   supportedLocales: AppLocalizations.supportedLocales,
   home: child,
 );
+
+class _NoUpdates implements AppUpdateService {
+  @override
+  Future<AppUpdateInfo?> checkForUpdate({bool notify = true}) async => null;
+}
 
 SessionItem _dummyItem({
   required DateTime startedAt,
@@ -187,6 +193,7 @@ void main() {
             overrides: [
               runJournalProvider.overrideWithValue(journal),
               runOwnerProvider.overrideWithValue(() => 'tester-1'),
+              appUpdateServiceProvider.overrideWithValue(_NoUpdates()),
             ],
             child: _testHost(HomeDashboard(onStart: () {})),
           ),

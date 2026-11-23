@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:runwild/core/services/app_update_service.dart';
 import 'package:runwild/core/utils/day_greeting.dart';
 import 'package:runwild/domain/stats/stats_engine.dart';
 import 'package:runwild/features/foundation/application/home_stats_provider.dart';
@@ -37,6 +38,11 @@ class _FakeScheduler implements RunReminderScheduler {
   Future<void> cancel(int notificationId) async {
     cancelled.add(notificationId);
   }
+}
+
+class _NoUpdates implements AppUpdateService {
+  @override
+  Future<AppUpdateInfo?> checkForUpdate({bool notify = true}) async => null;
 }
 
 String _forecastBody({int hours = 12}) => jsonEncode({
@@ -275,6 +281,7 @@ void main() {
           ),
           runReminderStoreProvider.overrideWithValue(RunReminderStore()),
           reminderSchedulerProvider.overrideWithValue(_FakeScheduler()),
+          appUpdateServiceProvider.overrideWithValue(_NoUpdates()),
         ],
         child: componentHost(HomeDashboard(onStart: () => started = true)),
       ),
@@ -408,6 +415,7 @@ void main() {
           ),
           runReminderStoreProvider.overrideWithValue(RunReminderStore()),
           reminderSchedulerProvider.overrideWithValue(_FakeScheduler()),
+          appUpdateServiceProvider.overrideWithValue(_NoUpdates()),
         ],
         child: componentHost(HomeDashboard(onStart: () {})),
       ),
