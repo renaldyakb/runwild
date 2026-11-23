@@ -13,6 +13,7 @@ import 'package:runwild/domain/tracking/gps_calibration.dart';
 import 'package:runwild/features/auth/application/auth_session.dart';
 import 'package:runwild/features/foundation/application/weather_service.dart';
 import 'package:runwild/features/onboarding/application/intro_preferences.dart';
+import 'package:runwild/features/onboarding/presentation/startup_screen.dart';
 import 'package:runwild/features/profile/application/initial_profile.dart';
 import 'package:runwild/features/run/application/gps_calibration.dart';
 import 'package:runwild/features/run/application/run_gps_probe.dart';
@@ -76,6 +77,7 @@ Future<void> pumpRunwild(
       overrides: [
         runJournalProvider.overrideWithValue(journal),
         weatherProvider.overrideWith((ref) async => null),
+        splashMinimumDurationProvider.overrideWithValue(Duration.zero),
         if (sessionClock != null)
           runClockFactoryProvider.overrideWithValue(() => sessionClock),
         if (mapService != null)

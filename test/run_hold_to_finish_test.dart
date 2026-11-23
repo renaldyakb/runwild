@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:runwild/core/services/run_wakelock.dart';
 import 'package:runwild/design/components/rw_hold_button.dart';
+import 'package:runwild/design/components/rw_loading.dart';
 import 'package:runwild/design/theme/rw_theme.dart';
+import 'package:runwild/domain/tracking/run_summary.dart';
+import 'package:runwild/features/run/application/run_gps_probe.dart';
+import 'package:runwild/features/run/application/run_journal.dart';
 import 'package:runwild/features/run/presentation/run_active_screen.dart';
 import 'package:runwild/l10n/generated/app_localizations.dart';
 
@@ -30,6 +36,22 @@ class _MockWakelock implements RunWakelock {
   Future<void> disable() async {
     enabled = false;
   }
+}
+
+class _SlowFinishRunNotifier extends RunGpsProbe {
+  _SlowFinishRunNotifier(this.completer);
+  final Completer<RunSummary> completer;
+
+  @override
+  Future<void> start({
+    required String notificationTitle,
+    required String notificationText,
+    bool activeSession = false,
+    RunCheckpoint? resume,
+  }) async {}
+
+  @override
+  Future<RunSummary> finishSession() => completer.future;
 }
 
 void main() {
@@ -125,5 +147,46 @@ void main() {
       await tester.pumpAndSettle();
       expect(mockWakelock.enabled, isFalse);
     });
+
+    testWidgets(
+      'RunActiveScreen shows full-page loading immediately after finish confirmation',
+      (tester) async {
+        final mockWakelock = _MockWakelock();
+        final finishCompleter = Completer<RunSummary>();
+        var now = Duration.zero;
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              runWakelockProvider.overrideWithValue(mockWakelock),
+              runCountdownClockProvider.overrideWithValue(() => now),
+              activeRunProvider.overrideWith(
+                () => _SlowFinishRunNotifier(finishCompleter),
+              ),
+            ],
+            child: _testHost(const RunActiveScreen()),
+          ),
+        );
+
+        now = const Duration(seconds: 3);
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump();
+
+        expect(find.text('km'), findsOneWidget);
+        expect(find.text('Kalori (perkiraan)'), findsOneWidget);
+
+        await tester.tap(find.byType(RwHoldToFinishButton));
+        await tester.pumpAndSettle();
+        expect(find.text('Akhiri sesi lari ini?'), findsOneWidget);
+
+        await tester.tap(find.widgetWithText(TextButton, 'Selesai'));
+        await tester.pump();
+
+        expect(find.byType(RwFullPageLoading), findsOneWidget);
+        expect(find.text('Menyimpan sesi lari…'), findsOneWidget);
+
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
   });
 }

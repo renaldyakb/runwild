@@ -338,47 +338,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final profileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          s.profileTitle,
-          style: const TextStyle(
-            fontFamily: RwType.family,
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-          ),
-        ),
-      ),
       body: SafeArea(
         child: profileAsync.when(
           loading: () => const _ProfileSkeleton(),
-          error: (err, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(RwSpace.lg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.error_outline_rounded,
-                    size: 40,
-                    color: RwColors.danger500,
-                  ),
-                  const SizedBox(height: RwSpace.md),
-                  Text('Gagal memuat profil: $err'),
-                  const SizedBox(height: RwSpace.md),
-                  RwButton.secondary(
-                    label: 'Coba Lagi',
-                    onPressed: () => ref.invalidate(userProfileProvider),
-                  ),
-                ],
+          error: (_, _) => RwPage(
+            children: [
+              Semantics(
+                header: true,
+                child: Text(
+                  s.profileTitle,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
               ),
-            ),
+              const SizedBox(height: RwSpace.lg),
+              RwCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.error_outline_rounded,
+                        size: RwSize.icon,
+                        color: RwColors.danger500,
+                      ),
+                    ),
+                    const SizedBox(height: RwSpace.sm),
+                    Text(s.profileLoadError),
+                    const SizedBox(height: RwSpace.md),
+                    RwButton.secondary(
+                      label: s.retry,
+                      onPressed: () => ref.invalidate(userProfileProvider),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           data: (profile) {
-            // Profil fallback jika user belum mengisi Firestore atau mode tamu
             final currentProfile =
                 profile ??
                 UserProfile(
-                  displayName: user.displayName ?? 'Pelari Tamu',
+                  displayName: user.displayName ?? s.runnerFallbackName,
                   email: user.email ?? '',
                   level: ProfileLevel.pemula,
                   goal: ProfileGoal.sehat,
@@ -388,6 +389,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 RwPage(
                   children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        s.profileTitle,
+                        style: Theme.of(context).textTheme.displaySmall,
+                      ),
+                    ),
+                    const SizedBox(height: RwSpace.md),
                     // ── Header Profil Atletis ───────────────────────
                     _ProfileHeaderCard(
                       profile: currentProfile,
@@ -554,22 +563,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       padding: const EdgeInsets.all(RwSpace.md),
                       child: Column(
                         children: [
-                          // Satuan
-                          _SettingTile(
-                            icon: Icons.straighten_rounded,
-                            title: s.profileUnitsLabel,
-                            subtitle: s.profileUnitsKm,
-                            trailing: const Text(
-                              'KM',
-                              style: TextStyle(
-                                fontFamily: RwType.family,
-                                fontWeight: FontWeight.w800,
-                                color: RwColors.ink700,
-                              ),
-                            ),
-                          ),
-                          const Divider(height: 1),
-
                           // Jeda Otomatis (Auto-Pause)
                           _SwitchSettingTile(
                             icon: Icons.pause_circle_outline_rounded,
@@ -624,7 +617,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _SwitchSettingTile(
                             icon: Icons.timer_outlined,
                             title: s.profileCountdownCue,
-                            subtitle: 'Suara hitung mundur 3-2-1',
+                            subtitle: s.profileCountdownCueDesc,
                             value: currentProfile.voice.countdownCue,
                             onChanged: (val) {
                               _updateProfile(
@@ -642,7 +635,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _SwitchSettingTile(
                             icon: Icons.repeat_rounded,
                             title: s.profileRoundCue,
-                            subtitle: 'Suara instruksi saat pergantian ronde',
+                            subtitle: s.profileRoundCueDesc,
                             value: currentProfile.voice.roundCue,
                             onChanged: (val) {
                               _updateProfile(
@@ -665,6 +658,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     RwCard(
                       padding: const EdgeInsets.all(RwSpace.md),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _SwitchSettingTile(
                             icon: Icons.visibility_off_outlined,
@@ -681,15 +675,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               );
                             },
                           ),
-                          const Divider(height: 1),
-                          _SettingTile(
-                            icon: Icons.lock_outline_rounded,
-                            title: s.profilePrivacyVisibility,
-                            subtitle: s.profilePrivacyPrivate,
-                            trailing: const Icon(
-                              Icons.check_circle_rounded,
-                              color: RwColors.lime600,
-                              size: 20,
+                          const SizedBox(height: RwSpace.xs),
+                          Text(
+                            s.profileStaticInfoNote,
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 12,
+                              color: RwColors.mutedTextOnLight,
                             ),
                           ),
                         ],
@@ -704,7 +696,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: RwSpace.lg),
 
                     // ── Bagian 5: Versi & Pembaruan Aplikasi ─────────
-                    const _SectionHeader(title: 'Versi & Pembaruan'),
+                    _SectionHeader(title: s.profileVersionSection),
                     const SizedBox(height: RwSpace.xs),
                     RwCard(
                       padding: const EdgeInsets.all(RwSpace.md),
@@ -716,7 +708,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: RwColors.paper100,
+                                  color: RwColors.surfaceMuted,
                                   borderRadius: BorderRadius.circular(
                                     RwRadius.sm,
                                   ),
@@ -733,18 +725,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'RUNWILD App',
-                                      style: TextStyle(
+                                      s.appName,
+                                      style: const TextStyle(
                                         fontFamily: RwType.family,
                                         fontWeight: FontWeight.w800,
                                         fontSize: 14,
                                         color: RwColors.ink950,
                                       ),
                                     ),
-                                    SizedBox(height: 2),
+                                    const SizedBox(height: 2),
                                     Text(
-                                      'Versi ${AppVersion.current} (Build ${AppVersion.buildNumber})',
-                                      style: TextStyle(
+                                      s.profileVersionLabel(
+                                        AppVersion.current,
+                                        AppVersion.buildNumber,
+                                      ),
+                                      style: const TextStyle(
                                         fontFamily: RwType.family,
                                         fontSize: 12,
                                         color: RwColors.mutedTextOnLight,
@@ -758,8 +753,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           const SizedBox(height: RwSpace.md),
                           RwButton.secondary(
                             label: _isCheckingUpdate
-                                ? 'Memeriksa...'
-                                : 'Periksa Pembaruan',
+                                ? s.profileCheckingUpdate
+                                : s.profileCheckUpdate,
                             icon: Icons.sync_rounded,
                             onPressed: _isCheckingUpdate
                                 ? null
@@ -876,13 +871,6 @@ class _ProfileHeaderCard extends StatelessWidget {
               color: RwColors.ink950,
               shape: BoxShape.circle,
               border: Border.all(color: RwColors.lime500, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: RwColors.lime500.withValues(alpha: 0.25),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Center(
               child: Text(
@@ -925,7 +913,8 @@ class _ProfileHeaderCard extends StatelessWidget {
                         color: RwColors.ink500,
                       ),
                       onPressed: onEditName,
-                      tooltip: 'Ubah nama',
+                      tooltip: AppLocalizations.of(context)
+                          .profileEditNameTooltip,
                     ),
                   ],
                 ),
@@ -952,12 +941,9 @@ class _ProfileHeaderCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF2EA),
+                        color: RwColors.surfaceMuted,
                         borderRadius: BorderRadius.circular(RwRadius.pill),
-                        border: Border.all(
-                          color: const Color(0xFFE2E6DC),
-                          width: 1,
-                        ),
+                        border: Border.all(color: RwColors.borderCard),
                       ),
                       child: Text(
                         switch (profile.level) {

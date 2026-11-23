@@ -89,11 +89,6 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
       ('/auth/sign-in', AuthForm.signIn),
       ('/auth/register', AuthForm.register),
       ('/auth/reset', AuthForm.reset),
-      ('/auth/guest', AuthForm.guest),
-      if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb)
-        ('/auth/google', AuthForm.google),
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb)
-        ('/auth/apple', AuthForm.apple),
     ])
       GoRoute(
         path: path,

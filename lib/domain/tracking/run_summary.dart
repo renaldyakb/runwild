@@ -41,11 +41,13 @@ class RunSummary {
 
   /// Estimasi kalori menggunakan formula MET standar running:
   /// Kalori ≈ jarak (km) × berat rata-rata 65 kg × faktor 1.036
-  int get estimatedCalories {
-    final distanceKm = distanceMeters / 1000.0;
+  static int estimateCalories(double meters) {
+    final distanceKm = meters / 1000.0;
     if (distanceKm <= 0) return 0;
     return (distanceKm * 65.0 * 1.036).round();
   }
+
+  int get estimatedCalories => estimateCalories(distanceMeters);
 
   RunSummary copyWith({RunFeeling? feeling, String? note}) => RunSummary(
     sessionId: sessionId,

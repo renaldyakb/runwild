@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../design/components/rw_bar_chart.dart';
+import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_chip.dart';
+import '../../../design/components/rw_motion.dart';
 import '../../../design/components/rw_page.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/stats/stats_engine.dart';
@@ -80,15 +82,32 @@ class ProgressScreen extends ConsumerWidget {
             // ── Period Statistics Card ──────────────────────────────
             statsAsync.when(
               loading: () => const _StatsSkeleton(),
-              error: (err, _) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(RwSpace.lg),
-                  child: Text('Gagal memuat data statistik: $err'),
+              error: (_, _) => RwCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.error_outline_rounded,
+                        size: RwSize.icon,
+                        color: RwColors.danger500,
+                      ),
+                    ),
+                    const SizedBox(height: RwSpace.sm),
+                    Text(s.progressLoadError),
+                    const SizedBox(height: RwSpace.md),
+                    RwButton.secondary(
+                      label: s.retry,
+                      onPressed: () {
+                        ref.invalidate(progressStatsProvider);
+                        ref.invalidate(allFinishedSessionsProvider);
+                      },
+                    ),
+                  ],
                 ),
               ),
               data: (stats) {
-                final distKm = (stats.totalDistanceMeters / 1000.0)
-                    .toStringAsFixed(2);
                 final chartItems = [
                   for (final bar in stats.chartBars)
                     RwBarChartItem(
@@ -98,78 +117,84 @@ class ProgressScreen extends ConsumerWidget {
                     ),
                 ];
 
-                return RwCard(
-                  padding: const EdgeInsets.all(RwSpace.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        distKm,
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                          letterSpacing: -1,
-                          height: 1,
-                          color: RwColors.ink950,
+                return RwEntrance(
+                  order: 0,
+                  child: RwCard(
+                    padding: const EdgeInsets.all(RwSpace.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        RwCountUp(
+                          value: stats.totalDistanceMeters / 1000.0,
+                          builder: (_, value) => Text(
+                            value.toStringAsFixed(2),
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontSize: 48,
+                              fontWeight: FontWeight.w900,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                              letterSpacing: -1,
+                              height: 1,
+                              color: RwColors.ink950,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'TOTAL KILOMETER · ${switch (selectedPeriod) {
-                          ProgressPeriod.week => s.progressPeriodWeek,
-                          ProgressPeriod.month => s.progressPeriodMonth,
-                          ProgressPeriod.allTime => s.progressPeriodAll,
-                        }.toUpperCase()}',
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: RwColors.mutedTextOnLight,
+                        const SizedBox(height: 2),
+                        Text(
+                          'TOTAL KILOMETER · ${switch (selectedPeriod) {
+                            ProgressPeriod.week => s.progressPeriodWeek,
+                            ProgressPeriod.month => s.progressPeriodMonth,
+                            ProgressPeriod.allTime => s.progressPeriodAll,
+                          }.toUpperCase()}',
+                          style: const TextStyle(
+                            fontFamily: RwType.family,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: RwColors.mutedTextOnLight,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: RwSpace.md),
-                      const Divider(color: Color(0xFFE2E6DC), height: 1),
-                      const SizedBox(height: RwSpace.md),
+                        const SizedBox(height: RwSpace.md),
+                        const Divider(color: RwColors.borderCard, height: 1),
+                        const SizedBox(height: RwSpace.md),
 
-                      // Metrics 4-Box Grid
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _MetricColumn(
-                            label: s.progressTotalTime,
-                            value: _formatDuration(stats.totalMovingTime),
-                          ),
-                          _MetricColumn(
-                            label: s.progressTotalSessions,
-                            value: '${stats.sessionCount}',
-                          ),
-                          _MetricColumn(
-                            label: s.progressTotalCalories,
-                            value: '${stats.totalCalories}',
-                            unit: ' kkal',
-                          ),
-                          _MetricColumn(
-                            label: s.progressAvgPace,
-                            value: _formatPace(stats.averagePaceSecondsPerKm),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: RwSpace.xs),
-                      Text(
-                        s.progressCaloriesNote,
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 11,
-                          color: RwColors.mutedTextOnLight,
+                        // Metrics 4-Box Grid
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _MetricColumn(
+                              label: s.progressTotalTime,
+                              value: _formatDuration(stats.totalMovingTime),
+                            ),
+                            _MetricColumn(
+                              label: s.progressTotalSessions,
+                              value: '${stats.sessionCount}',
+                            ),
+                            _MetricColumn(
+                              label: s.progressTotalCalories,
+                              value: '${stats.totalCalories}',
+                              unit: ' kkal',
+                            ),
+                            _MetricColumn(
+                              label: s.progressAvgPace,
+                              value: _formatPace(stats.averagePaceSecondsPerKm),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: RwSpace.lg),
+                        const SizedBox(height: RwSpace.xs),
+                        Text(
+                          s.progressCaloriesNote,
+                          style: const TextStyle(
+                            fontFamily: RwType.family,
+                            fontSize: 11,
+                            color: RwColors.mutedTextOnLight,
+                          ),
+                        ),
+                        const SizedBox(height: RwSpace.lg),
 
-                      // fl_chart Community Bar Chart
-                      RwBarChart(items: chartItems, height: 130),
-                    ],
+                        // fl_chart Community Bar Chart
+                        RwBarChart(items: chartItems, height: 130),
+                      ],
+                    ),
                   ),
                 );
               },

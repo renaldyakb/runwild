@@ -204,7 +204,7 @@ void main() {
       await _tap(tester, 'Lanjut');
       await _tap(tester, 'Selesai');
       await tester.tap(find.widgetWithText(TextButton, 'Selesai'));
-      await tester.pumpAndSettle();
+      await tester.pump();
       await tester.runAsync(() => Future<void>.delayed(Duration.zero));
       await tester.pumpAndSettle();
       if (find.text('Simpan Sesi').evaluate().isNotEmpty) {

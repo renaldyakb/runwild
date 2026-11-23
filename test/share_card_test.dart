@@ -16,6 +16,7 @@ import 'support.dart';
 
 class _FakeShareCardService implements ShareCardService {
   Uint8List? sharedBytes;
+  Uint8List? savedBytes;
   @override
   Future<bool> shareImage(
     Uint8List pngBytes, {
@@ -24,6 +25,12 @@ class _FakeShareCardService implements ShareCardService {
   }) async {
     sharedBytes = pngBytes;
     return true;
+  }
+
+  @override
+  Future<String?> saveImage(Uint8List pngBytes, {String? fileName}) async {
+    savedBytes = pngBytes;
+    return '/tmp/runwild_test.png';
   }
 }
 
@@ -119,7 +126,7 @@ void main() {
     await tester.tap(find.text('Sembunyikan rute'));
     await tester.pumpAndSettle();
 
-    // Action buttons
+    // Action buttons: Bagikan & Simpan
     final shareButton = find.text('Bagikan gambar');
     await tester.ensureVisible(shareButton);
     expect(shareButton, findsOneWidget);
@@ -137,6 +144,16 @@ void main() {
       frame.image.dispose();
       codec.dispose();
     });
+
+    final saveButton = find.text('Simpan');
+    expect(saveButton, findsOneWidget);
+    await tester.tap(saveButton);
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+    expect(fakeService.savedBytes, isNotNull);
+    expect(find.text('Kartu berhasil disimpan.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Private artwork omits GPS; public and private PNG layouts', (

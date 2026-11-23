@@ -50,6 +50,7 @@ class RunGpsProbe extends Notifier<GpsProbeSnapshot> {
   TrackingEngine? _engine;
   IntervalEngine? _interval;
   IntervalSnapshot? get interval => _interval?.snapshot;
+  IntervalConfig? get intervalConfig => _interval?.config;
   int? get intervalRounds => _interval?.config.rounds;
   Timer? _ticker;
   Timer? _checkpointTimer;

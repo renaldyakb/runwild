@@ -81,7 +81,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                     decoration: BoxDecoration(
                       color: i <= _index
                           ? RwColors.ink950
-                          : const Color(0xFFE2E6DC),
+                          : RwColors.borderCard,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

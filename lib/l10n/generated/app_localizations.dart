@@ -1714,6 +1714,30 @@ abstract class AppLocalizations {
   /// **'Aktifkan lokasi dan notifikasi untuk mulai.'**
   String get runStartBlocked;
 
+  /// No description provided for @runFinishing.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyimpan sesi lari…'**
+  String get runFinishing;
+
+  /// No description provided for @runFinishingHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyiapkan ringkasan dan rute sesimu.'**
+  String get runFinishingHint;
+
+  /// No description provided for @intervalQuickPresets.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih preset cepat'**
+  String get intervalQuickPresets;
+
+  /// No description provided for @authOtherOptions.
+  ///
+  /// In id, this message translates to:
+  /// **'Atau masuk cepat'**
+  String get authOtherOptions;
+
   /// No description provided for @close.
   ///
   /// In id, this message translates to:
@@ -1851,6 +1875,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'km'**
   String get distanceUnit;
+
+  /// No description provided for @distanceUnitFull.
+  ///
+  /// In id, this message translates to:
+  /// **'Kilometer'**
+  String get distanceUnitFull;
 
   /// No description provided for @noValue.
   ///
@@ -2698,6 +2728,138 @@ abstract class AppLocalizations {
   /// **'Belum bisa membagikan kartu. Coba lagi.'**
   String get shareError;
 
+  /// No description provided for @shareSaveAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan'**
+  String get shareSaveAction;
+
+  /// No description provided for @shareSaved.
+  ///
+  /// In id, this message translates to:
+  /// **'Kartu berhasil disimpan.'**
+  String get shareSaved;
+
+  /// No description provided for @shareSaveError.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum bisa menyimpan kartu. Coba lagi.'**
+  String get shareSaveError;
+
+  /// No description provided for @summaryRoundsLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Putaran'**
+  String get summaryRoundsLabel;
+
+  /// No description provided for @historyStatsButton.
+  ///
+  /// In id, this message translates to:
+  /// **'Statistik'**
+  String get historyStatsButton;
+
+  /// No description provided for @historyMonthSummary.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} sesi · {km} km'**
+  String historyMonthSummary(int count, String km);
+
+  /// No description provided for @activityMapOn.
+  ///
+  /// In id, this message translates to:
+  /// **'Peta'**
+  String get activityMapOn;
+
+  /// No description provided for @activityMapOff.
+  ///
+  /// In id, this message translates to:
+  /// **'Jejak rute'**
+  String get activityMapOff;
+
+  /// No description provided for @activityNoNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada catatan untuk sesi ini.'**
+  String get activityNoNote;
+
+  /// No description provided for @activityMetricsHelpTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tentang Pace & Split'**
+  String get activityMetricsHelpTitle;
+
+  /// No description provided for @activityMetricsHelpBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Pace adalah waktu rata-rata yang kamu butuhkan untuk menempuh 1 km (misal 6\'30\"/km berarti 6 menit 30 detik per km).\n\nSplit menunjukkan waktu dan pace pada setiap kilometer agar kamu bisa melihat ritme lari dari awal hingga akhir.'**
+  String get activityMetricsHelpBody;
+
+  /// No description provided for @activityMetricsHelpTooltip.
+  ///
+  /// In id, this message translates to:
+  /// **'Penjelasan pace dan split'**
+  String get activityMetricsHelpTooltip;
+
+  /// No description provided for @progressLoadError.
+  ///
+  /// In id, this message translates to:
+  /// **'Statistik belum bisa dimuat. Periksa data lalu coba lagi.'**
+  String get progressLoadError;
+
+  /// No description provided for @profileLoadError.
+  ///
+  /// In id, this message translates to:
+  /// **'Profil belum bisa dimuat. Periksa koneksi lalu coba lagi.'**
+  String get profileLoadError;
+
+  /// No description provided for @profileVersionSection.
+  ///
+  /// In id, this message translates to:
+  /// **'Versi & Pembaruan'**
+  String get profileVersionSection;
+
+  /// No description provided for @profileCheckUpdate.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa Pembaruan'**
+  String get profileCheckUpdate;
+
+  /// No description provided for @profileCheckingUpdate.
+  ///
+  /// In id, this message translates to:
+  /// **'Memeriksa…'**
+  String get profileCheckingUpdate;
+
+  /// No description provided for @profileVersionLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Versi {version} (Build {build})'**
+  String profileVersionLabel(String version, String build);
+
+  /// No description provided for @profileEditNameTooltip.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah nama'**
+  String get profileEditNameTooltip;
+
+  /// No description provided for @profileCountdownCueDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Suara hitung mundur 3-2-1'**
+  String get profileCountdownCueDesc;
+
+  /// No description provided for @profileRoundCueDesc.
+  ///
+  /// In id, this message translates to:
+  /// **'Suara instruksi saat pergantian ronde'**
+  String get profileRoundCueDesc;
+
+  /// No description provided for @profileStaticInfoNote.
+  ///
+  /// In id, this message translates to:
+  /// **'Satuan jarak: KM · Visibilitas sesi bawaan: Privat'**
+  String get profileStaticInfoNote;
+
   /// No description provided for @shareRouteError.
   ///
   /// In id, this message translates to:
@@ -3181,7 +3343,7 @@ abstract class AppLocalizations {
   /// No description provided for @weatherLocationSource.
   ///
   /// In id, this message translates to:
-  /// **'Lokasi: © OpenStreetMap contributors'**
+  /// **'Lokasi: BigDataCloud & OpenStreetMap'**
   String get weatherLocationSource;
 
   /// No description provided for @heroWeek.

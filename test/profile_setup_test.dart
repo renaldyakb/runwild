@@ -66,7 +66,7 @@ void main() {
       ProfileLevel.kembali,
       4,
     ));
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
+    expect(find.text('Run Free,'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -95,6 +95,6 @@ void main() {
     await tester.ensureVisible(save);
     await tester.tap(save);
     await tester.pumpAndSettle();
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
+    expect(find.text('Run Free,'), findsOneWidget);
   });
 }

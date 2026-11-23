@@ -31,9 +31,9 @@ class RwSegmentedControl<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFEFF2EA),
+          color: RwColors.surfaceMuted,
           borderRadius: BorderRadius.circular(RwRadius.pill),
-          border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+          border: Border.all(color: RwColors.borderCard, width: 1),
         ),
         child: Row(
           children: [

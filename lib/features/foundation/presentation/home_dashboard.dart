@@ -11,6 +11,7 @@ import '../../../core/utils/duration_format.dart';
 import '../../../design/components/rw_bar_chart.dart';
 import '../../../design/components/rw_button.dart';
 import '../../../design/components/rw_card.dart';
+import '../../../design/components/rw_motion.dart';
 import '../../../design/components/rw_page.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/stats/stats_engine.dart';
@@ -72,15 +73,15 @@ class _HomeDashboardState extends ConsumerState<HomeDashboard>
   @override
   Widget build(BuildContext context) => RwPage(
     children: [
-      _HeroCard(onStart: widget.onStart),
+      RwEntrance(order: 0, child: _HeroCard(onStart: widget.onStart)),
       const SizedBox(height: RwSpace.md),
-      const _WeekSection(),
+      const RwEntrance(order: 1, child: _WeekSection()),
       const SizedBox(height: RwSpace.md),
-      _RecommendationCard(onStart: widget.onStart),
+      RwEntrance(order: 2, child: _RecommendationCard(onStart: widget.onStart)),
       const SizedBox(height: RwSpace.md),
-      const _ReminderRow(),
+      const RwEntrance(order: 3, child: _ReminderRow()),
       const SizedBox(height: RwSpace.md),
-      const _ProgressRow(),
+      const RwEntrance(order: 4, child: _ProgressRow()),
       const SizedBox(height: RwSpace.lg),
     ],
   );
@@ -95,8 +96,9 @@ String _greetingFor(AppLocalizations s, int hour) =>
       DayGreeting.night => s.greetingNight,
     };
 
-/// Kartu hero: sapaan, satu aksi utama "Mulai berlari", kondisi cuaca saat ini,
-/// serta jadwal mendatang.
+/// Kartu hero atletis: motif outdoor arang (`ink950`), sapaan personal, judul
+/// tegas, satu CTA utama "Mulai berlari", panel cuaca interaktif, dan jadwal
+/// lari terdekat (tanpa menduplikasi metrik mingguan dari kartu di bawahnya).
 class _HeroCard extends ConsumerWidget {
   const _HeroCard({required this.onStart});
 
@@ -108,76 +110,153 @@ class _HeroCard extends ConsumerWidget {
     final user = ref.watch(currentProfileUserProvider);
     final name = user.displayName ?? s.runnerFallbackName;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: RwColors.ink950,
-        borderRadius: BorderRadius.circular(RwRadius.lg),
-      ),
-      padding: const EdgeInsets.all(RwSpace.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            s.homeGreetingLine(
-              _greetingFor(s, ref.watch(homeClockProvider)().hour),
-              firstNameOf(name),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(RwRadius.lg),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: RwColors.ink950),
+        child: Stack(
+          children: [
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: ExcludeSemantics(
+                  child: CustomPaint(painter: _HeroOutdoorBackdrop()),
+                ),
+              ),
             ),
-            style: const TextStyle(
-              fontFamily: RwType.family,
-              color: RwColors.paper200,
-              fontSize: RwType.label,
-              fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(RwSpace.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: RwColors.lime500,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: RwSpace.xs),
+                      Expanded(
+                        child: Text(
+                          s.homeGreetingLine(
+                            _greetingFor(
+                              s,
+                              ref.watch(homeClockProvider)().hour,
+                            ),
+                            firstNameOf(name),
+                          ),
+                          style: const TextStyle(
+                            fontFamily: RwType.family,
+                            color: RwColors.paper200,
+                            fontSize: RwType.label,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: RwSpace.md),
+                  Text(
+                    s.homeTitle,
+                    style: const TextStyle(
+                      fontFamily: RwType.family,
+                      color: RwColors.paper100,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.8,
+                      height: 1.04,
+                    ),
+                  ),
+                  Text(
+                    s.homeAccent,
+                    style: const TextStyle(
+                      fontFamily: RwType.family,
+                      color: RwColors.lime500,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.8,
+                      height: 1.04,
+                    ),
+                  ),
+                  const SizedBox(height: RwSpace.xs),
+                  Text(
+                    s.homeSessionHint,
+                    style: const TextStyle(
+                      fontFamily: RwType.family,
+                      color: RwColors.paper200,
+                      fontSize: RwType.bodySmall,
+                    ),
+                  ),
+                  const SizedBox(height: RwSpace.lg),
+                  RwButton.primary(
+                    label: s.homeStart,
+                    icon: Icons.arrow_forward_rounded,
+                    onPressed: onStart,
+                  ),
+                  const SizedBox(height: RwSpace.md),
+                  const _WeatherBlock(),
+                  const _HeroNextReminder(),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: RwSpace.md),
-          Text(
-            s.homeTitle,
-            style: const TextStyle(
-              fontFamily: RwType.family,
-              color: RwColors.paper100,
-              fontSize: RwType.displayM,
-              fontWeight: FontWeight.w900,
-              height: 1.1,
-            ),
-          ),
-          Text(
-            s.homeAccent,
-            style: const TextStyle(
-              fontFamily: RwType.family,
-              color: RwColors.lime500,
-              fontSize: RwType.displayM,
-              fontWeight: FontWeight.w900,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: RwSpace.sm),
-          Text(
-            s.homeSessionHint,
-            style: const TextStyle(
-              fontFamily: RwType.family,
-              color: RwColors.paper200,
-              fontSize: RwType.bodySmall,
-            ),
-          ),
-          const SizedBox(height: RwSpace.lg),
-          const _HeroWeekMetrics(),
-          const SizedBox(height: RwSpace.lg),
-          RwButton.primary(
-            label: s.homeStart,
-            icon: Icons.arrow_forward_rounded,
-            onPressed: onStart,
-          ),
-          const SizedBox(height: RwSpace.lg),
-          const _WeatherBlock(),
-          const _HeroNextReminder(),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
+/// Dekorasi outdoor samar di tepi kartu hero (non-interaktif, sesuai DESIGN.md
+/// §9.4): siluet punggung bukit dan busur lintasan tanpa mengganggu teks.
+class _HeroOutdoorBackdrop extends CustomPainter {
+  const _HeroOutdoorBackdrop();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final arcPaint = Paint()
+      ..color = RwColors.ink800
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final origin = Offset(size.width * 0.96, size.height * 0.08);
+    canvas
+      ..drawCircle(origin, size.width * 0.28, arcPaint)
+      ..drawCircle(origin, size.width * 0.44, arcPaint);
+
+    final slashPaint = Paint()
+      ..color = RwColors.lime500.withValues(alpha: 0.14)
+      ..style = PaintingStyle.fill;
+    final slash = Path()
+      ..moveTo(size.width * 0.78, 0)
+      ..lineTo(size.width * 0.90, 0)
+      ..lineTo(size.width * 0.72, size.height * 0.34)
+      ..lineTo(size.width * 0.64, size.height * 0.34)
+      ..close();
+    canvas.drawPath(slash, slashPaint);
+
+    final ridgePaint = Paint()
+      ..color = RwColors.ink900.withValues(alpha: 0.75)
+      ..style = PaintingStyle.fill;
+    final ridge = Path()
+      ..moveTo(size.width * 0.42, size.height)
+      ..lineTo(size.width * 0.62, size.height * 0.78)
+      ..lineTo(size.width * 0.74, size.height * 0.88)
+      ..lineTo(size.width * 0.90, size.height * 0.68)
+      ..lineTo(size.width, size.height * 0.78)
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(ridge, ridgePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 /// Bagian cuaca di dalam kartu hero: memuat, izin lokasi belum aktif, gagal
-/// ambil data, atau isi cuaca. Tiap keadaan punya kalimatnya sendiri.
+/// ambil data, atau isi cuaca dalam panel arang gelap yang dapat diketuk.
 class _WeatherBlock extends ConsumerWidget {
   const _WeatherBlock();
 
@@ -185,25 +264,28 @@ class _WeatherBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = AppLocalizations.of(context);
     final weather = ref.watch(weatherProvider);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          s.weatherTitle,
-          style: const TextStyle(
-            fontFamily: RwType.family,
-            color: RwColors.paper200,
-            fontSize: RwType.label,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: RwSpace.sm),
-        weather.when(
-          loading: () => const _WeatherLoading(),
-          error: (_, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+    return Container(
+      decoration: BoxDecoration(
+        color: RwColors.ink900,
+        borderRadius: BorderRadius.circular(RwRadius.md),
+        border: Border.all(color: RwColors.ink700),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: RwSpace.md,
+        vertical: RwSpace.sm,
+      ),
+      child: weather.when(
+        loading: () => const _WeatherLoading(),
+        error: (_, _) => Row(
+          children: [
+            const Icon(
+              Icons.cloud_off_rounded,
+              color: RwColors.paper200,
+              size: 20,
+            ),
+            const SizedBox(width: RwSpace.sm),
+            Expanded(
+              child: Text(
                 s.weatherError,
                 style: const TextStyle(
                   fontFamily: RwType.family,
@@ -211,25 +293,37 @@ class _WeatherBlock extends ConsumerWidget {
                   fontSize: RwType.bodySmall,
                 ),
               ),
-              TextButton(
-                style: TextButton.styleFrom(foregroundColor: RwColors.lime500),
-                onPressed: () => ref.invalidate(weatherProvider),
-                child: Text(s.weatherRetry),
-              ),
-            ],
-          ),
-          data: (forecast) => forecast == null
-              ? Text(
-                  s.weatherPermission,
-                  style: const TextStyle(
-                    fontFamily: RwType.family,
-                    color: RwColors.paper200,
-                    fontSize: RwType.bodySmall,
-                  ),
-                )
-              : _WeatherContent(forecast: forecast),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: RwColors.lime500),
+              onPressed: () => ref.invalidate(weatherProvider),
+              child: Text(s.weatherRetry),
+            ),
+          ],
         ),
-      ],
+        data: (forecast) => forecast == null
+            ? Row(
+                children: [
+                  const Icon(
+                    Icons.location_off_outlined,
+                    color: RwColors.paper200,
+                    size: 20,
+                  ),
+                  const SizedBox(width: RwSpace.sm),
+                  Expanded(
+                    child: Text(
+                      s.weatherPermission,
+                      style: const TextStyle(
+                        fontFamily: RwType.family,
+                        color: RwColors.paper200,
+                        fontSize: RwType.bodySmall,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : _WeatherContent(forecast: forecast),
+      ),
     );
   }
 }
@@ -258,48 +352,81 @@ class _WeatherLoading extends StatelessWidget {
 class _WeatherContent extends StatelessWidget {
   const _WeatherContent({required this.forecast});
   final WeatherForecast forecast;
+
+  void _openDetail(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const WeatherDetailScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
-    return Row(
-      children: [
-        IconButton(
-          tooltip: s.weatherDetailLink,
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const WeatherDetailScreen(),
+    return InkWell(
+      borderRadius: BorderRadius.circular(RwRadius.sm),
+      onTap: () => _openDetail(context),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: s.weatherDetailLink,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            onPressed: () => _openDetail(context),
+            icon: WeatherAnimation(
+              kind: weatherKindFor(forecast.code),
+              size: RwSize.touch,
+              animate: true,
             ),
           ),
-          icon: WeatherAnimation(
-            kind: weatherKindFor(forecast.code),
-            size: RwSize.button,
-            animate: true,
-          ),
-        ),
-        const SizedBox(width: RwSpace.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                forecast.city ?? s.weatherCityUnknown,
-                style: const TextStyle(
-                  color: RwColors.paper200,
-                  fontSize: RwType.bodySmall,
+          const SizedBox(width: RwSpace.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 13,
+                      color: RwColors.lime500,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        forecast.city ?? s.weatherCityUnknown,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: RwType.family,
+                          color: RwColors.paper200,
+                          fontSize: RwType.label,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: RwSpace.xxs),
-              Text(
-                '${forecast.temperature.round()}°C · ${weatherKindLabel(s, weatherKindFor(forecast.code))}',
-                style: const TextStyle(
-                  color: RwColors.paper100,
-                  fontWeight: FontWeight.w700,
+                const SizedBox(height: 2),
+                Text(
+                  '${forecast.temperature.round()}°C · ${weatherKindLabel(s, weatherKindFor(forecast.code))}',
+                  style: const TextStyle(
+                    fontFamily: RwType.family,
+                    color: RwColors.paper100,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: RwColors.paper200,
+            size: 20,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -884,75 +1011,6 @@ class _CardSkeleton extends StatelessWidget {
   );
 }
 
-class _HeroWeekMetrics extends ConsumerWidget {
-  const _HeroWeekMetrics();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final s = AppLocalizations.of(context);
-    return ref
-        .watch(weekSummaryProvider)
-        .when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, _) => const SizedBox.shrink(),
-          data: (week) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                s.heroWeek,
-                style: const TextStyle(
-                  color: RwColors.paper200,
-                  fontSize: RwType.label,
-                ),
-              ),
-              const SizedBox(height: RwSpace.sm),
-              Wrap(
-                spacing: RwSpace.xl,
-                runSpacing: RwSpace.md,
-                children: [
-                  for (final metric in [
-                    (
-                      value: (week.totalDistanceMeters / 1000).toStringAsFixed(
-                        1,
-                      ),
-                      label: s.heroDistance,
-                    ),
-                    (
-                      value: '${week.totalMovingTime.inMinutes}',
-                      label: s.heroMinutes,
-                    ),
-                    (
-                      value: '${week.sessionCount}/${week.targetSessions}',
-                      label: s.heroSessions,
-                    ),
-                  ])
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          metric.value,
-                          style: const TextStyle(
-                            color: RwColors.paper100,
-                            fontSize: RwType.title,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        Text(
-                          metric.label,
-                          style: const TextStyle(
-                            color: RwColors.paper200,
-                            fontSize: RwType.label,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-  }
-}
-
 class _HeroNextReminder extends ConsumerWidget {
   const _HeroNextReminder();
   @override
@@ -964,18 +1022,28 @@ class _HeroNextReminder extends ConsumerWidget {
     if (upcoming == null || upcoming.isEmpty) return const SizedBox.shrink();
     final s = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.only(top: RwSpace.lg),
+      padding: const EdgeInsets.only(top: RwSpace.sm),
       child: Material(
         color: RwColors.ink900,
-        borderRadius: BorderRadius.circular(RwRadius.sm),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RwRadius.md),
+          side: const BorderSide(color: RwColors.ink700),
+        ),
         child: InkWell(
-          borderRadius: BorderRadius.circular(RwRadius.sm),
+          borderRadius: BorderRadius.circular(RwRadius.md),
           onTap: () => context.push('/reminders'),
           child: Padding(
-            padding: const EdgeInsets.all(RwSpace.md),
+            padding: const EdgeInsets.symmetric(
+              horizontal: RwSpace.md,
+              vertical: RwSpace.sm,
+            ),
             child: Row(
               children: [
-                const Icon(Icons.alarm_outlined, color: RwColors.lime500),
+                const Icon(
+                  Icons.alarm_outlined,
+                  color: RwColors.lime500,
+                  size: 20,
+                ),
                 const SizedBox(width: RwSpace.sm),
                 Expanded(
                   child: Column(
@@ -984,24 +1052,31 @@ class _HeroNextReminder extends ConsumerWidget {
                       Text(
                         s.heroNextReminder,
                         style: const TextStyle(
+                          fontFamily: RwType.family,
                           color: RwColors.paper200,
                           fontSize: RwType.label,
                         ),
                       ),
-                      const SizedBox(height: RwSpace.xxs),
+                      const SizedBox(height: 2),
                       Text(
                         DateFormat.yMMMd(s.localeName)
                             .add_Hm()
                             .format(upcoming.first.time),
                         style: const TextStyle(
+                          fontFamily: RwType.family,
                           color: RwColors.paper100,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
+                          fontFeatures: [FontFeature.tabularFigures()],
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: RwColors.paper200),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: RwColors.paper200,
+                  size: 20,
+                ),
               ],
             ),
           ),

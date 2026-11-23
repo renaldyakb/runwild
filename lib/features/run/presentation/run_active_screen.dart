@@ -14,6 +14,7 @@ import '../../../design/components/rw_card.dart';
 import '../../../design/components/rw_chip.dart';
 import '../../../design/components/rw_hold_button.dart';
 import '../../../design/components/rw_loading.dart';
+import '../../../design/components/rw_motion.dart';
 import '../../../design/components/rw_page.dart';
 import '../../../design/tokens/rw_tokens.dart';
 import '../../../domain/interval/interval_engine.dart';
@@ -139,7 +140,7 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
       _confirming = false;
       if (!mounted || confirmed != true) return;
     }
-    _ending = true;
+    setState(() => _ending = true);
     _countdownTimer?.cancel();
     RunSummary? summary;
     try {
@@ -209,7 +210,17 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
       GpsProbeStatus.waiting || GpsProbeStatus.idle => s.runGpsWaiting,
       _ => s.runGpsRecording,
     };
-    if (_ending) return const Scaffold(body: RwFullPageLoading());
+    if (_ending) {
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          body: RwFullPageLoading(
+            label: s.runFinishing,
+            subtitle: s.runFinishingHint,
+          ),
+        ),
+      );
+    }
     return PopScope(
       canPop: _readyToLeave,
       onPopInvokedWithResult: (didPop, _) {
@@ -247,19 +258,22 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
               ),
               const SizedBox(height: RwSpace.xl),
               Center(
-                child: Container(
-                  width: RwSize.countdownCircle,
-                  height: RwSize.countdownCircle,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: RwColors.lime500,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      '$_remaining',
-                      style: theme.textTheme.displayLarge,
+                child: RwPhaseSwitcher(
+                  child: Container(
+                    key: ValueKey(_remaining),
+                    width: RwSize.countdownCircle,
+                    height: RwSize.countdownCircle,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: RwColors.lime500,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        '$_remaining',
+                        style: theme.textTheme.displayLarge,
+                      ),
                     ),
                   ),
                 ),
@@ -326,39 +340,76 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
               const SizedBox(height: RwSpace.lg),
               if (_tab == 0) ...[
                 RwCard(
+                  padding: const EdgeInsets.all(RwSpace.lg),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(s.runDistance, style: theme.textTheme.labelSmall),
-                      const SizedBox(height: RwSpace.sm),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            distance,
-                            style: theme.textTheme.displayLarge?.copyWith(
+                      Text(
+                        s.runDistance.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: RwColors.mutedTextOnLight,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: RwSpace.xs),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                distance,
+                                style: theme.textTheme.displayLarge?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  fontFeatures: const [
+                                    FontFeature.tabularFigures(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: RwSpace.xs),
+                          Text(
+                            s.distanceUnit,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: RwColors.mutedTextOnLight,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
-                        ),
+                        ],
                       ),
                       const SizedBox(height: RwSpace.md),
-                      const Divider(),
+                      const Divider(color: RwColors.borderCard, height: 1),
                       const SizedBox(height: RwSpace.md),
-                      Wrap(
-                        spacing: RwSpace.xl,
-                        runSpacing: RwSpace.md,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _Metric(
-                            label: s.runMovingTime,
-                            value: _time(session.moving.inSeconds),
+                          Expanded(
+                            child: _Metric(
+                              label: s.runMovingTime,
+                              value: _time(session.moving.inSeconds),
+                            ),
                           ),
-                          _Metric(
-                            label: s.runAveragePace,
-                            value: pace == null
-                                ? s.homeMetricEmpty
-                                : s.runPaceUnit(_time(pace.round())),
+                          const SizedBox(width: RwSpace.sm),
+                          Expanded(
+                            child: _Metric(
+                              label: s.runAveragePace,
+                              value: pace == null
+                                  ? s.homeMetricEmpty
+                                  : s.runPaceUnit(_time(pace.round())),
+                            ),
+                          ),
+                          const SizedBox(width: RwSpace.sm),
+                          Expanded(
+                            child: _Metric(
+                              label: s.summaryCalories,
+                              value: s.summaryCaloriesUnit(
+                                RunSummary.estimateCalories(session.meters),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -367,41 +418,13 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
                 ),
                 if (interval != null) ...[
                   const SizedBox(height: RwSpace.md),
-                  RwCard(
-                    color: RwColors.lime100,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(switch (interval.phase) {
-                          IntervalPhase.warmup => s.intervalWarmup,
-                          IntervalPhase.run => s.intervalRun,
-                          IntervalPhase.walk => s.intervalWalk,
-                          IntervalPhase.cooldown => s.intervalCooldown,
-                          IntervalPhase.finished => s.intervalFinished,
-                          _ => s.runCountdown,
-                        }, style: theme.textTheme.titleLarge),
-                        if (!intervalFinished) ...[
-                          const SizedBox(height: RwSpace.sm),
-                          Text(
-                            _time(
-                              (interval.remaining.inMilliseconds /
-                                      Duration.millisecondsPerSecond)
-                                  .ceil(),
-                            ),
-                            style: theme.textTheme.displayMedium,
-                          ),
-                        ],
-                        if (interval.round > 0) ...[
-                          const SizedBox(height: RwSpace.xs),
-                          Text(switch (recorder.intervalRounds) {
-                            final rounds? => s.intervalRound(
-                              interval.round,
-                              rounds,
-                            ),
-                            null => s.intervalRoundFree(interval.round),
-                          }),
-                        ],
-                      ],
+                  RwPhaseSwitcher(
+                    child: _IntervalPhaseBanner(
+                      key: ValueKey(interval.phase),
+                      interval: interval,
+                      config: recorder.intervalConfig,
+                      rounds: recorder.intervalRounds,
+                      formatTime: _time,
                     ),
                   ),
                 ],
@@ -480,87 +503,248 @@ class _RunActiveScreenState extends ConsumerState<RunActiveScreen>
             ],
           ],
         ),
-        bottomNavigationBar: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              RwSpace.screen,
-              RwSpace.sm,
-              RwSpace.screen,
-              RwSpace.sm,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (_remaining > 0)
-                  RwButton.secondary(label: s.runCancel, onPressed: _finish)
-                else if (_locked) ...[
-                  Text(s.runLocked, textAlign: TextAlign.center),
-                  Semantics(
-                    button: true,
-                    label: s.runUnlock,
-                    onTap: _unlock,
-                    excludeSemantics: true,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTapDown: (_) =>
-                          _unlockTimer = Timer(_unlockDuration, _unlock),
-                      onTapUp: (_) => _unlockTimer?.cancel(),
-                      onTapCancel: () => _unlockTimer?.cancel(),
-                      child: Container(
-                        padding: const EdgeInsets.all(RwSpace.md),
-                        decoration: BoxDecoration(
-                          color: RwColors.lime100,
-                          borderRadius: BorderRadius.circular(RwRadius.pill),
-                        ),
-                        child: Text(s.runUnlock, textAlign: TextAlign.center),
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  if (!failed && !intervalFinished) ...[
-                    RwButton.primary(
-                      label: paused ? s.runResume : s.runPause,
-                      icon: paused
-                          ? Icons.play_arrow_rounded
-                          : Icons.pause_rounded,
-                      onPressed: recorder.togglePause,
-                    ),
+        bottomNavigationBar: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: RwColors.paper100,
+            border: Border(top: BorderSide(color: RwColors.borderCard)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                RwSpace.screen,
+                RwSpace.sm,
+                RwSpace.screen,
+                RwSpace.sm,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (_remaining > 0)
+                    RwButton.secondary(label: s.runCancel, onPressed: _finish)
+                  else if (_locked) ...[
+                    Text(s.runLocked, textAlign: TextAlign.center),
                     const SizedBox(height: RwSpace.xs),
-                  ],
-                  Row(
-                    children: [
-                      if (!failed && !intervalFinished) ...[
-                        Expanded(
-                          child: RwButton.secondary(
-                            label: s.runLock,
-                            icon: Icons.lock_outline,
-                            onPressed: () => setState(() => _locked = true),
+                    Semantics(
+                      button: true,
+                      label: s.runUnlock,
+                      onTap: _unlock,
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapDown: (_) =>
+                            _unlockTimer = Timer(_unlockDuration, _unlock),
+                        onTapUp: (_) => _unlockTimer?.cancel(),
+                        onTapCancel: () => _unlockTimer?.cancel(),
+                        child: Container(
+                          padding: const EdgeInsets.all(RwSpace.md),
+                          decoration: BoxDecoration(
+                            color: RwColors.lime100,
+                            borderRadius: BorderRadius.circular(RwRadius.pill),
+                            border: Border.all(color: RwColors.lime600),
+                          ),
+                          child: Text(
+                            s.runUnlock,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontFamily: RwType.family,
+                              fontWeight: FontWeight.w800,
+                              color: RwColors.ink950,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: RwSpace.xs),
-                      ],
-                      Expanded(
-                        child: _saveFailed
-                            ? RwButton.secondary(
-                                label: s.retry,
-                                onPressed: () => _finish(skipDialog: true),
-                              )
-                            : RwHoldToFinishButton(
-                                label: s.runFinish,
-                                onHoldCompleted: () =>
-                                    _finish(skipDialog: true),
-                                onTapShort: () => _finish(skipDialog: false),
-                              ),
                       ),
+                    ),
+                  ] else ...[
+                    if (!failed && !intervalFinished) ...[
+                      RwButton.primary(
+                        label: paused ? s.runResume : s.runPause,
+                        icon: paused
+                            ? Icons.play_arrow_rounded
+                            : Icons.pause_rounded,
+                        onPressed: recorder.togglePause,
+                      ),
+                      const SizedBox(height: RwSpace.xs),
                     ],
-                  ),
+                    Row(
+                      children: [
+                        if (!failed && !intervalFinished) ...[
+                          Expanded(
+                            child: RwButton.secondary(
+                              label: s.runLock,
+                              icon: Icons.lock_outline,
+                              onPressed: () => setState(() => _locked = true),
+                            ),
+                          ),
+                          const SizedBox(width: RwSpace.xs),
+                        ],
+                        Expanded(
+                          child: _saveFailed
+                              ? RwButton.secondary(
+                                  label: s.retry,
+                                  onPressed: () => _finish(skipDialog: true),
+                                )
+                              : RwHoldToFinishButton(
+                                  label: s.runFinish,
+                                  onHoldCompleted: () =>
+                                      _finish(skipDialog: true),
+                                  onTapShort: () => _finish(skipDialog: false),
+                                ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _IntervalPhaseBanner extends StatelessWidget {
+  const _IntervalPhaseBanner({
+    required this.interval,
+    required this.config,
+    required this.rounds,
+    required this.formatTime,
+    super.key,
+  });
+
+  final IntervalSnapshot interval;
+  final IntervalConfig? config;
+  final int? rounds;
+  final String Function(int seconds) formatTime;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final phase = interval.phase;
+    final isRun = phase == IntervalPhase.run;
+    final isWalk = phase == IntervalPhase.walk;
+    final isFinished = phase == IntervalPhase.finished;
+
+    final phaseLabel = switch (phase) {
+      IntervalPhase.warmup => s.intervalWarmup,
+      IntervalPhase.run => s.intervalRun,
+      IntervalPhase.walk => s.intervalWalk,
+      IntervalPhase.cooldown => s.intervalCooldown,
+      IntervalPhase.finished => s.intervalFinished,
+      _ => s.runCountdown,
+    };
+
+    final totalDuration = switch (phase) {
+      IntervalPhase.warmup => config?.warmup,
+      IntervalPhase.run => config?.run,
+      IntervalPhase.walk => config?.walk,
+      IntervalPhase.cooldown => config?.cooldown,
+      _ => null,
+    };
+    final double? progress =
+        totalDuration != null && totalDuration > Duration.zero && !isFinished
+        ? (1.0 -
+                  interval.remaining.inMicroseconds /
+                      totalDuration.inMicroseconds)
+              .clamp(0.0, 1.0)
+        : null;
+
+    final bgColor = isRun
+        ? RwColors.ink950
+        : isFinished
+        ? RwColors.lime500
+        : isWalk
+        ? RwColors.lime100
+        : RwColors.paper100;
+    final borderColor = isRun
+        ? RwColors.ink950
+        : isWalk
+        ? RwColors.lime600
+        : RwColors.borderCard;
+    final titleColor = isRun ? RwColors.lime500 : RwColors.ink950;
+    final digitColor = isRun ? RwColors.paper100 : RwColors.ink950;
+    final subColor = isRun ? RwColors.paper200 : RwColors.mutedTextOnLight;
+    final trackColor = isRun ? RwColors.ink700 : RwColors.chartTrack;
+    final fillColor = isRun
+        ? RwColors.lime500
+        : isWalk
+        ? RwColors.lime700
+        : RwColors.ink950;
+
+    return RwCard(
+      color: bgColor,
+      borderColor: borderColor,
+      padding: const EdgeInsets.all(RwSpace.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isRun
+                    ? Icons.directions_run_rounded
+                    : isWalk
+                    ? Icons.directions_walk_rounded
+                    : isFinished
+                    ? Icons.flag_rounded
+                    : Icons.timer_outlined,
+                size: 20,
+                color: titleColor,
+              ),
+              const SizedBox(width: RwSpace.xs),
+              Expanded(
+                child: Text(
+                  phaseLabel,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: titleColor,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              if (interval.round > 0)
+                Text(
+                  switch (rounds) {
+                    final total? => s.intervalRound(interval.round, total),
+                    null => s.intervalRoundFree(interval.round),
+                  },
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: subColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+            ],
+          ),
+          if (!isFinished) ...[
+            const SizedBox(height: RwSpace.xs),
+            Text(
+              formatTime(
+                (interval.remaining.inMilliseconds /
+                        Duration.millisecondsPerSecond)
+                    .ceil(),
+              ),
+              style: theme.textTheme.displayMedium?.copyWith(
+                color: digitColor,
+                fontWeight: FontWeight.w900,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
+          if (progress != null) ...[
+            const SizedBox(height: RwSpace.sm),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(RwRadius.pill),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: trackColor,
+                valueColor: AlwaysStoppedAnimation<Color>(fillColor),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -574,9 +758,27 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: Theme.of(context).textTheme.labelSmall),
+      Text(
+        label,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: RwColors.mutedTextOnLight,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
       const SizedBox(height: RwSpace.xxs),
-      Text(value, style: Theme.of(context).textTheme.titleLarge),
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
     ],
   );
 }

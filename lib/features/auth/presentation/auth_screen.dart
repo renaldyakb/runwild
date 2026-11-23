@@ -11,7 +11,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../profile/application/initial_profile.dart';
 import '../application/auth_session.dart';
 
-enum AuthForm { signIn, register, reset, guest, google, apple }
+enum AuthForm { signIn, register, reset }
 
 String authErrorMessage(AppLocalizations s, Object error) {
   final problem = error is AuthFailure ? error.problem : AuthProblem.failed;
@@ -44,11 +44,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _busy = false;
   bool _resetSent = false;
 
-  bool get _usesEmail => switch (widget.form) {
-    AuthForm.signIn || AuthForm.register || AuthForm.reset => true,
-    _ => false,
-  };
-
   @override
   void dispose() {
     _email.dispose();
@@ -59,7 +54,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Future<void> _submit() async {
     if (_busy) return;
     final mode = widget.form;
-    if (_usesEmail && _formKey.currentState?.validate() != true) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
     final email = _email.text.trim();
@@ -76,9 +71,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         AuthForm.signIn => service.signIn(email, password),
         AuthForm.register => service.register(email, password),
         AuthForm.reset => service.resetPassword(email),
-        AuthForm.guest => service.continueAsGuest(),
-        AuthForm.google => service.signInWithGoogle(),
-        AuthForm.apple => service.signInWithApple(),
       };
       if (!mounted) return;
       if (mode == AuthForm.reset) {
@@ -106,20 +98,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final error = _error ?? service.error;
     final title = switch (mode) {
       AuthForm.signIn => s.signIn,
-      AuthForm.register =>
-        ref.watch(authSessionProvider).value == AuthSession.guest
-            ? s.authLink
-            : s.authRegister,
+      AuthForm.register => s.authRegister,
       AuthForm.reset => s.authForgot,
-      AuthForm.guest => s.authGuest,
-      AuthForm.google =>
-        ref.watch(authSessionProvider).value == AuthSession.guest
-            ? s.authGoogleLink
-            : s.authGoogle,
-      AuthForm.apple =>
-        ref.watch(authSessionProvider).value == AuthSession.guest
-            ? s.authAppleLink
-            : s.authApple,
     };
 
     if (loading) {
@@ -202,140 +182,91 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
             ),
             const SizedBox(height: RwSpace.lg),
-
-            if (_usesEmail)
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _email,
+                    enabled: !_busy,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
+                    decoration: InputDecoration(
+                      labelText: s.authEmail,
+                      prefixIcon: const Icon(
+                        Icons.mail_outline_rounded,
+                        size: 20,
+                      ),
+                    ),
+                    validator: (value) =>
+                        RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+                            .hasMatch(value?.trim() ?? '')
+                        ? null
+                        : s.authEmailInvalid,
+                  ),
+                  if (mode != AuthForm.reset) ...[
+                    const SizedBox(height: RwSpace.md),
                     TextFormField(
-                      controller: _email,
+                      controller: _password,
                       enabled: !_busy,
-                      keyboardType: TextInputType.emailAddress,
-                      autofillHints: const [AutofillHints.email],
+                      obscureText: _obscurePassword,
+                      autofillHints: [
+                        mode == AuthForm.register
+                            ? AutofillHints.newPassword
+                            : AutofillHints.password,
+                      ],
                       decoration: InputDecoration(
-                        labelText: s.authEmail,
+                        labelText: s.authPassword,
                         prefixIcon: const Icon(
-                          Icons.mail_outline_rounded,
+                          Icons.lock_outline_rounded,
                           size: 20,
                         ),
-                      ),
-                      validator: (value) =>
-                          RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
-                              .hasMatch(value?.trim() ?? '')
-                          ? null
-                          : s.authEmailInvalid,
-                    ),
-                    if (mode != AuthForm.reset) ...[
-                      const SizedBox(height: RwSpace.md),
-                      TextFormField(
-                        controller: _password,
-                        enabled: !_busy,
-                        obscureText: _obscurePassword,
-                        autofillHints: [
-                          mode == AuthForm.register
-                              ? AutofillHints.newPassword
-                              : AutofillHints.password,
-                        ],
-                        decoration: InputDecoration(
-                          labelText: s.authPassword,
-                          prefixIcon: const Icon(
-                            Icons.lock_outline_rounded,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
                             size: 20,
                           ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              size: 20,
-                            ),
-                            onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return s.authPasswordRequired;
-                          }
-                          if (mode == AuthForm.register && value.length < 6) {
-                            return s.authWeakPassword;
-                          }
-                          return null;
-                        },
                       ),
-                    ],
-                  ],
-                ),
-              )
-            else ...[
-              // Social / Guest Explanatory Card
-              Container(
-                padding: const EdgeInsets.all(RwSpace.md),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(RwRadius.md),
-                  border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: RwColors.ink950,
-                        borderRadius: BorderRadius.circular(RwRadius.sm),
-                      ),
-                      child: Icon(
-                        switch (mode) {
-                          AuthForm.google => Icons.g_mobiledata_rounded,
-                          AuthForm.apple => Icons.apple_rounded,
-                          AuthForm.guest => Icons.person_outline_rounded,
-                          _ => Icons.security_rounded,
-                        },
-                        color: RwColors.lime500,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: RwSpace.md),
-                    Expanded(
-                      child: Text(
-                        switch (mode) {
-                          AuthForm.guest => 'Lari sekarang tanpa perlu kata sandi. Progres tersimpan lokal di perangkat.',
-                          AuthForm.google => 'Sinkronisasi riwayat lari ke Google Cloud dengan aman.',
-                          AuthForm.apple => 'Sinkronisasi riwayat lari ke Apple ID dengan aman.',
-                          _ => title,
-                        },
-                        style: const TextStyle(
-                          fontFamily: RwType.family,
-                          fontSize: 13,
-                          color: RwColors.ink800,
-                          height: 1.4,
-                        ),
-                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return s.authPasswordRequired;
+                        }
+                        if (mode == AuthForm.register && value.length < 6) {
+                          return s.authWeakPassword;
+                        }
+                        return null;
+                      },
                     ),
                   ],
-                ),
+                ],
               ),
-            ],
+            ),
 
             if (error != null)
               Container(
                 margin: const EdgeInsets.only(top: RwSpace.md),
                 padding: const EdgeInsets.all(RwSpace.sm),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEE2E2),
+                  color: RwColors.danger500.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(RwRadius.md),
-                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                  border: Border.all(
+                    color: RwColors.danger500.withValues(alpha: 0.35),
+                  ),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.error_outline_rounded,
-                      color: Color(0xFFB91C1C),
+                      color: RwColors.danger500,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: RwSpace.xs),
                     Expanded(
                       child: Semantics(
                         liveRegion: true,
@@ -343,7 +274,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           authErrorMessage(s, error),
                           style: const TextStyle(
                             fontFamily: RwType.family,
-                            color: Color(0xFFB91C1C),
+                            color: RwColors.danger500,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -359,18 +290,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 margin: const EdgeInsets.only(top: RwSpace.md),
                 padding: const EdgeInsets.all(RwSpace.sm),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDCFCE7),
+                  color: RwColors.lime100,
                   borderRadius: BorderRadius.circular(RwRadius.md),
-                  border: Border.all(color: const Color(0xFF86EFAC)),
+                  border: Border.all(color: RwColors.lime700),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.check_circle_outline_rounded,
-                      color: Color(0xFF15803D),
+                      color: RwColors.lime700,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: RwSpace.xs),
                     Expanded(
                       child: Semantics(
                         liveRegion: true,
@@ -378,7 +309,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           s.authResetSent,
                           style: const TextStyle(
                             fontFamily: RwType.family,
-                            color: Color(0xFF15803D),
+                            color: RwColors.ink950,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),

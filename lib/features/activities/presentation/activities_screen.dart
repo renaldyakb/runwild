@@ -61,9 +61,9 @@ class ActivitiesScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => context.push('/progress'),
                     icon: const Icon(Icons.bar_chart_rounded, size: 18),
-                    label: const Text(
-                      'Statistik',
-                      style: TextStyle(
+                    label: Text(
+                      s.historyStatsButton,
+                      style: const TextStyle(
                         fontFamily: RwType.family,
                         fontWeight: FontWeight.w800,
                         fontSize: 12,
@@ -72,10 +72,10 @@ class ActivitiesScreen extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: RwColors.ink950,
                       side: const BorderSide(
-                        color: Color(0xFFE2E6DC),
+                        color: RwColors.borderCard,
                         width: 1.2,
                       ),
-                      backgroundColor: Colors.white,
+                      backgroundColor: RwColors.paper100,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(RwRadius.pill),
                       ),
@@ -90,17 +90,13 @@ class ActivitiesScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: RwSpace.lg),
-          Wrap(
-            spacing: RwSpace.xs,
-            runSpacing: RwSpace.xs,
-            children: [
+          RwSegmentedControl<ActivityHistoryFilter>(
+            items: [
               for (final filter in ActivityHistoryFilter.values)
-                RwChip(
-                  label: labels[filter.index],
-                  selected: controller.filter == filter,
-                  onSelected: (_) => controller.refresh(filter),
-                ),
+                RwSegmentItem(value: filter, label: labels[filter.index]),
             ],
+            selectedValue: controller.filter,
+            onChanged: controller.refresh,
           ),
           const SizedBox(height: RwSpace.lg),
           if (state.isLoading)
@@ -145,19 +141,7 @@ class ActivitiesScreen extends ConsumerWidget {
             if (i == 0 ||
                 items[i].startedAt.month != items[i - 1].startedAt.month ||
                 items[i].startedAt.year != items[i - 1].startedAt.year)
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: RwSpace.md,
-                  top: RwSpace.xs,
-                ),
-                child: Semantics(
-                  header: true,
-                  child: Text(
-                    DateFormat.yMMMM(s.localeName).format(items[i].startedAt),
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ),
+              _MonthGroupHeader(items: items, startIndex: i),
             _ActivityCard(item: items[i]),
             const SizedBox(height: RwSpace.md),
           ],
@@ -172,6 +156,57 @@ class ActivitiesScreen extends ConsumerWidget {
             const SizedBox(height: RwSpace.md),
           ],
           const SizedBox(height: RwSpace.xl),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonthGroupHeader extends StatelessWidget {
+  const _MonthGroupHeader({required this.items, required this.startIndex});
+  final List<HistoryItem> items;
+  final int startIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final anchor = items[startIndex].startedAt;
+    var count = 0;
+    var meters = 0.0;
+    for (var j = startIndex; j < items.length; j++) {
+      final dt = items[j].startedAt;
+      if (dt.month != anchor.month || dt.year != anchor.year) break;
+      count++;
+      meters += items[j].meters;
+    }
+    final km = (meters / 1000.0).toStringAsFixed(1);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: RwSpace.sm, top: RwSpace.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Expanded(
+            child: Semantics(
+              header: true,
+              child: Text(
+                DateFormat.yMMMM(s.localeName).format(anchor),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ),
+          const SizedBox(width: RwSpace.sm),
+          Text(
+            s.historyMonthSummary(count, km),
+            style: const TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: RwColors.mutedTextOnLight,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
         ],
       ),
     );

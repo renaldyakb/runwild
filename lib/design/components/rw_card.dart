@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../tokens/rw_tokens.dart';
+import 'rw_motion.dart';
 
 class RwCard extends StatelessWidget {
   const RwCard({
@@ -25,7 +26,7 @@ class RwCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final borderRadius = BorderRadius.circular(radius);
     final content = Padding(padding: padding, child: child);
-    return DecoratedBox(
+    final card = DecoratedBox(
       decoration: BoxDecoration(
         color: color ?? colors.surfaceContainer,
         borderRadius: borderRadius,
@@ -41,5 +42,6 @@ class RwCard extends StatelessWidget {
             : content,
       ),
     );
+    return onTap != null ? RwPressScale(child: card) : card;
   }
 }

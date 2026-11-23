@@ -203,9 +203,9 @@ class _RunPermissionSheetState extends ConsumerState<_RunPermissionSheet>
                       color: RwColors.ink950,
                     ),
                   ),
-                  const Text(
-                    'Pilih mode lari & pastikan sensor siap.',
-                    style: TextStyle(
+                  Text(
+                    s.runSetupSubtitle,
+                    style: const TextStyle(
                       fontFamily: RwType.family,
                       fontSize: 12,
                       color: RwColors.mutedTextOnLight,

@@ -66,7 +66,7 @@ final weatherProvider = FutureProvider.autoDispose<WeatherForecast?>((
       await response.transform(utf8.decoder).join(),
     );
     final cityKey =
-        '${position.latitude.toStringAsFixed(2)},${position.longitude.toStringAsFixed(2)}';
+        '${position.latitude.toStringAsFixed(3)},${position.longitude.toStringAsFixed(3)}';
     if (_cityCache.containsKey(cityKey)) {
       return WeatherForecast(
         forecast.temperature,
@@ -75,34 +75,11 @@ final weatherProvider = FutureProvider.autoDispose<WeatherForecast?>((
         city: _cityCache[cityKey],
       );
     }
-    String? city;
-    try {
-      final request = await client
-          .getUrl(
-            Uri.https('nominatim.openstreetmap.org', '/reverse', {
-              'lat': position.latitude.toStringAsFixed(2),
-              'lon': position.longitude.toStringAsFixed(2),
-              'format': 'jsonv2',
-              'zoom': '12',
-              'accept-language': 'id',
-            }),
-          )
-          .timeout(const Duration(seconds: 8));
-      request.headers.set(
-        'User-Agent',
-        'RUNWILD (https://github.com/renaldyakb/runwild)',
-      );
-      final response = await request.close().timeout(
-        const Duration(seconds: 8),
-      );
-      if (response.statusCode == 200) {
-        city = cityFromReverseJson(
-          await response.transform(utf8.decoder).join(),
-        );
-      }
-    } catch (error) {
-      city = null;
-    }
+    final city = await _resolveCityName(
+      client,
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
     if (city != null) {
       if (_cityCache.length >= 32) _cityCache.clear();
       _cityCache[cityKey] = city;
@@ -117,6 +94,64 @@ final weatherProvider = FutureProvider.autoDispose<WeatherForecast?>((
     client.close();
   }
 });
+
+Future<String?> _resolveCityName(
+  HttpClient client, {
+  required double latitude,
+  required double longitude,
+}) async {
+  final latStr = latitude.toStringAsFixed(3);
+  final lonStr = longitude.toStringAsFixed(3);
+
+  // 1. Primary: BigDataCloud Free Reverse Geocode API (akurat untuk kota &
+  //    kabupaten Indonesia termasuk daerah seperti Lhokseumawe, tanpa API key).
+  try {
+    final request = await client
+        .getUrl(
+          Uri.https('api.bigdatacloud.net', '/data/reverse-geocode-client', {
+            'latitude': latStr,
+            'longitude': lonStr,
+            'localityLanguage': 'id',
+          }),
+        )
+        .timeout(const Duration(seconds: 8));
+    final response = await request.close().timeout(const Duration(seconds: 8));
+    if (response.statusCode == 200) {
+      final resolved = cityFromBigDataCloudJson(
+        await response.transform(utf8.decoder).join(),
+      );
+      if (resolved != null) return resolved;
+    }
+  } catch (_) {
+    // Lanjut ke fallback Nominatim bila layanan pertama tidak merespons.
+  }
+
+  // 2. Fallback: OpenStreetMap Nominatim.
+  try {
+    final request = await client
+        .getUrl(
+          Uri.https('nominatim.openstreetmap.org', '/reverse', {
+            'lat': latStr,
+            'lon': lonStr,
+            'format': 'jsonv2',
+            'zoom': '10',
+            'accept-language': 'id',
+          }),
+        )
+        .timeout(const Duration(seconds: 8));
+    request.headers.set(
+      'User-Agent',
+      'RUNWILD (https://github.com/renaldyakb/runwild)',
+    );
+    final response = await request.close().timeout(const Duration(seconds: 8));
+    if (response.statusCode == 200) {
+      return cityFromReverseJson(await response.transform(utf8.decoder).join());
+    }
+  } catch (_) {
+    return null;
+  }
+  return null;
+}
 
 WeatherForecast parseWeatherForecast(String body) {
   final data = jsonDecode(body) as Map<String, dynamic>;
@@ -144,6 +179,31 @@ WeatherForecast parseWeatherForecast(String body) {
   );
 }
 
+String? cityFromBigDataCloudJson(String body) {
+  final data = jsonDecode(body) as Map<String, dynamic>;
+  final city = data['city'];
+  if (city is String && city.trim().isNotEmpty) return city.trim();
+
+  final localityInfo = data['localityInfo'] as Map<String, dynamic>?;
+  final admin = localityInfo?['administrative'] as List<dynamic>?;
+  if (admin != null) {
+    for (final level in [5, 6]) {
+      for (final entry in admin) {
+        if (entry is Map<String, dynamic> && entry['adminLevel'] == level) {
+          final name = entry['name'];
+          if (name is String && name.trim().isNotEmpty) return name.trim();
+        }
+      }
+    }
+  }
+
+  for (final key in ['locality', 'principalSubdivision']) {
+    final value = data[key];
+    if (value is String && value.trim().isNotEmpty) return value.trim();
+  }
+  return null;
+}
+
 String? cityFromReverseJson(String body) {
   final data = jsonDecode(body) as Map<String, dynamic>;
   final address = data['address'] as Map<String, dynamic>?;
@@ -152,11 +212,15 @@ String? cityFromReverseJson(String body) {
     'town',
     'municipality',
     'county',
+    'regency',
     'state_district',
     'city_district',
     'borough',
+    'district',
     'village',
     'suburb',
+    'hamlet',
+    'state',
   ]) {
     final value = address?[key];
     if (value is String && value.trim().isNotEmpty) return value.trim();

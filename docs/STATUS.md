@@ -1,5 +1,49 @@
 # Status RUNWILD
 
+- 23 Nov 2026: rilis `0.1.6+7` disiapkan dan didorong ke `main`; catatan pengguna `docs/releases/0.1.6.md`.
+  - Isi: perombakan Fase 5 lengkap (T5.1–T5.7): loading selesai lari & HUD aktif baru, auth Google langsung berlogo resmi tanpa tamu, Lottie splash screen, Hero Card & detail cuaca baru + geocoding kota BigDataCloud/Nominatim (Lhokseumawe), poles ringkasan/kartu bagikan + tombol Simpan, hapus double AppBar profil & pembersihan anti-slop, serta sistem motion `rw_motion.dart`.
+  - GitHub Actions akan menjalankan verifikasi, membangun APK rilis, dan memublikasikan tag `v0.1.6`.
+
+- 23 Nov 2026: T5.7 selesai — **Seluruh Fase 5 Perombakan UI/UX, Auth, Cuaca & Animasi (T5.1–T5.7) tuntas 100%** (`docs/phases/phase-5-revamp.md`).
+  - Sistem motion baru (`lib/design/components/rw_motion.dart`): `RwEntrance` (staggered slide+fade 320 ms), `RwCountUp` (counter angka tabular 420 ms), `RwPressScale` (micro press feedback 0.975 pada kartu interaktif `RwCard`), dan `RwPhaseSwitcher` (skala+fade untuk countdown 3-2-1 dan pergantian fase interval LARI ↔ JALAN). Seluruhnya otomatis nonaktif saat `MediaQuery.disableAnimations` aktif (`DESIGN.md` §9.3).
+  - Diterapkan di `RwCard`, `HomeDashboard`, `RunActiveScreen`, `RunSummaryScreen`, dan `ProgressScreen`.
+  - Bukti verifikasi akhir Fase 5: `flutter analyze --fatal-infos` proyek penuh bersih (0 issues), `dart format` 137 file 0 perubahan, **103/103 tes lulus** (seluruh 14 berkas tes CI + `rw_motion_test`, `auth_screen_test`, `intro_screen_test`, `profile_setup_test`, `run_hold_to_finish_test`, `live_route_test`).
+  - Uji perangkat nyata (GPS 60 menit, picker Google Auth, audio background, lokasi Lhokseumawe nyata, animasi 60fps di perangkat) tetap berada di checklist `docs/TESTING.md`.
+
+- 23 Nov 2026: T5.6 selesai (Poles Aktivitas, Detail Aktivitas, Progress & Profil + Hapus Double AppBar) — antislop mode during.
+  - Profil & Shell (`profile_screen.dart`, `foundation_screen.dart`): AppBar ganda di `ProfileScreen` dihapus, cabang mati `FoundationDestination.activities` dibersihkan, glow blur avatar dihapus (`DESIGN.md` §9.3), state error dibungkus `RwPage`/`RwCard` bebas overflow, 2 baris statis diringkas, dan seluruh string hardcode dipindah ke ARB.
+  - Aktivitas (`activities_screen.dart`): filter `RwChip` diganti `RwSegmentedControl`, header bulan kini menampilkan ringkasan jumlah sesi & total km (`_MonthGroupHeader`), teks `'Statistik'` & warna hex pindah ke ARB/`RwColors`.
+  - Detail Aktivitas & Progress (`activity_detail_screen.dart`, `progress_screen.dart`): emoji `🟢/🟡/🔴` dan warna Tailwind (`#15803D`, `#B45309`, `#DC2626`) di `_FeelingBadge` diganti ikon Material + `RwColors`; toggle `'Map: ON/OFF'` pindah ke ARB Indonesia (`Peta`/`Jejak rute`); tombol edit ganda dihapus (kartu catatan dapat diketuk); tambah tombol `?` penjelas istilah *Pace & Split*; error mentah di Progress diganti `RwCard` error + *Coba lagi*.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, 25/25 tes (`activity_detail_test`, `profile_settings_test`, `home_progress_test`, `weekly_goal_celebration_test`) lulus.
+
+- 23 Nov 2026: T5.5 selesai (Poles Ringkasan Sesi & Kartu Bagikan + Simpan Gambar) — antislop mode during.
+  - Ringkasan Sesi (`run_summary_screen.dart`): 2 banner piala bertumpuk (PB + Selebrasi) digabung menjadi 1 header selebrasi terpadu + perbaikan format tanggal/jam (`DateFormat`), label slop `'HISTORI RUTE PRESISI'` dihapus, emoji `🟢/🟡/🔴` diganti ikon Material pada pemilih rasa sesi, tombol *Bagikan* & *Simpan Sesi* dipindah ke sticky footer, `catch (_)` kosong diganti `debugPrint`, semua hex/string liar pindah ke `RwColors` & ARB.
+  - Kartu Bagikan (`share_card_screen.dart`, `share_card_service.dart`): tambah aksi **Simpan** langsung ke penyimpanan gambar perangkat (via `path_provider` tanpa dependensi native baru) berdampingan rapi dengan **Bagikan gambar** di sticky footer (`RwButton` padding horizontal diset `RwSpace.md` agar tombol sejajar 1 baris).
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, 8/8 tes (`share_card_test`, `personal_best_alert_test`) & 16/16 (`weather_reminder_test`, `release_ui_test`) lulus; golden `share_editor.png` diperbarui & diperiksa visual.
+
+- 23 Nov 2026: T5.4 selesai (Rombak Hero Card Home, Fix Geocoding Kota Terpencil & Detail Cuaca) — antislop mode during + ADR-032.
+  - Hero Card Home (`home_dashboard.dart`): dirombak dengan motif outdoor non-interaktif (`_HeroOutdoorBackdrop`: busur lintasan + slash lime samar + siluet bukit), judul tegas 36sp, satu CTA utama, panel cuaca interaktif ber-chevron, dan penghapusan duplikasi `_HeroWeekMetrics`.
+  - Geocoding kota (`weather_service.dart`): memakai BigDataCloud Free Client Reverse Geocode API (`localityLanguage=id`, tanpa API key) sebagai sumber utama + fallback Nominatim diperluas (`regency`, `district`, `hamlet`, `state`). Koordinat Lhokseumawe (`5.1801, 97.1507`) terverifikasi live mengembalikan `"Lhokseumawe"`.
+  - Detail Cuaca (`weather_detail_screen.dart`): dirombak dengan kartu hero arang `ink950` untuk kondisi saat ini + `RwCard` terstruktur untuk prakiraan 12 jam dan highlight jam basah `lime700`.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, 25/25 tes (`weather_reminder_test`, `release_ui_test`, `home_progress_test`) lulus termasuk tes parser BigDataCloud Lhokseumawe & skala 200%; 3 golden (`hero_weather_current`, `weather_detail`, `home_next_session`) diperbarui dan diperiksa visual.
+
+- 23 Nov 2026: T5.3 selesai (Animasi Lottie Splash Screen & Poles Onboarding/Setup Profil).
+  - Splash Screen (`startup_screen.dart`): latar arang `ink950` dengan animasi Lottie kinetik buatan proyek (`assets/lottie/splash_runner.json`), wordmark `RUNWILD`, tagline lime, durasi minimum 1,4 dtk (`splashMinimumDurationProvider`), dan fallback statis untuk reduced-motion/gagal muat.
+  - Onboarding & Setup Profil: bingkai kotak kaku di sekitar `MountainSilhouette` dilepas (Tier-A); `ProfileSetupScreen` dirombak ke `RwCard`, `RwSegmentedControl`, stepper target mingguan atletis, dan `RwFullPageLoading`; token `RwColors.borderCard`/`surfaceMuted` diterapkan di `rw_chip.dart` & `intro_screen.dart`; overflow 200% di divider `GetStartedScreen` diperbaiki.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, 11/11 tes (`intro_screen_test`, `profile_setup_test`, `auth_screen_test`) lulus termasuk validasi `LottieComposition` aset splash dan skala teks 200%.
+
+- 23 Nov 2026: T5.2 selesai (Auth Google Langsung, Logo Google 4 Warna & Hapus Mode Tamu) — ADR-031 di `docs/DECISIONS.md`.
+  - Logo Google resmi 4 warna dibuat via `CustomPainter` (`lib/design/components/google_logo_icon.dart`) dan didukung melalui `RwButton.leading`.
+  - Login Google (Android) & Apple (iOS) dipicu langsung dari `GetStartedScreen` dengan loading di tombol dan banner error `RwColors` (halaman konfirmasi perantara `/auth/google` & `/auth/apple` dihapus).
+  - Mode tamu (`/auth/guest`, tombol *Lanjut sebagai tamu*, opsi tautan tamu di `AccountActions`) dihapus dari UI & router; warna alert Tailwind di `AuthScreen` & `AccountActions` diganti token `RwColors`.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, `test/auth_screen_test.dart` 5/5 lulus (termasuk verifikasi langsung Google/Apple & nol tombol tamu). Uji login Google nyata di perangkat/emulator tetap perlu diperiksa pengguna.
+
+- 23 Nov 2026: T5.1 selesai (Lari Aktif, Loading Selesai & Pra-Sesi) — lihat `docs/phases/phase-5-revamp.md`.
+  - Bug loading selesai lari diperbaiki (`setState(() => _ending = true)` + `PopScope(canPop: false)` + `RwFullPageLoading` berlabel *"Menyimpan sesi lari…"*).
+  - HUD Live diperbarui: label satuan `km`, baris 3 kolom (Durasi · Pace · Kalori perkiraan), banner fase Interval ber-progress bar dengan kontras tinggi (LARI arang+lime, JALAN lime100+ink), dan sticky footer control ber-border rapi.
+  - Pra-sesi: 4 quick preset interval tampil langsung di sheet pertama, string hardcode pindah ke ARB (`runSetupSubtitle`, `runFinishing`, `runFinishingHint`, `intervalQuickPresets`), warna hex liar diganti token `RwColors`.
+  - Bukti: `flutter analyze --fatal-infos` bersih, `dart format` 0 perubahan, 15/15 tes (`run_hold_to_finish`, `run_permissions`, `live_route`) lulus termasuk tes baru loading konfirmasi selesai. Uji lapangan GPS/perangkat nyata tetap di `docs/TESTING.md`.
+
 - 20 Nov 2026: rilis 0.1.5+6 disiapkan untuk push ke main; catatan pengguna docs/releases/0.1.5.md.
   - Isi: cuaca/kota dan detail 12 jam, pengingat bersuara serta jadwal terdekat, badge lime, hero terbaru tanpa rute terakhir.
   - Verifikasi: 82 tes daftar CI lulus; analyze proyek fatal-infos bersih; helper tes terisolasi, sapaan/cuaca golden deterministik; format 134 file sesuai.

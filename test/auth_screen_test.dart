@@ -1,10 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:runwild/design/components/google_logo_icon.dart';
 import 'package:runwild/features/auth/application/auth_session.dart';
+import 'package:runwild/features/auth/presentation/account_actions.dart';
 import 'package:runwild/features/onboarding/application/intro_preferences.dart';
+import 'package:runwild/l10n/generated/app_localizations.dart';
 
 import 'support.dart';
 
@@ -23,6 +28,8 @@ class _FakeAuth implements AuthService {
   bool offline = false;
   bool cancelGoogle = false;
   bool cancelApple = false;
+  int googleAttempts = 0;
+  int appleAttempts = 0;
   String? resetEmail;
 
   @override
@@ -51,12 +58,14 @@ class _FakeAuth implements AuthService {
 
   @override
   Future<void> signInWithGoogle() async {
+    googleAttempts++;
     if (cancelGoogle) throw const AuthFailure(AuthProblem.canceled);
     await _set(AuthSession.member);
   }
 
   @override
   Future<void> signInWithApple() async {
+    appleAttempts++;
     if (cancelApple) throw const AuthFailure(AuthProblem.canceled);
     await _set(AuthSession.member);
   }
@@ -69,53 +78,67 @@ class _FakeAuth implements AuthService {
 }
 
 void main() {
-  testWidgets('Google menangani pembatalan dan percobaan ulang', (
-    tester,
-  ) async {
-    final auth = _FakeAuth(AuthSession.signedOut)..cancelGoogle = true;
-    addTearDown(auth.updates.close);
-    await pumpRunwild(tester, path: '/start', authService: auth);
-    final google = find.text('Masuk dengan Google');
-    await tester.ensureVisible(google);
-    await tester.tap(google);
-    await tester.pumpAndSettle();
-    final submit = find.widgetWithText(FilledButton, 'Masuk dengan Google');
-    await tester.tap(submit);
-    await tester.pumpAndSettle();
-    expect(find.text('Proses masuk dibatalkan.'), findsOneWidget);
-    expect(auth.session, AuthSession.signedOut);
-    auth.cancelGoogle = false;
-    await tester.tap(submit);
-    await tester.pumpAndSettle();
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
-  });
-  testWidgets('iOS menawarkan Apple dan tamu dapat menautkannya', (
+  testWidgets(
+    'Google langsung masuk tanpa halaman konfirmasi dan tanpa tombol tamu',
+    (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      final auth = _FakeAuth(AuthSession.signedOut)..cancelGoogle = true;
+      addTearDown(auth.updates.close);
+
+      await pumpRunwild(tester, path: '/start', authService: auth);
+      expect(find.text('Lanjut sebagai tamu'), findsNothing);
+      expect(find.byType(GoogleLogoIcon), findsOneWidget);
+
+      final google = find.text('Masuk dengan Google');
+      await tester.ensureVisible(google);
+      await tester.tap(google);
+      await tester.pumpAndSettle();
+
+      expect(auth.googleAttempts, 1);
+      expect(find.text('Proses masuk dibatalkan.'), findsOneWidget);
+      expect(auth.session, AuthSession.signedOut);
+
+      auth.cancelGoogle = false;
+      await tester.ensureVisible(google);
+      await tester.tap(google);
+      await tester.pumpAndSettle();
+
+      expect(auth.googleAttempts, 2);
+      expect(auth.session, AuthSession.member);
+      expect(find.text('Run Free,'), findsOneWidget);
+    },
+  );
+
+  testWidgets('iOS menawarkan Apple langsung tanpa halaman konfirmasi', (
     tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    final auth = _FakeAuth(AuthSession.guest)..cancelApple = true;
+    final auth = _FakeAuth(AuthSession.signedOut)..cancelApple = true;
     addTearDown(auth.updates.close);
+
     await pumpRunwild(tester, path: '/start', authService: auth);
     expect(find.text('Masuk dengan Apple'), findsOneWidget);
     expect(find.text('Masuk dengan Google'), findsNothing);
-    await tester.pumpWidget(const SizedBox.shrink());
-    await pumpRunwild(tester, path: '/profile', authService: auth);
-    final link = find.text('Tautkan Apple');
-    await tester.ensureVisible(link);
-    await tester.tap(link);
+    expect(find.text('Lanjut sebagai tamu'), findsNothing);
+
+    final apple = find.text('Masuk dengan Apple');
+    await tester.ensureVisible(apple);
+    await tester.tap(apple);
     await tester.pumpAndSettle();
-    final submit = find.widgetWithText(FilledButton, 'Tautkan Apple');
-    await tester.tap(submit);
-    await tester.pumpAndSettle();
+    expect(auth.appleAttempts, 1);
     expect(find.text('Proses masuk dibatalkan.'), findsOneWidget);
-    expect(auth.session, AuthSession.guest);
+
     auth.cancelApple = false;
-    await tester.tap(submit);
+    await tester.ensureVisible(apple);
+    await tester.tap(apple);
     await tester.pumpAndSettle();
+    expect(auth.appleAttempts, 2);
     expect(auth.session, AuthSession.member);
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
+    expect(find.text('Run Free,'), findsOneWidget);
   });
+
   testWidgets('Form menolak email kosong dan bisa masuk setelah offline', (
     tester,
   ) async {
@@ -140,13 +163,13 @@ void main() {
     auth.offline = false;
     await tester.tap(submit);
     await tester.pumpAndSettle();
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
+    expect(find.text('Run Free,'), findsOneWidget);
   });
 
-  testWidgets('Sesi tamu dipulihkan, dapat menautkan email dan keluar', (
+  testWidgets('Sesi anggota dipulihkan dan bisa keluar kembali ke start', (
     tester,
   ) async {
-    final auth = _FakeAuth(AuthSession.guest);
+    final auth = _FakeAuth(AuthSession.member);
     addTearDown(auth.updates.close);
     await pumpRunwild(
       tester,
@@ -155,33 +178,44 @@ void main() {
       authService: auth,
     );
     await tester.pumpAndSettle();
-    expect(find.text('Kejar jarakmu.'), findsOneWidget);
-    await tester.tap(find.text('Profil'));
-    await tester.pumpAndSettle();
-    final link = find.text('Tautkan email');
-    await tester.ensureVisible(link);
-    await tester.tap(link);
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byType(TextFormField).first,
-      'runner@example.com',
+    expect(find.text('Run Free,'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => const Scaffold(body: AccountActions()),
+        ),
+        GoRoute(
+          path: '/start',
+          builder: (_, _) => const Scaffold(body: Text('START_SCREEN')),
+        ),
+      ],
     );
-    await tester.enterText(find.byType(TextFormField).last, 'password');
-    await tester.tap(find.widgetWithText(FilledButton, 'Tautkan email'));
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authServiceProvider.overrideWith((ref) async => auth)],
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('id'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(auth.session, AuthSession.member);
-    await tester.tap(find.text('Profil'));
+    expect(find.text('Tautkan email'), findsNothing);
+    expect(find.text('Keluar'), findsOneWidget);
+    await tester.tap(find.text('Keluar'));
     await tester.pumpAndSettle();
-    final signOut = find.text('Keluar');
-    await tester.ensureVisible(signOut);
-    await tester.tap(signOut);
-    await tester.pumpAndSettle();
-    expect(find.text('SIAP BERGERAK?'), findsOneWidget);
-    await tester.tap(find.text('Lanjut sebagai tamu'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Lanjut sebagai tamu'));
-    await tester.pumpAndSettle();
-    expect(auth.session, AuthSession.guest);
+    expect(auth.session, AuthSession.signedOut);
+    expect(find.text('START_SCREEN'), findsOneWidget);
   });
 
   testWidgets('Reset mengirim email yang sudah dibersihkan', (tester) async {

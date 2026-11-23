@@ -35,6 +35,7 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
   var _hideRoute = false;
   var _initializedPrivacy = false;
   var _sharing = false;
+  var _saving = false;
   Uint8List? _customImage;
   Set<int> _segmentStarts = const {};
   List<LatLngPoint> _routePoints = const [];
@@ -96,21 +97,25 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
     }
   }
 
+  Future<Uint8List?> _capturePng() async {
+    final boundary =
+        _boundaryKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
+    if (boundary == null) return null;
+    final image = await boundary.toImage(
+      pixelRatio: RwSize.shareExportWidth / boundary.size.width,
+    );
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    return byteData?.buffer.asUint8List();
+  }
+
   Future<void> _share() async {
-    if (_sharing) return;
+    if (_sharing || _saving) return;
     setState(() => _sharing = true);
     try {
-      final boundary =
-          _boundaryKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) return;
-      final image = await boundary.toImage(
-        pixelRatio: RwSize.shareExportWidth / boundary.size.width,
-      );
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      image.dispose();
-      if (byteData == null) return;
-      final pngBytes = byteData.buffer.asUint8List();
+      final pngBytes = await _capturePng();
+      if (pngBytes == null) return;
 
       final service = ref.read(shareCardServiceProvider);
       final shared = await service.shareImage(
@@ -119,7 +124,8 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
         text: 'Lari bersama RUNWILD · RUN FREE, GO WILD.',
       );
       if (!shared) throw StateError('Image share failed');
-    } catch (_) {
+    } on Object catch (error) {
+      debugPrint('Share card action failed: ${error.runtimeType}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context).shareError)),
@@ -127,6 +133,33 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
       }
     } finally {
       if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  Future<void> _saveToDevice() async {
+    if (_sharing || _saving) return;
+    setState(() => _saving = true);
+    try {
+      final pngBytes = await _capturePng();
+      if (pngBytes == null) return;
+      final savedPath = await ref
+          .read(shareCardServiceProvider)
+          .saveImage(pngBytes);
+      if (savedPath == null) throw StateError('Image save failed');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).shareSaved)),
+        );
+      }
+    } on Object catch (error) {
+      debugPrint('Save share card action failed: ${error.runtimeType}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).shareSaveError)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -151,14 +184,38 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
     return Scaffold(
       backgroundColor: RwColors.paper50,
       appBar: AppBar(title: Text(s.shareTitle)),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(RwSpace.md),
-          child: RwButton.primary(
-            label: s.shareAction,
-            icon: Icons.ios_share,
-            loading: _sharing,
-            onPressed: _share,
+      bottomNavigationBar: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: RwColors.paper100,
+          border: Border(top: BorderSide(color: RwColors.borderCard)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(RwSpace.md),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: RwButton.secondary(
+                    label: s.shareSaveAction,
+                    icon: Icons.download_rounded,
+                    loading: _saving,
+                    onPressed: _sharing ? null : _saveToDevice,
+                  ),
+                ),
+                const SizedBox(width: RwSpace.sm),
+                Expanded(
+                  flex: 6,
+                  child: RwButton.primary(
+                    label: s.shareAction,
+                    icon: Icons.ios_share,
+                    loading: _sharing,
+                    onPressed: _saving ? null : _share,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -30,15 +30,28 @@ String _summary(AppLocalizations s, IntervalConfig config) {
   );
 }
 
-class IntervalOptions extends ConsumerWidget {
+class IntervalOptions extends ConsumerStatefulWidget {
   const IntervalOptions({required this.enabled, super.key});
   final bool enabled;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<IntervalOptions> createState() => _IntervalOptionsState();
+}
+
+class _IntervalOptionsState extends ConsumerState<IntervalOptions> {
+  bool _editorOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final config = ref.watch(intervalSelectionProvider);
     final selection = ref.read(intervalSelectionProvider.notifier);
+    final presetLabels = [
+      s.intervalBeginner,
+      s.intervalClassic,
+      s.intervalFiveOne,
+      s.intervalLevelUp,
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -67,7 +80,7 @@ class IntervalOptions extends ConsumerWidget {
           ],
           selectedValue: config != null,
           onChanged: (isInterval) {
-            if (!enabled) return;
+            if (!widget.enabled) return;
             if (isInterval) {
               selection.select(intervalPreset(IntervalPreset.beginner));
             } else {
@@ -77,12 +90,89 @@ class IntervalOptions extends ConsumerWidget {
         ),
         if (config != null) ...[
           const SizedBox(height: RwSpace.sm),
+          Offstage(
+            offstage: _editorOpen,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  s.intervalQuickPresets,
+                  style: const TextStyle(
+                    fontFamily: RwType.family,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: RwColors.mutedTextOnLight,
+                  ),
+                ),
+                const SizedBox(height: RwSpace.xs),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: RwColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(RwRadius.md),
+                    border: Border.all(color: RwColors.borderCard),
+                  ),
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < IntervalPreset.values.length; i++)
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: widget.enabled
+                                ? () => selection.select(
+                                    intervalPreset(IntervalPreset.values[i]),
+                                  )
+                                : null,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    config ==
+                                        intervalPreset(IntervalPreset.values[i])
+                                    ? RwColors.lime500
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(
+                                  RwRadius.sm,
+                                ),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  presetLabels[i],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: RwType.family,
+                                    fontSize: 12,
+                                    fontWeight:
+                                        config ==
+                                            intervalPreset(
+                                              IntervalPreset.values[i],
+                                            )
+                                        ? FontWeight.w800
+                                        : FontWeight.w600,
+                                    color: RwColors.ink950,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: RwSpace.sm),
+              ],
+            ),
+          ),
           Container(
             padding: const EdgeInsets.all(RwSpace.sm),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: RwColors.paper100,
               borderRadius: BorderRadius.circular(RwRadius.md),
-              border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+              border: Border.all(color: RwColors.borderCard),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,15 +202,17 @@ class IntervalOptions extends ConsumerWidget {
           RwButton.secondary(
             label: s.intervalConfigure,
             icon: Icons.tune_rounded,
-            onPressed: !enabled
+            onPressed: !widget.enabled
                 ? null
                 : () async {
+                    setState(() => _editorOpen = true);
                     final result = await showModalBottomSheet<IntervalConfig>(
                       context: context,
                       isScrollControlled: true,
                       useSafeArea: true,
                       builder: (_) => IntervalEditor(initial: config),
                     );
+                    if (mounted) setState(() => _editorOpen = false);
                     if (result != null && context.mounted) {
                       selection.select(result);
                     }
@@ -309,9 +401,9 @@ class _IntervalEditorState extends ConsumerState<IntervalEditor> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF2EA),
+              color: RwColors.surfaceMuted,
               borderRadius: BorderRadius.circular(RwRadius.md),
-              border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+              border: Border.all(color: RwColors.borderCard),
             ),
             child: Row(
               children: [

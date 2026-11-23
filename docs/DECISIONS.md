@@ -280,3 +280,7 @@ Tidak ada penambahan di luar roadmap PRD.
 - 18 Nov 2026: audit sisa `catch (_)` di layanan notifikasi, audio, sync, dan share card agar setiap kegagalan tercatat (tanpa koordinat); belum dikerjakan karena butuh verifikasi perangkat.
 
 - 20 Nov 2026: timezone 0.11.2 dipin untuk penjadwalan notifikasi satu kali dalam UTC; waktu lokal dipilih pengguna dan disimpan sebagai instant.
+
+- 23 Nov 2026: ADR-031 — Hapus pintu masuk tamu (guest login) dan layar konfirmasi perantara Google/Apple sesuai permintaan pengguna. Login Google/Apple dipicu langsung dari GetStartedScreen dengan logo Google 4 warna vektor.
+
+- 23 Nov 2026: ADR-032 — Reverse geocoding nama kota cuaca memakai BigDataCloud Free Client Reverse Geocode API (`api.bigdatacloud.net/data/reverse-geocode-client`, gratis tanpa API key, `localityLanguage=id`) sebagai sumber utama dengan fallback OpenStreetMap Nominatim (`zoom=10`), disetujui pengguna agar daerah seperti Lhokseumawe terdeteksi akurat.

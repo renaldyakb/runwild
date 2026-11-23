@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -50,50 +49,25 @@ class _AccountActionsState extends ConsumerState<AccountActions> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (session == AuthSession.guest && widget.showLinkOptions) ...[
-          RwButton.primary(
-            label: s.authLink,
-            icon: Icons.link_rounded,
-            fullWidth: true,
-            onPressed: _busy ? null : () => context.push('/auth/register'),
-          ),
-          const SizedBox(height: RwSpace.sm),
-          if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) ...[
-            RwButton.secondary(
-              label: s.authGoogleLink,
-              icon: Icons.g_mobiledata_rounded,
-              fullWidth: true,
-              onPressed: _busy ? null : () => context.push('/auth/google'),
-            ),
-            const SizedBox(height: RwSpace.sm),
-          ],
-          if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) ...[
-            RwButton.secondary(
-              label: s.authAppleLink,
-              icon: Icons.apple_rounded,
-              fullWidth: true,
-              onPressed: _busy ? null : () => context.push('/auth/apple'),
-            ),
-            const SizedBox(height: RwSpace.sm),
-          ],
-        ],
         if (error != null)
           Container(
             margin: const EdgeInsets.symmetric(vertical: RwSpace.sm),
             padding: const EdgeInsets.all(RwSpace.sm),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEE2E2),
+              color: RwColors.danger500.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(RwRadius.md),
-              border: Border.all(color: const Color(0xFFFCA5A5)),
+              border: Border.all(
+                color: RwColors.danger500.withValues(alpha: 0.35),
+              ),
             ),
             child: Row(
               children: [
                 const Icon(
                   Icons.error_outline_rounded,
-                  color: Color(0xFFB91C1C),
+                  color: RwColors.danger500,
                   size: 18,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: RwSpace.xs),
                 Expanded(
                   child: Semantics(
                     liveRegion: true,
@@ -101,7 +75,7 @@ class _AccountActionsState extends ConsumerState<AccountActions> {
                       authErrorMessage(s, error),
                       style: const TextStyle(
                         fontFamily: RwType.family,
-                        color: Color(0xFFB91C1C),
+                        color: RwColors.danger500,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),

@@ -916,6 +916,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get runStartBlocked => 'Aktifkan lokasi dan notifikasi untuk mulai.';
 
   @override
+  String get runFinishing => 'Menyimpan sesi lari…';
+
+  @override
+  String get runFinishingHint => 'Menyiapkan ringkasan dan rute sesimu.';
+
+  @override
+  String get intervalQuickPresets => 'Pilih preset cepat';
+
+  @override
+  String get authOtherOptions => 'Atau masuk cepat';
+
+  @override
   String get close => 'Tutup';
 
   @override
@@ -986,6 +998,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get distanceUnit => 'km';
+
+  @override
+  String get distanceUnitFull => 'Kilometer';
 
   @override
   String get noValue => '--';
@@ -1437,6 +1452,80 @@ class AppLocalizationsId extends AppLocalizations {
   String get shareError => 'Belum bisa membagikan kartu. Coba lagi.';
 
   @override
+  String get shareSaveAction => 'Simpan';
+
+  @override
+  String get shareSaved => 'Kartu berhasil disimpan.';
+
+  @override
+  String get shareSaveError => 'Belum bisa menyimpan kartu. Coba lagi.';
+
+  @override
+  String get summaryRoundsLabel => 'Putaran';
+
+  @override
+  String get historyStatsButton => 'Statistik';
+
+  @override
+  String historyMonthSummary(int count, String km) {
+    return '$count sesi · $km km';
+  }
+
+  @override
+  String get activityMapOn => 'Peta';
+
+  @override
+  String get activityMapOff => 'Jejak rute';
+
+  @override
+  String get activityNoNote => 'Belum ada catatan untuk sesi ini.';
+
+  @override
+  String get activityMetricsHelpTitle => 'Tentang Pace & Split';
+
+  @override
+  String get activityMetricsHelpBody =>
+      'Pace adalah waktu rata-rata yang kamu butuhkan untuk menempuh 1 km (misal 6\'30\"/km berarti 6 menit 30 detik per km).\n\nSplit menunjukkan waktu dan pace pada setiap kilometer agar kamu bisa melihat ritme lari dari awal hingga akhir.';
+
+  @override
+  String get activityMetricsHelpTooltip => 'Penjelasan pace dan split';
+
+  @override
+  String get progressLoadError =>
+      'Statistik belum bisa dimuat. Periksa data lalu coba lagi.';
+
+  @override
+  String get profileLoadError =>
+      'Profil belum bisa dimuat. Periksa koneksi lalu coba lagi.';
+
+  @override
+  String get profileVersionSection => 'Versi & Pembaruan';
+
+  @override
+  String get profileCheckUpdate => 'Periksa Pembaruan';
+
+  @override
+  String get profileCheckingUpdate => 'Memeriksa…';
+
+  @override
+  String profileVersionLabel(String version, String build) {
+    return 'Versi $version (Build $build)';
+  }
+
+  @override
+  String get profileEditNameTooltip => 'Ubah nama';
+
+  @override
+  String get profileCountdownCueDesc => 'Suara hitung mundur 3-2-1';
+
+  @override
+  String get profileRoundCueDesc => 'Suara instruksi saat pergantian ronde';
+
+  @override
+  String get profileStaticInfoNote =>
+      'Satuan jarak: KM · Visibilitas sesi bawaan: Privat';
+
+  @override
   String get shareRouteError =>
       'Rute belum dapat dimuat. Buka kembali halaman ini untuk mencoba lagi.';
 
@@ -1709,7 +1798,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherCityUnknown => 'Nama kota belum tersedia';
 
   @override
-  String get weatherLocationSource => 'Lokasi: © OpenStreetMap contributors';
+  String get weatherLocationSource => 'Lokasi: BigDataCloud & OpenStreetMap';
 
   @override
   String get heroWeek => 'Langkah minggu ini';

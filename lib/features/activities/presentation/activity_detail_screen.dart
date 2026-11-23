@@ -98,9 +98,7 @@ class ActivityDetailScreen extends ConsumerWidget {
             child: Text(s.runCancel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
-            ),
+            style: FilledButton.styleFrom(backgroundColor: RwColors.danger500),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(s.activityDelete),
           ),
@@ -234,9 +232,7 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
                     color: _showMap ? RwColors.lime100 : RwColors.paper100,
                     borderRadius: BorderRadius.circular(RwRadius.pill),
                     border: Border.all(
-                      color: _showMap
-                          ? RwColors.lime500
-                          : const Color(0xFFE2E6DC),
+                      color: _showMap ? RwColors.lime500 : RwColors.borderCard,
                     ),
                   ),
                   child: Row(
@@ -249,7 +245,7 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        _showMap ? 'Map: ON' : 'Map: OFF',
+                        _showMap ? s.activityMapOn : s.activityMapOff,
                         style: const TextStyle(
                           fontFamily: RwType.family,
                           fontSize: 11,
@@ -276,9 +272,9 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
             Container(
               height: RwSize.liveMapHeight,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: RwColors.paper100,
                 borderRadius: BorderRadius.circular(RwRadius.lg),
-                border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+                border: Border.all(color: RwColors.borderCard),
               ),
               clipBehavior: Clip.antiAlias,
               child: RunRouteView(
@@ -332,18 +328,39 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'KILOMETER',
-                style: TextStyle(
-                  fontFamily: RwType.family,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                  color: RwColors.mutedTextOnLight,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    s.distanceUnitFull.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: RwType.family,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                      color: RwColors.mutedTextOnLight,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () => _showMetricsHelp(context),
+                    borderRadius: BorderRadius.circular(RwRadius.pill),
+                    child: Tooltip(
+                      message: s.activityMetricsHelpTooltip,
+                      child: const Padding(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.help_outline_rounded,
+                          size: 16,
+                          color: RwColors.mutedTextOnLight,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: RwSpace.md),
-              const Divider(color: Color(0xFFE2E6DC), height: 1),
+              const Divider(color: RwColors.borderCard, height: 1),
               const SizedBox(height: RwSpace.md),
               Row(
                 children: [
@@ -391,6 +408,7 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
         // ── Notes & Feeling Card ────────────────────────────────────
         RwCard(
           padding: const EdgeInsets.all(RwSpace.md),
+          onTap: () => _editTitleAndNote(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -413,7 +431,7 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
               Text(
                 detail.note?.isNotEmpty ?? false
                     ? detail.note!
-                    : 'Tidak ada catatan tambahan untuk sesi ini.',
+                    : s.activityNoNote,
                 style: TextStyle(
                   fontFamily: RwType.family,
                   fontSize: 13,
@@ -424,13 +442,6 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
                       ? FontStyle.normal
                       : FontStyle.italic,
                 ),
-              ),
-              const SizedBox(height: RwSpace.md),
-              RwButton.secondary(
-                label: s.activityEditTitle,
-                icon: Icons.edit_note_rounded,
-                fullWidth: true,
-                onPressed: () => _editTitleAndNote(context),
               ),
             ],
           ),
@@ -444,9 +455,9 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
             vertical: RwSpace.sm,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: RwColors.paper100,
             borderRadius: BorderRadius.circular(RwRadius.sm),
-            border: Border.all(color: const Color(0xFFE2E6DC), width: 1),
+            border: Border.all(color: RwColors.borderCard),
           ),
           child: Row(
             children: [
@@ -493,6 +504,47 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
     );
   }
 
+  void _showMetricsHelp(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      backgroundColor: RwColors.paper100,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(RwRadius.lg)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(
+          RwSpace.lg,
+          0,
+          RwSpace.lg,
+          RwSpace.xl,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              s.activityMetricsHelpTitle,
+              style: Theme.of(ctx).textTheme.titleLarge,
+            ),
+            const SizedBox(height: RwSpace.sm),
+            Text(
+              s.activityMetricsHelpBody,
+              style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(height: 1.5),
+            ),
+            const SizedBox(height: RwSpace.lg),
+            RwButton.primary(
+              label: s.close,
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _editTitleAndNote(BuildContext context) async {
     final detail = widget.detail;
     final result = await showModalBottomSheet<({String title, String note})>(
@@ -534,9 +586,7 @@ class _DetailContentState extends ConsumerState<_DetailContent> {
             child: Text(s.runCancel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
-            ),
+            style: FilledButton.styleFrom(backgroundColor: RwColors.danger500),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(s.activityDelete),
           ),
@@ -562,27 +612,58 @@ class _FeelingBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
-    final (label, color) = switch (feeling) {
-      'easy' => ('🟢 ${s.summaryFeelingEasy}', const Color(0xFF15803D)),
-      'normal' => ('🟡 ${s.summaryFeelingNormal}', const Color(0xFFB45309)),
-      'hard' => ('🔴 ${s.summaryFeelingHard}', const Color(0xFFDC2626)),
-      _ => (feeling, RwColors.ink950),
+    final (label, icon, fg, bg, border) = switch (feeling) {
+      'easy' => (
+        s.summaryFeelingEasy,
+        Icons.sentiment_satisfied_alt_rounded,
+        RwColors.lime700,
+        RwColors.lime100,
+        RwColors.lime600,
+      ),
+      'normal' => (
+        s.summaryFeelingNormal,
+        Icons.speed_rounded,
+        RwColors.ink950,
+        RwColors.surfaceMuted,
+        RwColors.borderCard,
+      ),
+      'hard' => (
+        s.summaryFeelingHard,
+        Icons.local_fire_department_rounded,
+        RwColors.danger500,
+        RwColors.danger500.withValues(alpha: 0.08),
+        RwColors.danger500.withValues(alpha: 0.35),
+      ),
+      _ => (
+        feeling,
+        Icons.tag_faces_rounded,
+        RwColors.ink950,
+        RwColors.surfaceMuted,
+        RwColors.borderCard,
+      ),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: bg,
         borderRadius: BorderRadius.circular(RwRadius.pill),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        border: Border.all(color: border),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: RwType.family,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: color,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: fg),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: RwType.family,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: fg,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -874,7 +955,7 @@ class _SplitsCard extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(color: Color(0xFFE2E6DC), height: 16),
+          const Divider(color: RwColors.borderCard, height: 16),
           for (final split in splits)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),

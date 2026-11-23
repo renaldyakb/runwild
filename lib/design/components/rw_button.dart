@@ -7,6 +7,7 @@ class RwButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
+    this.leading,
     this.loading = false,
     this.loadingLabel,
     this.fullWidth = true,
@@ -17,6 +18,7 @@ class RwButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
+    this.leading,
     this.loading = false,
     this.loadingLabel,
     this.fullWidth = true,
@@ -26,6 +28,7 @@ class RwButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final Widget? leading;
   final bool loading;
   final String? loadingLabel;
   final bool secondary;
@@ -40,8 +43,21 @@ class RwButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (loading || icon != null) ...[
-          Icon(loading ? Icons.hourglass_top_rounded : icon, size: 20),
+        if (loading) ...[
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.2,
+              color: RwColors.ink950,
+            ),
+          ),
+          const SizedBox(width: RwSpace.xs),
+        ] else if (leading != null) ...[
+          leading!,
+          const SizedBox(width: RwSpace.xs),
+        ] else if (icon != null) ...[
+          Icon(icon, size: 20),
           const SizedBox(width: RwSpace.xs),
         ],
         Flexible(
@@ -62,7 +78,7 @@ class RwButton extends StatelessWidget {
     final style = ButtonStyle(
       minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
       padding: const WidgetStatePropertyAll(
-        EdgeInsets.symmetric(horizontal: RwSpace.lg, vertical: RwSpace.sm),
+        EdgeInsets.symmetric(horizontal: RwSpace.md, vertical: RwSpace.sm),
       ),
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(

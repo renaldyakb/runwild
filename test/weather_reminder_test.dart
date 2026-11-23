@@ -100,8 +100,37 @@ void main() {
       cityFromReverseJson('{"address":{"state_district":"Kota Bekasi"}}'),
       'Kota Bekasi',
     );
+    expect(
+      cityFromReverseJson('{"address":{"regency":"Aceh Utara"}}'),
+      'Aceh Utara',
+    );
     expect(cityFromReverseJson('{"address":{}}'), isNull);
   });
+
+  test(
+    'Parser BigDataCloud mendeteksi Lhokseumawe dan daerah kecamatan/kabupaten',
+    () {
+      expect(
+        cityFromBigDataCloudJson(
+          '{"city":"Lhokseumawe","locality":"Banda Sakti","principalSubdivision":"Aceh"}',
+        ),
+        'Lhokseumawe',
+      );
+      expect(
+        cityFromBigDataCloudJson(
+          '{"city":"","locality":"Dewantara","principalSubdivision":"Aceh","localityInfo":{"administrative":[{"adminLevel":4,"name":"Aceh"},{"adminLevel":5,"name":"Kabupaten Aceh Utara"}]}}',
+        ),
+        'Kabupaten Aceh Utara',
+      );
+      expect(
+        cityFromBigDataCloudJson(
+          '{"city":"","locality":"Banda Sakti","principalSubdivision":"Aceh"}',
+        ),
+        'Banda Sakti',
+      );
+      expect(cityFromBigDataCloudJson('{"city":""}'), isNull);
+    },
+  );
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('Setiap animasi cuaca Meteocons dapat dibaca sebagai Lottie', () async {

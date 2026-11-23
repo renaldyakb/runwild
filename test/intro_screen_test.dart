@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lottie/lottie.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:runwild/features/onboarding/application/intro_preferences.dart';
+import 'package:runwild/features/onboarding/presentation/startup_screen.dart';
 
 import 'support.dart';
 
@@ -89,5 +93,12 @@ void main() {
     await tester.tap(find.text('Lewati'));
     await tester.pumpAndSettle();
     expect(find.text('SIAP BERGERAK?'), findsOneWidget);
+  });
+
+  test('Aset Lottie Splash valid dan dapat di-parse', () async {
+    final bytes = await File(splashLottieAsset).readAsBytes();
+    final composition = await LottieComposition.fromBytes(bytes);
+    expect(composition.duration, greaterThan(Duration.zero));
+    expect(composition.bounds.width, 240);
   });
 }
